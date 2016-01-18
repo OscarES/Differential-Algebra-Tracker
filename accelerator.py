@@ -74,12 +74,23 @@ class Drift(LinearElement):
         n = 5
         Msp, Tsp = self.disunite(self.M,self.T,n)
         # evaluate the SC
+        # for n
+        #     newdata = Msp*olddata
+        #     olddata = newdata
 
         return 0, 0
 
     def disunite(self,M,T,n):
         L_n = self.L/n
-        return 0, 0
+        Msp = np.array([
+                [1,L_n,0,0,0,0],
+                [0,1,0,0,0,0],
+                [0,0,1,L_n,0,0],
+                [0,0,0,1,0,0],
+                [0,0,0,0,1,0],
+                [0,0,0,0,0,1]
+                ])
+        return Msp, 0
 
 
     def evaluateM(self,multipart,envelope):
