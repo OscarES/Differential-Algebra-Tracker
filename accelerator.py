@@ -9,8 +9,112 @@ import math
 import random
 import matplotlib.pyplot as plt
 
-class Element:
+class LinearElement:
+    def __init__(self, name):
+        self.name = name
+
+    def printInfo(self):
+        return self.name
+
+class Quad(LinearElement):
+    def __init__(self, name, K, L):
+        LinearElement.__init__(self, name)
+        #self.name = name
+        self.K = K
+        self.L = L
+        self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
+        self.T = self.createMatrixT(K, L) # M should be a 9x9 matrix
+
+    """ taken from lie code where K = sqrt(k)"""
+    def createMatrixM(self,K,L):
+        if K > 0: # defocus in x
+            return np.array([
+                [cosh(K*L),sinh(K*L)/K,0,0,0,0],
+                [K*sinh(K*L),cosh(K*L),0,0,0,0],
+                [0,0,cos(K*L),sin(K*L)/K,0,0],
+                [0,0,-K*sin(K*L),cos(K*L),0,0],
+                [0,0,0,0,1,0],
+                [0,0,0,0,0,1]
+                ])
+        elif K < 0: # focus in x
+            return np.array([
+                [cos(K*L/2),sin(K*L/2)/K,0,0,0,0],
+                [-K*sin(K*L/2),cos(K*L/2),0,0,0,0],
+                [0,0,cosh(K*L/2),sinh(K*L/2)/K,0,0],
+                [0,0,K*sinh(K*L/2),cosh(K*L/2),0,0],
+                [0,0,0,0,1,0],
+                [0,0,0,0,0,1]
+                ])
+        else:
+            return np.array([
+                [1,L,0,0,0,0],
+                [0,1,0,0,0,0],
+                [0,0,1,L,0,0],
+                [0,0,0,1,0,0],
+                [0,0,0,0,1,0],
+                [0,0,0,0,0,1]
+                ])
+
+    def createMatrixT(self, K, L):
+        return 0
+
+    def printInfo(self):
+        return self.name + "\n" + str(self.M)
+
+    def evaluatue(self,multipart,envelope):
+        newmultipart, newenvelope = evaluateSC(multipart,envelope) # evaluate the SC
+        newmultipart, newenvelope = evaluateM(newmultipart,newenvelope) # use the new data for "normal" evaluation
+        return newmultipart, newenvelope
+
+    # Evaluate for Space Charges
+    def evaluateSC(self,multipart,envelope):
+        # disunite matrices
+        Msp, Tsp = disunite(M,T,n)
+        # evaluate the SC
+
+        return 0, 0
+
+    def disunite(self,M,T,n):
+        L_n = self.L/n
+        return 0, 0
+
+    def evaluateM(self,multipart,envelope):
+        # something M*multipart
+        return 0, 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class NonLinearElement:
     def __init__(self, name, ham, kval, lval, order):
+        super(name, self).__init__()
         self.name = name
         self.ham = ham
         self.L = lval
