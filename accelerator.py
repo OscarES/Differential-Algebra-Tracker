@@ -69,7 +69,7 @@ class Drift(LinearElement):
                 [0,1,0,0,0,0],
                 [0,0,1,L,0,0],
                 [0,0,0,1,0,0],
-                [0,0,0,0,1,0],
+                [0,0,0,0,1,L],
                 [0,0,0,0,0,1]
                 ])
     def createMatrixT(self, L):
@@ -106,7 +106,7 @@ class Drift(LinearElement):
                 [0,1,0,0,0,0],
                 [0,0,1,self.Lsp,0,0],
                 [0,0,0,1,0,0],
-                [0,0,0,0,1,0],
+                [0,0,0,0,1,self.Lsp],
                 [0,0,0,0,0,1]
                 ])
         return Msp, 0
@@ -140,16 +140,16 @@ class Quad(LinearElement):
                 [K*sinh(K*L),cosh(K*L),0,0,0,0],
                 [0,0,cos(K*L),sin(K*L)/K,0,0],
                 [0,0,-K*sin(K*L),cos(K*L),0,0],
-                [0,0,0,0,1,0],
+                [0,0,0,0,1,L],
                 [0,0,0,0,0,1]
                 ])
         elif K < 0: # focus in x
             return np.array([
-                [cos(K*L/2),sin(K*L/2)/K,0,0,0,0],
-                [-K*sin(K*L/2),cos(K*L/2),0,0,0,0],
-                [0,0,cosh(K*L/2),sinh(K*L/2)/K,0,0],
-                [0,0,K*sinh(K*L/2),cosh(K*L/2),0,0],
-                [0,0,0,0,1,0],
+                [cos(K*L),sin(K*L)/K,0,0,0,0],
+                [-K*sin(K*L),cos(K*L),0,0,0,0],
+                [0,0,cosh(K*L),sinh(K*L)/K,0,0],
+                [0,0,K*sinh(K*L),cosh(K*L),0,0],
+                [0,0,0,0,1,L],
                 [0,0,0,0,0,1]
                 ])
         else:
@@ -158,7 +158,7 @@ class Quad(LinearElement):
                 [0,1,0,0,0,0],
                 [0,0,1,L,0,0],
                 [0,0,0,1,0,0],
-                [0,0,0,0,1,0],
+                [0,0,0,0,1,L],
                 [0,0,0,0,0,1]
                 ])
 
@@ -171,9 +171,10 @@ class Quad(LinearElement):
     def evaluate(self,multipart,envelope):
         # some for loop that goes through all of the disunited parts
         #print "hej fran quad"
-        newmultipart, newenvelope = self.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
-        newmultipart, newenvelope = self.evaluateM(newmultipart,newenvelope) # use the new data for "normal" evaluation
-        return newmultipart, newenvelope
+        for i in range(0,self.n):
+            multipart, envelope = self.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
+            multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+        return multipart, envelope
 
     # Evaluate for Space Charges
     def evaluateSC(self,multipart,envelope):
@@ -186,14 +187,16 @@ class Quad(LinearElement):
             return 0,0
 
     def disunite(self,M,T,n):
-        
-        return 0, 0
+        Msp = self.createMatrixM(self.K, self.Lsp)
+        return Msp, 0
 
 
     def evaluateM(self,multipart,envelope):
         # should just go through a disunited part
-        # something M*multipart
-        return 0, 0
+        # each loop iteration is for a new particle
+        for j in range(0,len(np.atleast_1d(multipart))):
+            multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
+        return multipart, 0
 
 
 
