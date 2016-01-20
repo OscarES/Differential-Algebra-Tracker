@@ -77,14 +77,15 @@ class Drift(LinearElement):
 
     def evaluate(self,multipart,envelope):
         # some for loop that goes through all of the disunited parts
-        newmultipart, newenvelope = multipart, envelope
+        #newmultipart, newenvelope = multipart, envelope
         for i in range(0,self.n):
 
         #print "hej fran drift"
         #print "evaluate multipart: " + str(multipart)
-            newmultipart, newenvelope = self.evaluateSC(newmultipart,newenvelope) # evaluate the SC # not needed since it is linear
-            newmultipart, newenvelope = self.evaluateM(newmultipart,newenvelope) # use the new data for "normal" evaluation
-        return newmultipart, newenvelope
+
+            multipart, envelope = self.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
+            multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+        return multipart, envelope
 
     # Evaluate for Space Charges
     def evaluateSC(self,multipart,envelope):
@@ -113,10 +114,9 @@ class Drift(LinearElement):
 
     def evaluateM(self,multipart,envelope):
         # should just go through a disunited part
-        #print "multipart" + str(multipart)
-        #newmultipart = np.array([np.dot(self.M, multipart[0:6]), multipart[6] + self.L])
-        newmultipart = np.array([np.dot(self.Msp, multipart[0][0:6]), multipart[1] + self.Lsp])
-        return newmultipart, 0
+        for j in range(0,len(np.atleast_1d(multipart))):
+            multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
+        return multipart, 0
 
 class Quad(LinearElement):
     def __init__(self, name, K, L):

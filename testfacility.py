@@ -15,15 +15,18 @@ quad = Quad('quad', 0.01, 1)
 order = 5 # user sets this
 
 ## Multiparticle
-x = 0
-xp = 1
-y = 0
-yp = 1
-z = 0
-zp = 0
-s = 1 # from ref 1 in section 2.3
+x = np.array([0.0])
+xp = np.array([1.0])
+y = np.array([0.0])
+yp = np.array([1.0])
+z = np.array([0.0])
+zp = np.array([0.0])
+s = 1.0 # from ref 1 in section 2.3
 zvector = np.array([x, xp, y, yp, z, zp])
-multipart = np.array([zvector, s])
+particle1 = np.array([zvector, s])
+particle2 = np.array([zvector, s])
+multipart = np.array([particle1, particle2])
+print "len(np.atleast_1d(multipart))" + str(len(np.atleast_1d(multipart)))
 #print "multipart[0][0:6]" + str(multipart[0][0:6])
 #print "multipart[1] (s)" + str(multipart[1])
 print "multipart" + str(multipart)
