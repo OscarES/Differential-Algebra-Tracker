@@ -5,10 +5,7 @@ from accelerator import Lattice, Element, LinearElement, Quad, Drift
 sigma = 0.001 # the standard deviation that the user will enter
 #epsilon = sqrt(sigmax**2*sigmaxp**2-sigmaxxp**2)
 
-quad = Quad('quad', 0.1, 1)
-#print quad.printInfo()
 
-#quad.evaluate(0,0)
 
 
 ## Non-linear
@@ -30,13 +27,20 @@ multipart = np.array([particle1, particle2])
 #print "multipart[0][0:6]" + str(multipart[0][0:6])
 #print "multipart[1] (s)" + str(multipart[1])
 print "multipart" + str(multipart)
+#print "len(multipart) " + str(len(multipart))
+# envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
+envelope = np.array([0.0, 10.3338028723, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06])
 
 ## Lattice construction
-drift = Drift('drift', 1)
+spaceChargeOn = 1
+drift = Drift('drift', 1, spaceChargeOn, multipart, envelope)
+
+quad = Quad('quad', 0.1, 1, spaceChargeOn, multipart, envelope)
+
 lattice = Lattice('lattice')
 lattice.appendElement(drift)
 lattice.appendElement(quad)
-partres, envres = lattice.evaluate(multipart,0)
+partres, envres = lattice.evaluate(multipart,envelope)
 
 print "partres: " + str(partres)
 #print "partres[0]: " + str(partres[0]) # don't have to worry about the dtype=object
