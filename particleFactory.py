@@ -1,34 +1,62 @@
-def straight(particles):
-    x = np.linspace(-1,1,particles) #x and xp for when xp is 0
-    xp = np.linspace(0,0,particles)
-    y = np.linspace(-1,1,particles) #y and yp for when yp is 0
-    yp = np.linspace(0,0,particles)
-    return x,xp,y,yp
+import numpy as np
 
-def scanned(particles):
-    x = np.linspace(-0.05,0.05,particles)     # x and xp for when xp is scanned
-    xp = np.linspace(-0.0001,0.0001,particles)
-    y = np.linspace(-0.05,0.05,particles)     # y and yp for when yp is scanned
-    yp = np.linspace(-0.0001,0.0001,particles)
-    return x,xp,y,yp
+def straight(nbrOfParticles):
+    x = np.linspace(-1,1,nbrOfParticles) #x and xp for when xp is 0
+    xp = np.linspace(0,0,nbrOfParticles)
+    y = np.linspace(-1,1,nbrOfParticles) #y and yp for when yp is 0
+    yp = np.linspace(0,0,nbrOfParticles)
+
+    z = np.linspace(0,0,nbrOfParticles)
+    zp = np.linspace(0,0,nbrOfParticles)
+
+    s = np.linspace(0,0,nbrOfParticles)
+
+    bigMatrix = np.array([x, xp, y, yp, z, zp, s])
+    #print "bigMatrix: " + str(bigMatrix)
+
+    #particle1 = bigMatrix[:,0]
+    #print "particle1: " + str(particle1)
+
+    multipart = [bigMatrix[:,i] for i in xrange(nbrOfParticles)]
+    #print "multipart: " + str(multipart)
+
+    return multipart
+
+    #return x,xp,y,yp,z,zp
+
+def scanned(nbrOfParticles):
+    x = np.linspace(-0.05,0.05,nbrOfParticles)     # x and xp for when xp is scanned
+    xp = np.linspace(-0.0001,0.0001,nbrOfParticles)
+    y = np.linspace(-0.05,0.05,nbrOfParticles)     # y and yp for when yp is scanned
+    yp = np.linspace(-0.0001,0.0001,nbrOfParticles)
+
+    z = np.linspace(0,0,nbrOfParticles)
+    zp = np.linspace(0,0,nbrOfParticles)
+    return x,xp,y,yp,z,zp
                            
-def randomed(particles):
-    x = [random.uniform(-0.05, 0.05) for _ in xrange(particles)]
-    xp = [random.uniform(-0.00001, 0.00001) for _ in xrange(particles)]
-    y = [random.uniform(-0.05, 0.05) for _ in xrange(particles)]
-    yp = [random.uniform(-0.00001, 0.00001) for _ in xrange(particles)]
-    return x,xp,y,yp
+def randomed(nbrOfParticles):
+    x = [random.uniform(-0.05, 0.05) for _ in xrange(nbrOfParticles)]
+    xp = [random.uniform(-0.00001, 0.00001) for _ in xrange(nbrOfParticles)]
+    y = [random.uniform(-0.05, 0.05) for _ in xrange(nbrOfParticles)]
+    yp = [random.uniform(-0.00001, 0.00001) for _ in xrange(nbrOfParticles)]
 
-def gaussian(particles):
-    x = np.random.normal(0,0.001,particles)
-    xp = np.random.normal(0,0.000001,particles)
-    y = np.random.normal(0,0.001,particles)
-    yp = np.random.normal(0,0.000001,particles)
-    return x,xp,y,yp
+    z = np.linspace(0,0,nbrOfParticles)
+    zp = np.linspace(0,0,nbrOfParticles)
+    return x,xp,y,yp,z,zp
 
-def gaussiantwiss(particles, alpha, beta, epsilon):
-    xi = np.random.normal(0,1,particles)
-    xip = np.random.normal(0,1,particles)
+def gaussian(nbrOfParticles):
+    x = np.random.normal(0,0.001,nbrOfParticles)
+    xp = np.random.normal(0,0.000001,nbrOfParticles)
+    y = np.random.normal(0,0.001,nbrOfParticles)
+    yp = np.random.normal(0,0.000001,nbrOfParticles)
+
+    z = np.linspace(0,0,nbrOfParticles)
+    zp = np.linspace(0,0,nbrOfParticles)
+    return x,xp,y,yp,z,zp
+
+def gaussiantwiss(nbrOfParticles, alpha, beta, epsilon):
+    xi = np.random.normal(0,1,nbrOfParticles)
+    xip = np.random.normal(0,1,nbrOfParticles)
 
     M = np.array([
         [1/sqrt(beta*epsilon), 0],
@@ -37,10 +65,10 @@ def gaussiantwiss(particles, alpha, beta, epsilon):
 
     Minv = np.linalg.inv(M)
 
-    x = np.zeros(particles)
-    xp = np.zeros(particles)
+    x = np.zeros(nbrOfParticles)
+    xp = np.zeros(nbrOfParticles)
 
-    for i in range(particles):
+    for i in range(nbrOfParticles):
         x[i] = Minv[0,0]*xi[i] + Minv[0,1]*xip[i]
         xp[i] = Minv[1,0]*xi[i] + Minv[1,1]*xip[i]
 

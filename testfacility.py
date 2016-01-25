@@ -2,6 +2,7 @@ import numpy as np
 from accelerator import Lattice, Element, LinearElement, Quad, Drift, DifferentialAlgebra, DiffAlgElement
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
+from particleFactory import straight
 
 
 sigma = 0.001 # the standard deviation that the user will enter
@@ -86,16 +87,24 @@ diffAlgElemQuadpartres, diffAlgElemQuadenvres = diffAlgElemQuad.evaluate(multipa
 print "diffAlgElemQuadRes: " + str(diffAlgElemQuadpartres)
 
 
+### Tons of particles
+print "Tons of particles..."
+nbrOfParticles = 10
+multiparttonsMat = straight(nbrOfParticles)
+multiparttonsDiffAlg = straight(nbrOfParticles)
 
-#print "partres[0]: " + str(partres[0]) # don't have to worry about the dtype=object
-#print "partres[0][0]: " + str(partres[0][0]) # don't have to worry about the dtype=object
-## check if isLinear() works
-#print drift.isLinear()
-#if 1:
-#    print "1 is yes"
-#
-#if not 0:
-#    print "0 is no"
+tonsMatPartRes, tonsMatEnvRes = lattice.evaluate(multiparttonsMat,envelope)
+tonsDiffAlgPartRes, tonsDiffAlgEnvRes = diffAlgElemQuad.evaluate(multiparttonsDiffAlg,envelope)
+
+print "tonsMatPartRes: \n" + str(tonsMatPartRes)
+print "tonsDiffAlgPartRes: \n" + str(tonsDiffAlgPartRes)
+
+
+
+
+
+
+
 
 ## References
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
