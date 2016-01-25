@@ -373,6 +373,84 @@ class NonLinearElement(Element):
 
 #         return (xout,xpout,yout,ypout)
 
+## Here all the heavy Lie calculations will be made
+class DifferentialAlgebra():
+    def __init__(self):
+        self.qx = Symbol('qx')
+        self.qy = Symbol('qy')
+        self.qz = Symbol('qz')
+        self.px = Symbol('px')
+        self.py = Symbol('py')
+        self.pz = Symbol('pz')
+
+        self.l = Symbol('l') # arbitrary length
+        self.k = Symbol('k')
+
+    def lieop(self, f,g):
+        dfdqx = f.diff(self.qx) 
+        dfdpx = f.diff(self.px)
+        dgdqx = g.diff(self.qx)
+        dgdpx = g.diff(self.px)
+        sumtermx = dfdqx*dgdpx-dfdpx*dgdqx
+    
+        dfdqy = f.diff(self.qy) 
+        dfdpy = f.diff(self.py)
+        dgdqy = g.diff(self.qy)
+        dgdpy = g.diff(self.py)
+        sumtermy = dfdqy*dgdpy-dfdpy*dgdqy
+    
+        dfdqz = f.diff(self.qz) 
+        dfdpz = f.diff(self.pz)
+        dgdqz = g.diff(self.qz)
+        dgdpz = g.diff(self.pz)
+        sumtermz = dfdqz*dgdpz-dfdpz*dgdqz
+    
+        colfcolg = sumtermx + sumtermy + sumtermz
+    
+        return colfcolg
+
+    def lietransform(self, ham, vof0, order):#,t):, #zzz
+        voft = vof0
+        for i in range(1,order+1):
+            lieterm = simplify(self.lieop(ham,vof0))
+            for j in range(0,i-1):
+                lieterm = simplify(self.lieop(ham,lieterm))
+
+            #voft = voft + t**i / factorial(i) * lieterm # for my formalism, #zzz
+            voft = voft + lieterm / factorial(i) # for Ems formalism, shouldn't each term also 
+
+        return voft
+
+    def funFromHam(self, ham, order, vof0):
+        transresult = self.lietransform(ham, vof0, order)
+        fun = simplify(transresult)
+        return fun
+
+    def hamToNumFuns(self, ham, kval, lval,order):
+        xfun = self.funFromHam(ham, order, self.qx)
+        xprimefun = self.funFromHam(ham, order, self.px)
+        yfun = self.funFromHam(ham, order, self.qy)
+        yprimefun = self.funFromHam(ham, order, self.py)
+        zfun = self.funFromHam(ham, order, self.qz)
+        zprimefun = self.funFromHam(ham, order, self.pz)
+
+        xf = xfun.subs([(self.k,kval),(self.l,lval)])
+        xpf = xprimefun.subs([(self.k,kval), (self.l,lval)])
+        yf = yfun.subs([(self.k,kval),(self.l,lval)])
+        ypf = yprimefun.subs([(self.k,kval), (self.l,lval)])
+        zf = zfun.subs([(self.k,kval),(self.l,lval)])
+        zpf = zprimefun.subs([(self.k,kval), (self.l,lval)])
+
+        xNumFun = lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),xf, "numpy")
+        xpNumFun= lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),xpf, "numpy")
+        yNumFun = lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),yf, "numpy")
+        ypNumFun= lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),ypf, "numpy")
+        zNumFun = lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),zf, "numpy")
+        zpNumFun= lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),zpf, "numpy")
+        
+        numFuns = (xNumFun, xpNumFun, yNumFun, ypNumFun, zNumFun, zpNumFun)
+        return numFuns
+
 # just a copy of Quad so far. TODO: use the scraps from the lie code!
 class Sextu(NonLinearElement):
     def __init__(self, name, K, L, M):
