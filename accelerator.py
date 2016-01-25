@@ -329,7 +329,7 @@ class SpaceCharge(LinearElement):
 
 
 
-
+### Here the non-linear stuff starts
 
 class NonLinearElement(Element):
     def __init__(self, name):
@@ -337,41 +337,6 @@ class NonLinearElement(Element):
 
     def printInfo(self):
         return self.name
-
-# class NonLinearElement(Element):
-#     def __init__(self, name, ham, kval, lval, order):
-#         Element.__init__(self, name, 1)
-#         super(name, self).__init__()
-#         self.name = name
-#         self.ham = ham
-#         self.L = lval
-
-#         # Same this done 4 times, time for a new function?
-#         self.xfun = funFromHam(ham, order, qx)
-#         self.xprimefun = funFromHam(ham, order, px)
-#         self.yfun = funFromHam(ham, order, qy)
-#         self.yprimefun = funFromHam(ham, order, py)
-
-#         self.xf = self.xfun.subs([(k,kval),(l,lval)])
-#         self.xpf = self.xprimefun.subs([(k,kval), (l,lval)])
-#         self.yf = self.yfun.subs([(k,kval),(l,lval)])
-#         self.ypf = self.yprimefun.subs([(k,kval), (l,lval)])
-
-#         self.xf = lambdify((qx,px,qy,py),self.xf, "numpy")
-#         self.xpf = lambdify((qx,px,qy,py),self.xpf, "numpy")
-#         self.yf = lambdify((qx,px,qy,py),self.yf, "numpy")
-#         self.ypf = lambdify((qx,px,qy,py),self.ypf, "numpy")
-
-#     def printInfo(self):
-#         return self.name
-
-#     def evaluate(self, (mulxin, mulxpin, mulyin, mulypin)): # sending in xin and xpin as a vector (same for return) allows "recursive" calls and a lattice can be constructed
-#         xout = self.xf(mulxin, mulxpin, mulyin, mulypin)
-#         xpout = self.xpf(mulxin, mulxpin, mulyin, mulypin)
-#         yout = self.yf(mulxin, mulxpin, mulyin, mulypin)
-#         ypout = self.ypf(mulxin, mulxpin, mulyin, mulypin)
-
-#         return (xout,xpout,yout,ypout)
 
 ## Here all the heavy Lie calculations will be made
 class DifferentialAlgebra():
@@ -447,7 +412,7 @@ class DifferentialAlgebra():
         ypNumFun= lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),ypf, "numpy")
         zNumFun = lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),zf, "numpy")
         zpNumFun= lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),zpf, "numpy")
-        
+
         numFuns = (xNumFun, xpNumFun, yNumFun, ypNumFun, zNumFun, zpNumFun)
         return numFuns
 
