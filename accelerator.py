@@ -329,14 +329,7 @@ class SpaceCharge(LinearElement):
 
 
 
-### Here the non-linear stuff starts
 
-class NonLinearElement(Element):
-    def __init__(self, name):
-        Element.__init__(self, name, 0)
-
-    def printInfo(self):
-        return self.name
 
 ## Here all the heavy Lie calculations will be made
 class DifferentialAlgebra():
@@ -415,6 +408,72 @@ class DifferentialAlgebra():
 
         numFuns = (xNumFun, xpNumFun, yNumFun, ypNumFun, zNumFun, zpNumFun)
         return numFuns
+
+# General class for elements from Hamiltonians, can be linear but since all is based on differential algebra "linear" is set to 0
+class DiffAlgElement(Element):
+    def __init__(self, name, DA, ham, K, L, order, spaceChargeOn, multipart, envelope):
+        Element.__init__(self, name, 0)
+
+        self.n = 5
+        self.Lsp = L/self.n
+
+        self.numFuns = DA.hamToNumFuns(ham, K, self.Lsp, order) # assumes that the element can be split
+
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn:
+            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, envelope)
+
+    def printInfo(self):
+        return self.name
+
+    def evaluate(self,multipart,envelope):
+        # some for loop that goes through all of the disunited parts
+        #print "hej fran quad"
+        for i in range(0,self.n):
+            if self.spaceChargeOn:
+                multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
+            multipart, envelope = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+        return multipart, envelope
+
+    def evaluateNumFun(self,multipart,envelope):
+        for particle in multipart:
+            #print "hej"
+            #print "particle: " + str(particle)
+            x = particle[0][0]
+            xp = particle[0][1]
+            y = particle[0][2]
+            yp = particle[0][3]
+            z = particle[0][4]
+            zp = particle[0][5]
+            #s = particle[1]
+
+            particle[0][0] = self.numFuns[0](x, xp, y, yp, z, zp)
+            particle[0][1] = self.numFuns[1](x, xp, y, yp, z, zp)
+            particle[0][2] = self.numFuns[2](x, xp, y, yp, z, zp)
+            particle[0][3] = self.numFuns[3](x, xp, y, yp, z, zp)
+            particle[0][4] = self.numFuns[4](x, xp, y, yp, z, zp)
+            particle[0][5] = self.numFuns[5](x, xp, y, yp, z, zp)
+
+            particle[1] += self.Lsp
+
+        return multipart, envelope
+
+
+
+
+
+
+
+
+
+### Here the non-linear stuff starts
+
+class NonLinearElement(Element):
+    def __init__(self, name):
+        Element.__init__(self, name, 0)
+
+    def printInfo(self):
+        return self.name
 
 # just a copy of Quad so far. TODO: use the scraps from the lie code!
 class Sextu(NonLinearElement):

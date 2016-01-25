@@ -1,5 +1,5 @@
 import numpy as np
-from accelerator import Lattice, Element, LinearElement, Quad, Drift, LinearElement, DifferentialAlgebra
+from accelerator import Lattice, Element, LinearElement, Quad, Drift, DifferentialAlgebra, DiffAlgElement
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 
@@ -33,7 +33,7 @@ quaddefocuskval = 0.1
 quaddefocuslval = 1
 quaddefocusNumFuns = DA.hamToNumFuns(quadhamdefocus, quaddefocuskval, quaddefocuslval, order)
 
-print "quaddefocusNumFuns:" + str(quaddefocusNumFuns)
+#print "quaddefocusNumFuns:" + str(quaddefocusNumFuns)
 
 #diffAlgRes = (quaddefocusNumFuns[0](particle1), quaddefocusNumFuns[1](particle1), quaddefocusNumFuns[2](particle1), quaddefocusNumFuns[3](particle1), quaddefocusNumFuns[4](particle1), quaddefocusNumFuns[5](particle1))
 
@@ -52,6 +52,7 @@ zvector = np.array([x, xp, y, yp, z, zp])
 particle1 = np.array([zvector, s])
 particle2 = np.array([-zvector, s])
 multipart = np.array([particle1, particle2])
+multipart2 = np.array([particle1, particle2])
 #print "len(np.atleast_1d(multipart))" + str(len(np.atleast_1d(multipart)))
 #print "multipart[0][0:6]" + str(multipart[0][0:6])
 #print "multipart[1] (s)" + str(multipart[1])
@@ -69,13 +70,22 @@ quad = Quad('quad', 0.1, 1, spaceChargeOn, multipart, envelope)
 lattice = Lattice('lattice')
 #lattice.appendElement(drift)
 lattice.appendElement(quad)
-partres, envres = lattice.evaluate(multipart,envelope)
+#print "multipart before latt eval: " + str(multipart)
+partres, envres = lattice.evaluate(multipart,envelope) ### changes multipart and envelope!!!!!!!!!!!!!!!!!!
+#print "multipart2 after latt eval: " + str(multipart2)
 
 print "partres: " + str(partres)
 
-print "particle1[0][0:6] : " + str(particle1[0][0:6])
+# Using the differential algebra "raw"
 diffAlgRes = (quaddefocusNumFuns[0](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[1](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[2](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[3](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[4](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[5](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]))
 print "DiffAlgRes: " + str(diffAlgRes) # MATCHES the linear calculation!!!!! :)
+
+# Using the differential algebra through DiffAlgElement
+diffAlgElemQuad = DiffAlgElement("diffAlgElemQuad", DA, quadhamdefocus, quaddefocuskval, quaddefocuslval, order, 0, multipart2, envelope)
+diffAlgElemQuadpartres, diffAlgElemQuadenvres = diffAlgElemQuad.evaluate(multipart2,envelope) # not the same as raw! Since the element is split!
+print "diffAlgElemQuadRes: " + str(diffAlgElemQuadpartres)
+
+
 
 #print "partres[0]: " + str(partres[0]) # don't have to worry about the dtype=object
 #print "partres[0][0]: " + str(partres[0][0]) # don't have to worry about the dtype=object
