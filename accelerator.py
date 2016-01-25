@@ -414,7 +414,8 @@ class DiffAlgElement(Element):
     def __init__(self, name, DA, ham, K, L, order, spaceChargeOn, multipart, envelope):
         Element.__init__(self, name, 0)
 
-        self.n = 5
+        self.n = 1 # matches matrix approach well
+        #self.n = 5 # matches matrix approach not as well but is needed for split
         self.Lsp = L/self.n
 
         self.numFuns = DA.hamToNumFuns(ham, K, self.Lsp, order) # assumes that the element can be split

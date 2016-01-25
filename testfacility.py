@@ -82,7 +82,7 @@ print "DiffAlgRes: " + str(diffAlgRes) # MATCHES the linear calculation!!!!! :)
 
 # Using the differential algebra through DiffAlgElement
 diffAlgElemQuad = DiffAlgElement("diffAlgElemQuad", DA, quadhamdefocus, quaddefocuskval, quaddefocuslval, order, 0, multipart2, envelope)
-diffAlgElemQuadpartres, diffAlgElemQuadenvres = diffAlgElemQuad.evaluate(multipart2,envelope) # not the same as raw! Since the element is split!
+diffAlgElemQuadpartres, diffAlgElemQuadenvres = diffAlgElemQuad.evaluate(multipart2,envelope) # not the same as raw! Since the element is split! But if n = 1 in the class then there is a very good match!!!! :)
 print "diffAlgElemQuadRes: " + str(diffAlgElemQuadpartres)
 
 
