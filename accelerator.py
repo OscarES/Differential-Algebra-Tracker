@@ -277,7 +277,11 @@ class SpaceCharge(LinearElement):
         f_scy = gamma**3*beta**2*m*c**2/q*(norm_of_yy - norm_of_y**2)/norm_of_yE_y # (152) (with x->y) in ref 1.
         f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.
         
-        # where do these come from?
+        # Eliptical integral?
+        s = 1 # Put the real stuff HERE!
+        epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf) # eqn 5 in ref B
+
+        # where do these come from? Put correct stuff (perhaps just the mean) HERE!
         xbar = 1.0
         ybar = 1.0
         zbar = 1.0
@@ -536,3 +540,4 @@ class Cavity(NonLinearElement):
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
 # A. 7.2. Space Charge Impulses in simulatingbeamswithellipsoidalsymmetry-secondedition
+# B. A MODIFIED QUADSCAN TECHNIQUE FOR EMITTANCE.pdf

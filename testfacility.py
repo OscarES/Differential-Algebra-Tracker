@@ -88,16 +88,16 @@ print "diffAlgElemQuadRes: " + str(diffAlgElemQuadpartres)
 
 
 ### Tons of particles
-print "Tons of particles..."
-nbrOfParticles = 10
-multiparttonsMat = straight(nbrOfParticles)
-multiparttonsDiffAlg = straight(nbrOfParticles)
+#print "Tons of particles..."
+#nbrOfParticles = 10
+#multiparttonsMat = straight(nbrOfParticles)
+#multiparttonsDiffAlg = straight(nbrOfParticles)
 
-tonsMatPartRes, tonsMatEnvRes = lattice.evaluate(multiparttonsMat,envelope)
-tonsDiffAlgPartRes, tonsDiffAlgEnvRes = diffAlgElemQuad.evaluate(multiparttonsDiffAlg,envelope)
+#tonsMatPartRes, tonsMatEnvRes = lattice.evaluate(multiparttonsMat,envelope)
+#tonsDiffAlgPartRes, tonsDiffAlgEnvRes = diffAlgElemQuad.evaluate(multiparttonsDiffAlg,envelope)
 
-print "tonsMatPartRes: \n" + str(tonsMatPartRes)
-print "tonsDiffAlgPartRes: \n" + str(tonsDiffAlgPartRes)
+#print "tonsMatPartRes: \n" + str(tonsMatPartRes)
+#print "tonsDiffAlgPartRes: \n" + str(tonsDiffAlgPartRes)
 
 
 
