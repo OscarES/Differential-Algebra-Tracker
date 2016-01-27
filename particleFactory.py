@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 def straight(nbrOfParticles):
     x = np.linspace(-1,1,nbrOfParticles) #x and xp for when xp is 0
@@ -11,14 +12,9 @@ def straight(nbrOfParticles):
 
     s = np.linspace(0,0,nbrOfParticles)
 
-    bigMatrix = np.array([x, xp, y, yp, z, zp, s])
-    #print "bigMatrix: " + str(bigMatrix)
+    bigMatrix = np.array([x, xp, y, yp, z, zp])
 
-    #particle1 = bigMatrix[:,0]
-    #print "particle1: " + str(particle1)
-
-    multipart = [bigMatrix[:,i] for i in xrange(nbrOfParticles)]
-    #print "multipart: " + str(multipart)
+    multipart = [[bigMatrix[:,i], s[i]] for i in xrange(nbrOfParticles)]
 
     return multipart
 
@@ -32,7 +28,16 @@ def scanned(nbrOfParticles):
 
     z = np.linspace(0,0,nbrOfParticles)
     zp = np.linspace(0,0,nbrOfParticles)
-    return x,xp,y,yp,z,zp
+
+    s = np.linspace(0,0,nbrOfParticles)
+
+    bigMatrix = np.array([x, xp, y, yp, z, zp])
+
+    multipart = [[bigMatrix[:,i], s[i]] for i in xrange(nbrOfParticles)]
+
+    return multipart
+
+    #return x,xp,y,yp,z,zp
                            
 def randomed(nbrOfParticles):
     x = [random.uniform(-0.05, 0.05) for _ in xrange(nbrOfParticles)]
@@ -42,7 +47,16 @@ def randomed(nbrOfParticles):
 
     z = np.linspace(0,0,nbrOfParticles)
     zp = np.linspace(0,0,nbrOfParticles)
-    return x,xp,y,yp,z,zp
+
+    s = np.linspace(0,0,nbrOfParticles)
+
+    bigMatrix = np.array([x, xp, y, yp, z, zp])
+
+    multipart = [[bigMatrix[:,i], s[i]] for i in xrange(nbrOfParticles)]
+
+    return multipart
+
+    #return x,xp,y,yp,z,zp
 
 def gaussian(nbrOfParticles):
     x = np.random.normal(0,0.001,nbrOfParticles)
@@ -52,7 +66,16 @@ def gaussian(nbrOfParticles):
 
     z = np.linspace(0,0,nbrOfParticles)
     zp = np.linspace(0,0,nbrOfParticles)
-    return x,xp,y,yp,z,zp
+
+    s = np.linspace(0,0,nbrOfParticles)
+
+    bigMatrix = np.array([x, xp, y, yp, z, zp])
+
+    multipart = [[bigMatrix[:,i], s[i]] for i in xrange(nbrOfParticles)]
+
+    return multipart
+
+    #return x,xp,y,yp,z,zp
 
 def gaussiantwiss(nbrOfParticles, alpha, beta, epsilon):
     xi = np.random.normal(0,1,nbrOfParticles)

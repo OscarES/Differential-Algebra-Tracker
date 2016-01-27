@@ -2,7 +2,7 @@ import numpy as np
 from accelerator import Lattice, Element, LinearElement, Quad, Drift, DifferentialAlgebra, DiffAlgElement
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
-from particleFactory import straight
+from particleFactory import straight, scanned, randomed, gaussian
 
 
 sigma = 0.001 # the standard deviation that the user will enter
@@ -42,12 +42,12 @@ quaddefocusNumFuns = DA.hamToNumFuns(quadhamdefocus, quaddefocuskval, quaddefocu
 #sextupoleNumFuns = DA.hamToNumFuns(sextupoleham, kval, lval, order)
 
 ## Multiparticle
-x = np.array([0.0])
-xp = np.array([1.0])
-y = np.array([0.0])
-yp = np.array([1.0])
-z = np.array([0.0])
-zp = np.array([0.0])
+x = 0.0
+xp =1.0
+y = 0.0
+yp =1.0
+z = 0.0
+zp =0.0
 s = 1.0 # from ref 1 in section 2.3
 zvector = np.array([x, xp, y, yp, z, zp])
 particle1 = np.array([zvector, s])
@@ -88,21 +88,28 @@ print "diffAlgElemQuadRes: " + str(diffAlgElemQuadpartres)
 
 
 ### Tons of particles
-#print "Tons of particles..."
-#nbrOfParticles = 10
-#multiparttonsMat = straight(nbrOfParticles)
-#multiparttonsDiffAlg = straight(nbrOfParticles)
+print "Tons of particles..."
+nbrOfParticles = 10
+multiparttonsMat = straight(nbrOfParticles)
+multiparttonsDiffAlg = straight(nbrOfParticles)
 
-#tonsMatPartRes, tonsMatEnvRes = lattice.evaluate(multiparttonsMat,envelope)
-#tonsDiffAlgPartRes, tonsDiffAlgEnvRes = diffAlgElemQuad.evaluate(multiparttonsDiffAlg,envelope)
+#print "multiparttonsMat: \n" + str(multiparttonsMat)
+
+tonsMatPartRes, tonsMatEnvRes = lattice.evaluate(multiparttonsMat,envelope)
+tonsDiffAlgPartRes, tonsDiffAlgEnvRes = diffAlgElemQuad.evaluate(multiparttonsDiffAlg,envelope)
 
 #print "tonsMatPartRes: \n" + str(tonsMatPartRes)
 #print "tonsDiffAlgPartRes: \n" + str(tonsDiffAlgPartRes)
 
+# Checking the others
+scannedparts = scanned(nbrOfParticles)
+#print "scannedparts: \n" + str(scannedparts)
 
+randomedparts = randomed(nbrOfParticles)
+#print "randomedparts: \n" + str(randomedparts)
 
-
-
+gaussianparts = gaussian(nbrOfParticles)
+#print "gaussianparts: \n" + str(gaussianparts)
 
 
 
