@@ -51,7 +51,7 @@ zp =0.0
 s = 1.0 # from ref 1 in section 2.3
 zvector = np.array([x, xp, y, yp, z, zp])
 particle1 = np.array([zvector, s])
-particle2 = np.array([-zvector, s])
+particle2 = np.array([-zvector, s]) # careful, if this is the same expression as for particle1 there will only be one object!
 multipart = np.array([particle1, particle2])
 multipart2 = np.array([particle1, particle2])
 #print "len(np.atleast_1d(multipart))" + str(len(np.atleast_1d(multipart)))
