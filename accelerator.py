@@ -278,8 +278,8 @@ class SpaceCharge(LinearElement):
         f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.
         
         # Eliptical integral?
-        s = 1 # Put the real stuff HERE!
-        epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf) # eqn 5 in ref B
+        s = Z/sqrt(X*Y) # Put the real stuff HERE!
+        epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf)[0] # eqn 5 in ref B
 
         # where do these come from? Put correct stuff (perhaps just the mean) HERE!
         xbar = 1.0
@@ -304,7 +304,7 @@ class SpaceCharge(LinearElement):
             #if beamChanged(envelope):
                 #self.Msc, self.Tsc = spaceChargeMatrix(envlope)
 
-            extendedphasespace = np.vstack((multipart[j][0][0:6], 1)) # adds the dispersion 1 term
+            extendedphasespace = np.append(multipart[j][0][0:6], 1) # adds the dispersion 1 term
             extendedphasespace = np.dot(self.Msc, extendedphasespace) # here calculations are made
             reducedphasespace = extendedphasespace[0:6] # throws away the dispersion 1 term
             multipart[j] = np.array([reducedphasespace, multipart[j][1]]) # s remains the same because the particles don't go anywhere. They "go" in evaluateM()

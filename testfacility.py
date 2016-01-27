@@ -63,7 +63,7 @@ print "multipart" + str(multipart)
 envelope = np.array([0.0, 10.3338028723, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06])
 
 ## Lattice construction
-spaceChargeOn = 0
+spaceChargeOn = 1
 drift = Drift('drift', 1, spaceChargeOn, multipart, envelope)
 
 quad = Quad('quad', 0.1, 1, spaceChargeOn, multipart, envelope)
@@ -79,7 +79,7 @@ print "partres: " + str(partres)
 
 # Using the differential algebra "raw"
 diffAlgRes = (quaddefocusNumFuns[0](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[1](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[2](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[3](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[4](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[5](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]))
-print "DiffAlgRes: " + str(diffAlgRes) # MATCHES the linear calculation!!!!! :)
+#print "DiffAlgRes: " + str(diffAlgRes) # MATCHES the linear calculation!!!!! :)
 
 # Using the differential algebra through DiffAlgElement
 diffAlgElemQuad = DiffAlgElement("diffAlgElemQuad", DA, quadhamdefocus, quaddefocuskval, quaddefocuslval, order, 0, multipart2, envelope)
