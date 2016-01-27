@@ -55,11 +55,11 @@ class LinearElement(Element):
 
 ### DRIFT !!!!
 class Drift(LinearElement):
-    def __init__(self, name, L, spaceChargeOn, multipart, envelope):
+    def __init__(self, name, L, spaceChargeOn, multipart, twiss):
         LinearElement.__init__(self, name)
         self.L = L
         self.M = self.createMatrixM(L) # M should be a 6x6 matrix
-        self.T = self.createMatrixT(L) # M should be a 9x9 matrix
+        self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
 
         # disunite the matrices, CLEAN UP THIS CODE!!!!!! (should disunite be removed or kept?)
         self.n = 5
@@ -70,7 +70,7 @@ class Drift(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn:
-            self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, envelope)
+            self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss)
 
     def createMatrixM(self,L):
         return np.array([
@@ -81,37 +81,50 @@ class Drift(LinearElement):
                 [0,0,0,0,1,L],
                 [0,0,0,0,0,1]
                 ])
-    def createMatrixT(self, L):
-        return 0
+    def createMatrixT(self, M):
+        # T is size 9x9 and defined from eqn (1.56) in ref C
+        return np.array([
+                [M[0,0]**2, 2*M[0,0]*M[0,1], M[0,1]**2, 0, 0, 0, 0, 0, 0],
+                [M[0,0]*M[1,0], M[0,0]*M[1,1]+M[0,1]*M[1,0], M[0,1]*M[1,1], 0, 0, 0, 0, 0, 0],
+                [M[1,0]**2, 2*M[1,0]*M[1,1], M[1,1]**2, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, M[2,2]**2, 2*M[2,2]*M[2,3], M[2,3]**2, 0, 0, 0],
+                [0, 0, 0, M[2,2]*M[3,2], M[2,2]*M[3,3]+M[2,3]*M[3,2], M[2,3]*M[3,3], 0, 0, 0],
+                [0, 0, 0, M[3,2]**2, 2*M[3,2]*M[3,3], M[3,3]**2, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, M[4,4]**2, 2*M[4,4]*M[4,5], M[4,5]**2],
+                [0, 0, 0, 0, 0, 0, M[4,4]*M[5,4], M[4,4]*M[5,5]+M[4,5]*M[5,4], M[4,5]*M[5,5]],
+                [0, 0, 0, 0, 0, 0, M[5,4]**2, 2*M[5,4]*M[5,5], M[5,5]**2]
+                ])
 
     def disunite(self,M,T,n):
         Msp = self.createMatrixM(self.Lsp)
-        return Msp, 0
+        Tsp = self.createMatrixT(Msp)
+        return Msp, Tsp
 
     def evaluate(self,multipart,envelope):
         # some for loop that goes through all of the disunited parts
         for i in range(0,self.n):
             if self.spaceChargeOn:
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
-            multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
         return multipart, envelope
 
-    def evaluateM(self,multipart,envelope):
+    def evaluateMT(self,multipart,envelope):
         # should just go through a disunited part
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
-        return multipart, 0
+        envelope = np.dot(self.Tsp, envelope)
+        return multipart, envelope
 
 
 ### QUAD
 class Quad(LinearElement):
-    def __init__(self, name, K, L, spaceChargeOn, multipart, envelope):
+    def __init__(self, name, K, L, spaceChargeOn, multipart, twiss):
         LinearElement.__init__(self, name)
         #self.name = name
         self.K = K
         self.L = L
         self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
-        self.T = self.createMatrixT(K, L) # M should be a 9x9 matrix
+        self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
         
         # disunite matrices
         self.n = 5
@@ -121,7 +134,7 @@ class Quad(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn:
-            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, envelope)
+            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss)
 
     """ taken from lie code where K = sqrt(k)"""
     def createMatrixM(self,K,L):
@@ -153,12 +166,24 @@ class Quad(LinearElement):
                 [0,0,0,0,0,1]
                 ])
 
-    def createMatrixT(self, K, L):
-        return 0
+    def createMatrixT(self, M):
+        # T is size 9x9 and defined from eqn (1.56) in ref C
+        return np.array([
+                [M[0,0]**2, 2*M[0,0]*M[0,1], M[0,1]**2, 0, 0, 0, 0, 0, 0],
+                [M[0,0]*M[1,0], M[0,0]*M[1,1]+M[0,1]*M[1,0], M[0,1]*M[1,1], 0, 0, 0, 0, 0, 0],
+                [M[1,0]**2, 2*M[1,0]*M[1,1], M[1,1]**2, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, M[2,2]**2, 2*M[2,2]*M[2,3], M[2,3]**2, 0, 0, 0],
+                [0, 0, 0, M[2,2]*M[3,2], M[2,2]*M[3,3]+M[2,3]*M[3,2], M[2,3]*M[3,3], 0, 0, 0],
+                [0, 0, 0, M[3,2]**2, 2*M[3,2]*M[3,3], M[3,3]**2, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, M[4,4]**2, 2*M[4,4]*M[4,5], M[4,5]**2],
+                [0, 0, 0, 0, 0, 0, M[4,4]*M[5,4], M[4,4]*M[5,5]+M[4,5]*M[5,4], M[4,5]*M[5,5]],
+                [0, 0, 0, 0, 0, 0, M[5,4]**2, 2*M[5,4]*M[5,5], M[5,5]**2]
+                ])
 
     def disunite(self,M,T,n):
         Msp = self.createMatrixM(self.K, self.Lsp)
-        return Msp, 0
+        Tsp = self.createMatrixT(Msp)
+        return Msp, Tsp
 
     def printInfo(self):
         return self.name + "\n" + str(self.M)
@@ -177,30 +202,31 @@ class Quad(LinearElement):
         # each loop iteration is for a new particle
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
-        return multipart, 0
+        envelope = np.dot(self.Tsp, envelope)
+        return multipart, envelope
 
 ### SPACE CHARGE!!!!!
 class SpaceCharge(LinearElement):
-    def __init__(self, name, deltas, multipart, envelope):
+    def __init__(self, name, deltas, multipart, twiss):
         LinearElement.__init__(self, name)
         self.deltas = deltas
         self.multipart = multipart
-        self.envelope = envelope
+        self.twiss = twiss
 
-        self.Msc = self.spaceChargeMatrix(multipart,envelope)
+        self.Msc = self.spaceChargeMatrix(multipart,twiss)
 
-    def updateBeam(self, envelope):
-        self.envelope = envelope
+    def updateBeam(self, twiss):
+        self.twiss = twiss
         return
 
-    def beamChanged(self, newenvelope):
+    def beamChanged(self, newtwiss):
         threshold = 0.1
-        if diffBtwBeams(self.envelope,newenvelope) > threshold:
+        if diffBtwBeams(self.twiss, newtwiss) > threshold:
             return 1
         else:
             return 0
 
-    def diffBtwBeams(self, envelope1,envelope2):
+    def diffBtwBeams(self, twiss1,twiss2):
         diff = 0
 #        for bla
 #            diff += diff_each_variable
@@ -212,7 +238,7 @@ class SpaceCharge(LinearElement):
         # result[0] is the result and result[1] is the error
         return result[0]
 
-    def spaceChargeMatrix(self, multipart, envelope):
+    def spaceChargeMatrix(self, multipart, twiss):
 
         # beam data is needed as input to calculate the following variables...
         beta = 0.9 # beam data needed
@@ -226,15 +252,15 @@ class SpaceCharge(LinearElement):
 
         ## Courant-Snyder or Twiss params
         # envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
-        alpha_x = envelope[0]
-        beta_x = envelope[1]
-        epsilon_rms_x = envelope[2]
-        alpha_y = envelope[3]
-        beta_y = envelope[4]
-        epsilon_rms_y = envelope[5]
-        alpha_z = envelope[6]
-        beta_z = envelope[7]
-        epsilon_rms_z = envelope[8]
+        alpha_x = twiss[0]
+        beta_x = twiss[1]
+        epsilon_rms_x = twiss[2]
+        alpha_y = twiss[3]
+        beta_y = twiss[4]
+        epsilon_rms_y = twiss[5]
+        alpha_z = twiss[6]
+        beta_z = twiss[7]
+        epsilon_rms_z = twiss[8]
 
         ## envelope X, Xp, Y, Yp, Z and Zp
         X = sqrt(5*beta_x*epsilon_rms_x)
@@ -460,7 +486,7 @@ class DiffAlgElement(Element):
             particle[0][5] = self.numFuns[5](x, xp, y, yp, z, zp)
 
             particle[1] += self.Lsp
-
+            # Doesn't change envelope at all
         return multipart, envelope
 
 
@@ -541,3 +567,4 @@ class Cavity(NonLinearElement):
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
 # A. 7.2. Space Charge Impulses in simulatingbeamswithellipsoidalsymmetry-secondedition
 # B. A MODIFIED QUADSCAN TECHNIQUE FOR EMITTANCE.pdf
+# C. Accelerator-Recipies.pdf by E. Laface

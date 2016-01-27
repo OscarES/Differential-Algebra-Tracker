@@ -59,23 +59,31 @@ multipart2 = np.array([particle1, particle2])
 #print "multipart[1] (s)" + str(multipart[1])
 print "multipart" + str(multipart)
 #print "len(multipart) " + str(len(multipart))
-# envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
-envelope = np.array([0.0, 10.3338028723, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06])
+
+
+# twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
+twiss = np.array([0.0, 10.3338028723, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06])
+
+# this new def needs twiss params perhaps? YES, since otherwise SC won't work
+# envelope comes as [sigma_x**2, sigma_x*sigma_xp, sigma_xp**2, sigma_y**2, sigma_y*sigma_yp, sigma_yp**2, sigma_z**2, sigma_z*sigma_zp, sigma_zp**2]
+envelope = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0])
+
 
 ## Lattice construction
 spaceChargeOn = 1
-drift = Drift('drift', 1, spaceChargeOn, multipart, envelope)
+drift = Drift('drift', 1, spaceChargeOn, multipart, twiss)
 
-quad = Quad('quad', 0.1, 1, spaceChargeOn, multipart, envelope)
+quad = Quad('quad', 0.1, 1, spaceChargeOn, multipart, twiss)
 
 lattice = Lattice('lattice')
-#lattice.appendElement(drift)
+lattice.appendElement(drift)
 lattice.appendElement(quad)
 #print "multipart before latt eval: " + str(multipart)
 partres, envres = lattice.evaluate(multipart,envelope) ### changes multipart and envelope!!!!!!!!!!!!!!!!!!
 #print "multipart2 after latt eval: " + str(multipart2)
 
 print "partres: " + str(partres)
+print "envres: " + str(envres)
 
 # Using the differential algebra "raw"
 diffAlgRes = (quaddefocusNumFuns[0](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[1](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[2](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[3](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[4](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[5](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]))
