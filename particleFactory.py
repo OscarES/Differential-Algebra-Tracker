@@ -1,3 +1,4 @@
+from __future__ import division # needed for 1/2 = 0.5
 import numpy as np
 import random
 
