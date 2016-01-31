@@ -362,7 +362,7 @@ class SpaceCharge(LinearElement):
 
 
 ## Here all the heavy Lie calculations will be made
-class DifferentialAlgebra():
+class LieAlgebra():
     def __init__(self):
         self.qx = Symbol('qx')
         self.qy = Symbol('qy')
@@ -440,7 +440,7 @@ class DifferentialAlgebra():
         return numFuns
 
 # General class for elements from Hamiltonians, can be linear but since all is based on differential algebra "linear" is set to 0
-class DiffAlgElement(Element):
+class LieAlgElement(Element):
     def __init__(self, name, DA, ham, K, L, order, spaceChargeOn, multipart, envelope):
         Element.__init__(self, name, 0)
 
@@ -490,6 +490,32 @@ class DiffAlgElement(Element):
         return multipart, envelope
 
 
+
+
+
+## Leapfrog algorithm mostly from ref D.
+def leapfrog(x_0, v_0, F, h, n):
+    """ The leapfrog algorithm: x_0 is the single particle's x,y and z. v_0 is the single particle's xp,yp and zp. h is the step length. F() is a function (of just x,y,z or all (x,xp,y,yp,z, zp)?). n is the amount of steps """
+
+    x_of_i = list()
+    x_of_i.append(x_0) # first value in x_of_i
+    
+    v_of_i_plus_half = list()
+    # the first value of v_of_i_plus_half is given in the first iteration of the velocity verlet
+
+    v_of_i = list()
+    v_of_i.append(v_0)
+
+    # velocity verlet (better version of leapfrog). To get the wholes of v (v_of_i) from v_of_i_plus_half
+    for i in range(0,n): # +1 to get a i to n as well
+        
+        v_of_i_plus_half.append(v_of_i[i] + 1/2*h*F(x_of_i[i])) # v_n_plus_half = v_n + 1/2*h*F(x_n)
+        
+        x_of_i.append(x_of_i[i] + h*v_of_i_plus_half[i]) # x_n_plus_one = x_n + h*v_n_plus_half
+        
+        v_of_i.append(v_of_i_plus_half[i] + 1/2*h*F(x_of_i[i+1])) # v_n_plus_one = v_n_plus_half + 1/2*h*F(x_n_plus_one)
+
+    return x_of_i, v_of_i
 
 
 
@@ -568,3 +594,4 @@ class Cavity(NonLinearElement):
 # A. 7.2. Space Charge Impulses in simulatingbeamswithellipsoidalsymmetry-secondedition
 # B. A MODIFIED QUADSCAN TECHNIQUE FOR EMITTANCE.pdf
 # C. Accelerator-Recipies.pdf by E. Laface
+# D. The leapfrog method and other symplectic algorithms for integrating Newtons laws of motion Peter Young Dated April 21 2014

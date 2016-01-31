@@ -1,5 +1,6 @@
+from __future__ import division # needed for 1/2 = 0.5
 import numpy as np
-from accelerator import Lattice, Element, LinearElement, Quad, Drift, DifferentialAlgebra, DiffAlgElement
+from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian
@@ -28,11 +29,11 @@ octupoleham = -l/2*(2/4*k*(qx**4-6*qx**2*qy**2+qy**4)+(px**2+py**2)) # same deci
 ## Non-linear
 order = 5 # user sets this
 
-DA = DifferentialAlgebra()
+LA = LieAlgebra()
 
 quaddefocuskval = 0.1
 quaddefocuslval = 1
-quaddefocusNumFuns = DA.hamToNumFuns(quadhamdefocus, quaddefocuskval, quaddefocuslval, order)
+quaddefocusNumFuns = LA.hamToNumFuns(quadhamdefocus, quaddefocuskval, quaddefocuslval, order)
 
 #print "quaddefocusNumFuns:" + str(quaddefocusNumFuns)
 
@@ -85,14 +86,14 @@ partres, envres = lattice.evaluate(multipart,envelope) ### changes multipart and
 print "partres: " + str(partres)
 print "envres: " + str(envres)
 
-# Using the differential algebra "raw"
-diffAlgRes = (quaddefocusNumFuns[0](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[1](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[2](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[3](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[4](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[5](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]))
+# Using the Lie algebra "raw"
+LieAlgRes = (quaddefocusNumFuns[0](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[1](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[2](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[3](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[4](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]), quaddefocusNumFuns[5](particle1[0][0],particle1[0][1],particle1[0][2],particle1[0][3],particle1[0][4],particle1[0][5]))
 #print "DiffAlgRes: " + str(diffAlgRes) # MATCHES the linear calculation!!!!! :)
 
 # Using the differential algebra through DiffAlgElement
-diffAlgElemQuad = DiffAlgElement("diffAlgElemQuad", DA, quadhamdefocus, quaddefocuskval, quaddefocuslval, order, 0, multipart2, envelope)
-diffAlgElemQuadpartres, diffAlgElemQuadenvres = diffAlgElemQuad.evaluate(multipart2,envelope) # not the same as raw! Since the element is split! But if n = 1 in the class then there is a very good match!!!! :)
-print "diffAlgElemQuadRes: " + str(diffAlgElemQuadpartres)
+LieAlgElemQuad = LieAlgElement("LieAlgElemQuad", LA, quadhamdefocus, quaddefocuskval, quaddefocuslval, order, 0, multipart2, envelope)
+LieAlgElemQuadpartres, LieAlgElemQuadenvres = LieAlgElemQuad.evaluate(multipart2,envelope) # not the same as raw! Since the element is split! But if n = 1 in the class then there is a very good match!!!! :)
+print "LieAlgElemQuadRes: " + str(LieAlgElemQuadpartres)
 
 
 ### Tons of particles
@@ -104,10 +105,10 @@ multiparttonsDiffAlg = straight(nbrOfParticles)
 #print "multiparttonsMat: \n" + str(multiparttonsMat)
 
 tonsMatPartRes, tonsMatEnvRes = lattice.evaluate(multiparttonsMat,envelope)
-tonsDiffAlgPartRes, tonsDiffAlgEnvRes = diffAlgElemQuad.evaluate(multiparttonsDiffAlg,envelope)
+tonsLieAlgPartRes, tonsLieAlgEnvRes = LieAlgElemQuad.evaluate(multiparttonsDiffAlg,envelope)
 
 #print "tonsMatPartRes: \n" + str(tonsMatPartRes)
-#print "tonsDiffAlgPartRes: \n" + str(tonsDiffAlgPartRes)
+#print "tonsLieAlgPartRes: \n" + str(tonsLieAlgPartRes)
 
 # Checking the others
 scannedparts = scanned(nbrOfParticles)
@@ -119,7 +120,21 @@ randomedparts = randomed(nbrOfParticles)
 gaussianparts = gaussian(nbrOfParticles)
 #print "gaussianparts: \n" + str(gaussianparts)
 
+### Leapfrog
+print "Leapfrog..."
+x_0 = 100.0
+v_0 = 0.0
+def F(x):
+    return -x
 
+L = 4
+n = 4*10*10000
+h = L/n
+
+x_of_i, v_of_i = leapfrog(x_0, v_0, F, h, n)
+#print "Results:"
+print "x_of_i[-1]: " + str(x_of_i[-1])
+print "v_of_i[-1]: " + str(v_of_i[-1])
 
 ## References
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
