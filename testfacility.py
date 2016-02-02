@@ -127,6 +127,9 @@ v_0 = 0.0
 def F(x):
     return -x
 
+# F should perhaps be numfuns: xpNumFun, ypNumFun, zpNumFun
+# F is Force!
+
 L = 4
 n = 4*10*10000
 h = L/n
