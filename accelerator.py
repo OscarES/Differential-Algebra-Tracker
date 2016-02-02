@@ -116,6 +116,8 @@ class Drift(LinearElement):
         envelope = np.dot(self.Tsp, envelope)
         return multipart, envelope
 
+### DIPOLE
+# class Dipole(LinearElement):
 
 ### QUAD
 class Quad(LinearElement):
