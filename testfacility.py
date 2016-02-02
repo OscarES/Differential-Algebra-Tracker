@@ -4,6 +4,7 @@ from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian
+from plotting import plotEverything, plotEnvelope
 
 
 sigma = 0.001 # the standard deviation that the user will enter
