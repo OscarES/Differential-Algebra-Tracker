@@ -75,6 +75,7 @@ envelope = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0])
 spaceChargeOn = 1
 drift = Drift('drift', 1, spaceChargeOn, multipart, twiss)
 
+# K = sqrt(e*g/p)
 quad = Quad('quad', 0.1, 1, spaceChargeOn, multipart, twiss)
 
 lattice = Lattice('lattice')
