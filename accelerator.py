@@ -5,6 +5,7 @@ from scipy.misc import *
 #from scipy.linalg import *
 from scipy import linalg
 from scipy.integrate import quad
+from scipy import constants
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 import math
@@ -205,7 +206,7 @@ class Quad(LinearElement):
         envelope = np.dot(self.Tsp, envelope)
         return multipart, envelope
 
-### SPACE CHARGE!!!!!
+### SPACE CHARGE!!!!! C. Allen's approach
 class SpaceCharge(LinearElement):
     def __init__(self, name, deltas, multipart, twiss):
         LinearElement.__init__(self, name)
@@ -248,7 +249,7 @@ class SpaceCharge(LinearElement):
         N = len(multipart) # this info should come from the multipart (len(multipart))
         Q = q*N # from (19) in ref 1.
         c = 299792458.0 # in metric (metric for everything perhaps?)
-        vac_perm = 8.854187817e-12
+        vac_perm = constants.epsilon_0
 
         ## Courant-Snyder or Twiss params
         # envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
@@ -303,9 +304,9 @@ class SpaceCharge(LinearElement):
         f_scy = gamma**3*beta**2*m*c**2/q*(norm_of_yy - norm_of_y**2)/norm_of_yE_y # (152) (with x->y) in ref 1.
         f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.
         
-        # Eliptical integral?
-        s = Z/sqrt(X*Y)
-        epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf)[0] # eqn 5 in ref B
+        ## Eliptical integral?
+        #s = Z/sqrt(X*Y)
+        #epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf)[0] # eqn 5 in ref B
 
         # Mean of x,y and z from all the particles
         xbar = sum([multipart[:,0][i][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
@@ -338,6 +339,170 @@ class SpaceCharge(LinearElement):
 
 
 
+
+
+
+### SPACE CHARGE!!!!! Elliptical integral approach
+class SpaceChargeEllipticalIntegral(LinearElement):
+    def __init__(self, name, deltas, multipart, twiss):
+        LinearElement.__init__(self, name)
+        self.deltas = deltas
+        self.multipart = multipart
+        self.twiss = twiss
+
+        self.Msc = self.spaceChargeMatrix(multipart,twiss)
+
+    def updateBeam(self, twiss):
+        self.twiss = twiss
+        return
+
+    def beamChanged(self, newtwiss):
+        threshold = 0.1
+        if diffBtwBeams(self.twiss, newtwiss) > threshold:
+            return 1
+        else:
+            return 0
+
+    def diffBtwBeams(self, twiss1,twiss2):
+        diff = 0
+#        for bla
+#            diff += diff_each_variable
+        return diff
+
+    def R_D(self, x, y, z):
+        # from (110) in ref 1.
+        result = quad(lambda t : 3/2*1/(sqrt(t+x) * sqrt(t+y) * (t+z)**(3/2)), 0, inf)
+        # result[0] is the result and result[1] is the error
+        return result[0]
+
+    def spaceChargeMatrix(self, multipart, twiss):
+
+        # beam data is needed as input to calculate the following variables...
+        beta = 0.9 # Relativistic beta. Beam data needed
+        gamma = 1/sqrt(1-beta**2)
+        m = 1.6726219e-27 # should be proton mass but would rather have mass and q as input so that other particles can be used
+        m_0 = m
+        q = 1.6021766208e-19 # -II-
+        N = len(multipart) # this info should come from the multipart (len(multipart))
+        Q = q*N # from (19) in ref 1.
+        c = 299792458.0 # in metric (metric for everything perhaps?)
+        vac_perm = 8.854187817e-12
+        I = 0.001 # beam data needed
+        letter_lambda = 1e-9 # The wavelength of the bunches. Beam data needed.
+
+        ## Courant-Snyder or Twiss params
+        # envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
+        alpha_x = twiss[0]
+        beta_x = twiss[1]
+        epsilon_rms_x = twiss[2]
+        alpha_y = twiss[3]
+        beta_y = twiss[4]
+        epsilon_rms_y = twiss[5]
+        alpha_z = twiss[6]
+        beta_z = twiss[7]
+        epsilon_rms_z = twiss[8]
+
+        ## envelope X, Xp, Y, Yp, Z and Zp
+        X = sqrt(5*beta_x*epsilon_rms_x)
+        Xp = -alpha_x*sqrt(5*epsilon_rms_x/beta_x)
+
+        Y = sqrt(5*beta_y*epsilon_rms_y)
+        Yp = -alpha_y*sqrt(5*epsilon_rms_y/beta_y)
+
+        Z = sqrt(5*beta_z*epsilon_rms_z)
+        Zp = -alpha_z*sqrt(5*epsilon_rms_z/beta_z)
+
+        ## Deviations from multipart (x,y,z). So there should really be one matrix per particle
+        x = multipart[0][0][0]
+        y = multipart[0][0][2]
+        z = multipart[0][0][4]
+
+        ## <.> is called "norm_of_."
+        ## <x^2> (norm_of_xx), <xx'> (norm_of_xx') and <x'^2> (norm_of_xpxp) come from (119) in ref 1.
+        #norm_of_xx = 1/5*X**2
+        ## <x> (norm_of_x) come from (81) in ref 1.
+        #norm_of_x = 0.0
+        ## <xx'> (norm_of_xxp) come from (119) in ref 1. NOT used here but here as a reminder
+        #norm_of_xxp = 1/5*X*Xp
+        ## <x'x'> (norm_of_xpxp) come from (119) in ref 1. NOT used here but here as a reminder
+        #norm_of_xpxp = 1/5*Xp**2+5*epsilon_rms_x**2/X**2
+#
+        #norm_of_yy = 1/5*Y**2
+        #norm_of_y = 0.0
+        #norm_of_yp = 1/5*Y*Yp
+        #norm_of_ypyp = 1/5*Yp**2+5*epsilon_rms_y**2/Y**2
+#
+        #norm_of_zz = 1/5*Z**2
+        #norm_of_z = 0.0
+        #norm_of_zp = 1/5*Z*Zp
+        #norm_of_zpzp = 1/5*Zp**2+5*epsilon_rms_z**2/Z**2
+
+        ## <xE_x> (norm_of_xE_x) come from (115) in ref 1.
+        #norm_of_xE_x = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_xx*self.R_D(norm_of_yy, norm_of_zz, norm_of_xx)
+        #norm_of_yE_y = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_yy*self.R_D(norm_of_xx, norm_of_zz, norm_of_yy)
+        #norm_of_zE_z = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_zz*self.R_D(norm_of_xx, norm_of_yy, norm_of_zz)
+        ## R_D_bracket() = R_D_() from (111) and (112) in ref 1.
+#
+        ## eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
+        #f_scx = gamma**3*beta**2*m*c**2/q*(norm_of_xx - norm_of_x**2)/norm_of_xE_x # eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
+        #f_scy = gamma**3*beta**2*m*c**2/q*(norm_of_yy - norm_of_y**2)/norm_of_yE_y # (152) (with x->y) in ref 1.
+        #f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.
+        
+        # Eliptical integral?
+        #s = Z/sqrt(X*Y)
+        #epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf)[0] # eqn 5 in ref B
+
+        # r_x = X, r_y = Y, r_z = Z
+        g = gamma*Z/sqrt(X*Y) # eqn 40 from ref E.
+        f_of_g_integral = g/2*quad(lambda t : 1/((t+1)*(t+g**2)**(3/2)), 0, inf)[0] # eqn 41 from ref E.
+
+        G_x = 3*(1-f_of_g_integral)*x/(X*(X+Y)*Z) # eqn 36 from ref E.
+        G_y = 3*(1-f_of_g_integral)*y/(Y*(X+Y)*Z) # eqn 37 from ref E.
+        G_z = 3*f_of_g_integral*z/(X*Y*Z) # eqn 38 from ref E.
+
+        U_scx = I*letter_lambda*G_x/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 33 from ref E.
+        U_scy = I*letter_lambda*G_y/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 34 from ref E.
+        U_scz = I*letter_lambda*G_z/(4*math.pi*constants.epsilon_0*c) # eqn 35 from ref E.
+
+        delta_P_x = q*U_scx*self.deltas/(m_0*c**2*beta) # eqn 42 from ref E.
+        delta_P_y = q*U_scy*self.deltas/(m_0*c**2*beta) # eqn 42 from ref E.
+        delta_P_z = q*U_scz*self.deltas/(m_0*c**2*beta) # eqn 42 from ref E.
+
+        # Converting from delta_P to delta_xp
+        v = beta*c
+        p = gamma*m_0*v
+        delta_xp = delta_P_x/p # xp = p_x/p. eqn 150 and 151 from ref 1.
+        delta_yp = delta_P_y/p # yp = p_y/p. eqn 150 and 151 from ref 1.
+        delta_zp = delta_P_z/p # zp = p_z/p. eqn 150 and 151 from ref 1.
+
+        ## Mean of x,y and z from all the particles
+        #xbar = sum([multipart[:,0][i][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
+        #ybar = sum([multipart[:,0][i][2] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting y out of each particle and then taking the mean
+        #zbar = sum([multipart[:,0][i][4] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting z out of each particle and then taking the mean
+
+        # Matrix eqn (154) in ref 1.
+        Msc = np.array([
+                [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
+                [0.0,1.0,0.0,0.0,0.0,0.0,delta_xp],
+                [0.0,0.0,1.0,0.0,0.0,0.0,0.0],
+                [0.0,0.0,0.0,1.0,0.0,0.0,delta_yp],
+                [0.0,0.0,0.0,0.0,1.0,0.0,0.0],
+                [0.0,0.0,0.0,0.0,0.0,1.0,delta_zp],
+                [0.0,0.0,0.0,0.0,0.0,0.0,1.0]
+            ])
+        return Msc
+
+    def evaluateSC(self,multipart,envelope):
+        for j in range(0,len(np.atleast_1d(multipart))):
+            # The should be a check if Msc and Tsc need to be updated if the beam properties have changed a lot!!!!!!!!
+            #if beamChanged(envelope):
+                #self.Msc, self.Tsc = spaceChargeMatrix(envlope)
+
+            extendedphasespace = np.append(multipart[j][0][0:6], 1) # adds the dispersion 1 term
+            extendedphasespace = np.dot(self.Msc, extendedphasespace) # here calculations are made
+            reducedphasespace = extendedphasespace[0:6] # throws away the dispersion 1 term
+            multipart[j] = np.array([reducedphasespace, multipart[j][1]]) # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
+        return multipart,envelope
 
 
 
@@ -595,3 +760,4 @@ class Cavity(NonLinearElement):
 # B. A MODIFIED QUADSCAN TECHNIQUE FOR EMITTANCE.pdf
 # C. Accelerator-Recipies.pdf by E. Laface
 # D. The leapfrog method and other symplectic algorithms for integrating Newtons laws of motion Peter Young Dated April 21 2014
+# E. ESS Linac simulator
