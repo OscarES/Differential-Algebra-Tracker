@@ -302,11 +302,7 @@ class SpaceCharge(LinearElement):
         # eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
         f_scx = gamma**3*beta**2*m*c**2/q*(norm_of_xx - norm_of_x**2)/norm_of_xE_x # eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
         f_scy = gamma**3*beta**2*m*c**2/q*(norm_of_yy - norm_of_y**2)/norm_of_yE_y # (152) (with x->y) in ref 1.
-        f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.
-        
-        ## Eliptical integral?
-        #s = Z/sqrt(X*Y)
-        #epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf)[0] # eqn 5 in ref B
+        f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.        
 
         # Mean of x,y and z from all the particles
         xbar = sum([multipart[:,0][i][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
@@ -417,41 +413,11 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         y = multipart[0][0][2]
         z = multipart[0][0][4]
 
-        ## <.> is called "norm_of_."
-        ## <x^2> (norm_of_xx), <xx'> (norm_of_xx') and <x'^2> (norm_of_xpxp) come from (119) in ref 1.
-        #norm_of_xx = 1/5*X**2
-        ## <x> (norm_of_x) come from (81) in ref 1.
-        #norm_of_x = 0.0
-        ## <xx'> (norm_of_xxp) come from (119) in ref 1. NOT used here but here as a reminder
-        #norm_of_xxp = 1/5*X*Xp
-        ## <x'x'> (norm_of_xpxp) come from (119) in ref 1. NOT used here but here as a reminder
-        #norm_of_xpxp = 1/5*Xp**2+5*epsilon_rms_x**2/X**2
-#
-        #norm_of_yy = 1/5*Y**2
-        #norm_of_y = 0.0
-        #norm_of_yp = 1/5*Y*Yp
-        #norm_of_ypyp = 1/5*Yp**2+5*epsilon_rms_y**2/Y**2
-#
-        #norm_of_zz = 1/5*Z**2
-        #norm_of_z = 0.0
-        #norm_of_zp = 1/5*Z*Zp
-        #norm_of_zpzp = 1/5*Zp**2+5*epsilon_rms_z**2/Z**2
-
-        ## <xE_x> (norm_of_xE_x) come from (115) in ref 1.
-        #norm_of_xE_x = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_xx*self.R_D(norm_of_yy, norm_of_zz, norm_of_xx)
-        #norm_of_yE_y = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_yy*self.R_D(norm_of_xx, norm_of_zz, norm_of_yy)
-        #norm_of_zE_z = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_zz*self.R_D(norm_of_xx, norm_of_yy, norm_of_zz)
-        ## R_D_bracket() = R_D_() from (111) and (112) in ref 1.
-#
-        ## eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
-        #f_scx = gamma**3*beta**2*m*c**2/q*(norm_of_xx - norm_of_x**2)/norm_of_xE_x # eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
-        #f_scy = gamma**3*beta**2*m*c**2/q*(norm_of_yy - norm_of_y**2)/norm_of_yE_y # (152) (with x->y) in ref 1.
-        #f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.
-        
-        # Eliptical integral?
+        ## Eliptical integral?
         #s = Z/sqrt(X*Y)
         #epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf)[0] # eqn 5 in ref B
 
+        # Eliptical integral
         # r_x = X, r_y = Y, r_z = Z
         g = gamma*Z/sqrt(X*Y) # eqn 40 from ref E.
         f_of_g_integral = g/2*quad(lambda t : 1/((t+1)*(t+g**2)**(3/2)), 0, inf)[0] # eqn 41 from ref E.
@@ -475,12 +441,6 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         delta_yp = delta_P_y/p # yp = p_y/p. eqn 150 and 151 from ref 1.
         delta_zp = delta_P_z/p # zp = p_z/p. eqn 150 and 151 from ref 1.
 
-        ## Mean of x,y and z from all the particles
-        #xbar = sum([multipart[:,0][i][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
-        #ybar = sum([multipart[:,0][i][2] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting y out of each particle and then taking the mean
-        #zbar = sum([multipart[:,0][i][4] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting z out of each particle and then taking the mean
-
-        # Matrix eqn (154) in ref 1.
         Msc = np.array([
                 [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
                 [0.0,1.0,0.0,0.0,0.0,0.0,delta_xp],
