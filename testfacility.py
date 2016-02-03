@@ -5,6 +5,7 @@ from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian
 from plotting import plotEverything, plotEnvelope
+from IOHandler import saveMultipart, loadMultipart
 
 
 sigma = 0.001 # the standard deviation that the user will enter
@@ -140,6 +141,16 @@ x_of_i, v_of_i = leapfrog(x_0, v_0, F, h, n)
 #print "Results:"
 print "x_of_i[-1]: " + str(x_of_i[-1])
 print "v_of_i[-1]: " + str(v_of_i[-1])
+
+
+
+### IOHandling
+filename = "savedParticles"
+saveMultipart(filename, multipart2)
+print "multipart2 stored in " + filename
+
+loadedmultipart = loadMultipart(filename + ".npy")
+print "loaded particles: \n" + str(loadedmultipart)
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
