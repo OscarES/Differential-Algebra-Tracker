@@ -30,15 +30,14 @@ def loadEnvelope(filename):
     envelope = np.load(filename)
     return envelope
 
-### NEEDS fixin
 def saveLattice(filename, lattice):
     #np.save(filename, lattice)
     if not os.path.isfile(filename):
         os.mknod(filename)
-    pickle.dump(lattice, open(filename, 'rwb'))
+    pickle.dump(lattice, open(filename, 'wb'))
     return 1
 
 def loadLattice(filename):
     #lattice = np.load(filename)
-    lattice = pickle.load(filename)
+    lattice = pickle.load(open(filename, 'rb'))
     return lattice

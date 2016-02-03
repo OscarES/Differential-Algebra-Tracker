@@ -171,11 +171,11 @@ loadedenvelope = loadEnvelope(filenameEnvelope + ".npy")
 print "loaded envelope: \n" + str(loadedenvelope)
 
 # lattice
-filenameLattice = "savedLattice"
+filenameLattice = "savedLattice.npy"
 saveLattice(filenameLattice, lattice)
 print "lattice stored in " + filenameLattice
 
-loadedlattice = loadLattice(filenameLattice + ".npy")
+loadedlattice = loadLattice(filenameLattice)
 print "loaded lattice: \n" + loadedlattice.printLattice()
 
 # references
