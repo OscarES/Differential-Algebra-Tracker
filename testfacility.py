@@ -147,36 +147,36 @@ print "v_of_i[-1]: " + str(v_of_i[-1])
 
 ### IOHandling
 # multipart
-filename = "savedParticles"
-saveMultipart(filename, multipart2)
-print "multipart2 stored in " + filename
+filenameMultipart = "savedParticles"
+saveMultipart(filenameMultipart, multipart2)
+print "multipart2 stored in " + filenameMultipart
 
-loadedmultipart = loadMultipart(filename + ".npy")
+loadedmultipart = loadMultipart(filenameMultipart + ".npy")
 print "loaded particles: \n" + str(loadedmultipart)
 
-## twiss
-#filename = "savedParticles"
-#saveMultipart(filename, multipart2)
-#print "multipart2 stored in " + filename
-#
-#loadedmultipart = loadMultipart(filename + ".npy")
-#print "loaded particles: \n" + str(loadedmultipart)
-#
-## envelope
-#filename = "savedParticles"
-#saveMultipart(filename, multipart2)
-#print "multipart2 stored in " + filename
-#
-#loadedmultipart = loadMultipart(filename + ".npy")
-#print "loaded particles: \n" + str(loadedmultipart)
-#
-## lattice
-#filename = "savedParticles"
-#saveMultipart(filename, multipart2)
-#print "multipart2 stored in " + filename
-#
-#loadedmultipart = loadMultipart(filename + ".npy")
-#print "loaded particles: \n" + str(loadedmultipart)
+# twiss
+filenameTwiss = "savedTwiss"
+saveTwiss(filenameTwiss, twiss)
+print "twiss stored in " + filenameTwiss
+
+loadedtwiss = loadMultipart(filenameTwiss + ".npy")
+print "loaded twiss: \n" + str(loadedtwiss)
+
+# envelope
+filenameEnvelope = "savedEnvelope"
+saveEnvelope(filenameEnvelope, envelope)
+print "envelope stored in " + filenameEnvelope
+
+loadedenvelope = loadEnvelope(filenameEnvelope + ".npy")
+print "loaded envelope: \n" + str(loadedenvelope)
+
+# lattice
+filenameLattice = "savedLattice"
+saveLattice(filenameLattice, lattice)
+print "lattice stored in " + filenameLattice
+
+loadedlattice = loadLattice(filenameLattice + ".npy")
+print "loaded lattice: \n" + loadedlattice.printLattice()
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
