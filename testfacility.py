@@ -75,7 +75,7 @@ envelope = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0])
 spaceChargeOn = 1
 drift = Drift('drift', 1, spaceChargeOn, multipart, twiss)
 
-# K = sqrt(e*g/p)
+# K = sqrt(e*g/p) ,from ref E.
 quad = Quad('quad', 0.1, 1, spaceChargeOn, multipart, twiss)
 
 lattice = Lattice('lattice')
@@ -141,5 +141,10 @@ x_of_i, v_of_i = leapfrog(x_0, v_0, F, h, n)
 print "x_of_i[-1]: " + str(x_of_i[-1])
 print "v_of_i[-1]: " + str(v_of_i[-1])
 
-## References
+# references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
+# A. 7.2. Space Charge Impulses in simulatingbeamswithellipsoidalsymmetry-secondedition
+# B. A MODIFIED QUADSCAN TECHNIQUE FOR EMITTANCE.pdf
+# C. Accelerator-Recipies.pdf by E. Laface
+# D. The leapfrog method and other symplectic algorithms for integrating Newtons laws of motion Peter Young Dated April 21 2014
+# E. ESS Linac simulator
