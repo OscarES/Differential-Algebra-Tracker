@@ -385,7 +385,7 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         Q = q*N # from (19) in ref 1.
         c = 299792458.0 # in metric (metric for everything perhaps?)
         vac_perm = 8.854187817e-12
-        I = 0.001 # beam data needed
+        I = 0.065 # beam data from paper WEPEA40
         letter_lambda = 1e-9 # The wavelength of the bunches. Beam data needed.
 
         ## Courant-Snyder or Twiss params
@@ -641,6 +641,7 @@ def leapfrog(x_0, v_0, F, h, n):
         x_of_i.append(x_of_i[i] + h*v_of_i_plus_half[i]) # x_n_plus_one = x_n + h*v_n_plus_half
         
         v_of_i.append(v_of_i_plus_half[i] + 1/2*h*F(x_of_i[i+1])) # v_n_plus_one = v_n_plus_half + 1/2*h*F(x_n_plus_one)
+        # send F(x_of_i[i+1]) to next lap to save some time
 
     return x_of_i, v_of_i
 
