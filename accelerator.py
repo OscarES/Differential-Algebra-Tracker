@@ -565,6 +565,11 @@ class LieAlgebra():
         zf = zfun.subs([(self.k,kval),(self.l,lval)])
         zpf = zprimefun.subs([(self.k,kval), (self.l,lval)])
 
+        protoFunctions = (xf, xpf, yf, ypf, zf, zpf)
+        symplectic = self.isSymplectic(protoFunctions)
+        if not symplectic:
+            print "Not symplectic!!!!!"
+
         xNumFun = lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),xf, "numpy")
         xpNumFun= lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),xpf, "numpy")
         yNumFun = lambdify((self.qx,self.px,self.qy,self.py,self.qz,self.pz),yf, "numpy")
@@ -575,9 +580,38 @@ class LieAlgebra():
         numFuns = (xNumFun, xpNumFun, yNumFun, ypNumFun, zNumFun, zpNumFun)
         return numFuns
 
+    def isSymplectic(self, protoFuns):
+        size = len(protoFuns)/2 # numFun must be of even length
+        S = np.append(np.append(np.zeros((size,size)),np.identity(size), axis=1),np.append(-np.identity(size),np.zeros((size,size)), axis=1), axis=0)
+
+        J = np.array([
+            [diff(protoFuns[0],self.qx), diff(protoFuns[0],self.qy), diff(protoFuns[0],self.qz), diff(protoFuns[0],self.px), diff(protoFuns[0],self.py), diff(protoFuns[0],self.pz)],
+            [diff(protoFuns[2],self.qx), diff(protoFuns[2],self.qy), diff(protoFuns[2],self.qz), diff(protoFuns[2],self.px), diff(protoFuns[2],self.py), diff(protoFuns[2],self.pz)],
+            [diff(protoFuns[4],self.qx), diff(protoFuns[4],self.qy), diff(protoFuns[4],self.qz), diff(protoFuns[4],self.px), diff(protoFuns[4],self.py), diff(protoFuns[4],self.pz)],
+            [diff(protoFuns[1],self.qx), diff(protoFuns[1],self.qy), diff(protoFuns[1],self.qz), diff(protoFuns[1],self.px), diff(protoFuns[1],self.py), diff(protoFuns[1],self.pz)],
+            [diff(protoFuns[3],self.qx), diff(protoFuns[3],self.qy), diff(protoFuns[3],self.qz), diff(protoFuns[3],self.px), diff(protoFuns[3],self.py), diff(protoFuns[3],self.pz)],
+            [diff(protoFuns[5],self.qx), diff(protoFuns[5],self.qy), diff(protoFuns[5],self.qz), diff(protoFuns[5],self.px), diff(protoFuns[5],self.py), diff(protoFuns[5],self.pz)],
+            ]) # from 1.80 in ref C
+        J_transpose = np.transpose(J)
+        LHS = np.dot(J_transpose, np.dot(S, J)) # from 1.81 in ref C
+        LHSminusS = LHS - S
+        detOfJ = np.linalg.det(J)
+
+        ### Pick one of these
+        ## symplecticity check with det of J
+        #if abs(detOfJ-1) <0.000001:
+        #    print "det of J is 1!"
+        #    return 1
+
+        ## symplecticity check with 1.81 in ref C (checks if J^T*S*J = S)
+        if sum(sum(np.isclose(LHSminusS.astype(np.float64), np.zeros((2*size,2*size)).astype(np.float64)))) == LHSminusS.size: # if all elements are close the sum will be a sum of ones
+            return 1
+
+        return 0
+
 # General class for elements from Hamiltonians, can be linear but since all is based on differential algebra "linear" is set to 0
 class LieAlgElement(Element):
-    def __init__(self, name, DA, ham, K, L, order, spaceChargeOn, multipart, envelope):
+    def __init__(self, name, LA, ham, K, L, order, spaceChargeOn, multipart, envelope):
         Element.__init__(self, name, 0)
 
         self.L = L
@@ -586,7 +620,7 @@ class LieAlgElement(Element):
         #self.n = 5 # matches matrix approach not as well but is needed for split
         self.Lsp = L/self.n
 
-        self.numFuns = DA.hamToNumFuns(ham, K, self.Lsp, order) # assumes that the element can be split
+        self.numFuns = LA.hamToNumFuns(ham, K, self.Lsp, order) # assumes that the element can be split
 
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn:
