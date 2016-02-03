@@ -20,12 +20,18 @@ class Lattice:
 
     def appendElement(self, element):
         self.lattice.append(element)
+        return 1
+
+    def printLattice(self):
+        text = ""
+        for elem in self.lattice:
+            text = text + elem.printInfo() + "\n"
+        return text
+
 
     def evaluate(self, multipart,envelope):
         for elem in self.lattice:
-            #print "ett varv till"
             multipart,envelope = elem.evaluate(multipart,envelope)
-
         return multipart,envelope
 
 class Element:
@@ -72,6 +78,9 @@ class Drift(LinearElement):
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn:
             self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss)
+
+    def printInfo(self):
+        return self.name + "\t L: " + str(self.L)
 
     def createMatrixM(self,L):
         return np.array([
@@ -189,7 +198,7 @@ class Quad(LinearElement):
         return Msp, Tsp
 
     def printInfo(self):
-        return self.name + "\n" + str(self.M)
+        return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K)
 
     def evaluate(self,multipart,envelope):
         # some for loop that goes through all of the disunited parts
@@ -571,6 +580,8 @@ class LieAlgElement(Element):
     def __init__(self, name, DA, ham, K, L, order, spaceChargeOn, multipart, envelope):
         Element.__init__(self, name, 0)
 
+        self.L = L
+        self.K = K
         self.n = 1 # matches matrix approach well
         #self.n = 5 # matches matrix approach not as well but is needed for split
         self.Lsp = L/self.n
@@ -582,7 +593,7 @@ class LieAlgElement(Element):
             self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, envelope)
 
     def printInfo(self):
-        return self.name
+        return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K)
 
     def evaluate(self,multipart,envelope):
         # some for loop that goes through all of the disunited parts

@@ -5,7 +5,7 @@ from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian
 from plotting import plotEverything, plotEnvelope
-from IOHandler import saveMultipart, loadMultipart
+from IOHandler import saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice
 
 
 sigma = 0.001 # the standard deviation that the user will enter
@@ -82,6 +82,7 @@ quad = Quad('quad', 0.1, 1, spaceChargeOn, multipart, twiss)
 lattice = Lattice('lattice')
 lattice.appendElement(drift)
 lattice.appendElement(quad)
+print "latticeprint: \n" + lattice.printLattice()
 #print "multipart before latt eval: " + str(multipart)
 partres, envres = lattice.evaluate(multipart,envelope) ### changes multipart and envelope!!!!!!!!!!!!!!!!!!
 #print "multipart2 after latt eval: " + str(multipart2)
@@ -145,12 +146,37 @@ print "v_of_i[-1]: " + str(v_of_i[-1])
 
 
 ### IOHandling
+# multipart
 filename = "savedParticles"
 saveMultipart(filename, multipart2)
 print "multipart2 stored in " + filename
 
 loadedmultipart = loadMultipart(filename + ".npy")
 print "loaded particles: \n" + str(loadedmultipart)
+
+## twiss
+#filename = "savedParticles"
+#saveMultipart(filename, multipart2)
+#print "multipart2 stored in " + filename
+#
+#loadedmultipart = loadMultipart(filename + ".npy")
+#print "loaded particles: \n" + str(loadedmultipart)
+#
+## envelope
+#filename = "savedParticles"
+#saveMultipart(filename, multipart2)
+#print "multipart2 stored in " + filename
+#
+#loadedmultipart = loadMultipart(filename + ".npy")
+#print "loaded particles: \n" + str(loadedmultipart)
+#
+## lattice
+#filename = "savedParticles"
+#saveMultipart(filename, multipart2)
+#print "multipart2 stored in " + filename
+#
+#loadedmultipart = loadMultipart(filename + ".npy")
+#print "loaded particles: \n" + str(loadedmultipart)
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
