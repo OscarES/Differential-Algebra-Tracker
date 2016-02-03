@@ -60,3 +60,17 @@ def plotEnvelope(envx,envy):
     plt.ylabel('Envelope in y')
 
     plt.show()
+
+## Plot def
+def plotPhaseSpace(x,xp,y,yp):
+    plt.subplot(121)
+    plt.plot(x,xp,'ro')
+    plt.xlabel('x')
+    plt.ylabel('xp')
+    
+    plt.subplot(122)
+    plt.plot(y,yp,'ro')
+    plt.xlabel('y')
+    plt.ylabel('yp')
+
+    plt.show()
