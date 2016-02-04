@@ -319,9 +319,9 @@ class SpaceCharge(LinearElement):
         f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.        
 
         # Mean of x,y and z from all the particles
-        xbar = sum([multipart[:,0][i][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
-        ybar = sum([multipart[:,0][i][2] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting y out of each particle and then taking the mean
-        zbar = sum([multipart[:,0][i][4] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting z out of each particle and then taking the mean
+        xbar = sum([multipart[i][0][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
+        ybar = sum([multipart[i][0][2] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting y out of each particle and then taking the mean
+        zbar = sum([multipart[i][0][4] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting z out of each particle and then taking the mean
 
         # Matrix eqn (154) in ref 1.
         Msc = np.array([
