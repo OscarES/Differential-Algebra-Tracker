@@ -4,7 +4,7 @@ from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D
-from plotting import plotEverything, plotEnvelope
+from plotting import plotEverything, plotEnvelope, plotPhaseSpace
 from IOHandler import saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice
 
 
@@ -181,6 +181,22 @@ print "IOHandling..."
 #
 #loadedlattice = loadLattice(filenameLattice)
 #print "loaded lattice: \n" + loadedlattice.printLattice()
+
+### Plotting
+print "Plotting..."
+twissin = np.array([0.0, 10.3338028723, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06])
+twissout = twissin
+envelopein = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0])
+envelopeout = envelopein
+
+nbrOfParticlestest = 100
+
+multipartin = gaussianTwiss3D(nbrOfParticlestest, twissout)
+multipartout = multipartin
+
+multipartout, envelopeout = lattice.evaluate(multipartout, envelopeout)
+
+plotEverything(multipartin, twissin, multipartout)
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition

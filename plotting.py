@@ -1,6 +1,30 @@
 import matplotlib.pyplot as plt
 
-def plotEverything(xin,xpin,yin,ypin,alpha_x,beta_x,epsilon_x,alpha_y,beta_y,epsilon_y,xo,xpo,yo,ypo,envx,envy):
+def plotEverything(multipartin,twiss,multipartout):#,envx,envy):
+    xin = [multipartin[i][0][0] for i in xrange(len(multipartin))]
+    xpin = [multipartin[i][0][1] for i in xrange(len(multipartin))]
+    yin = [multipartin[i][0][2] for i in xrange(len(multipartin))]
+    ypin = [multipartin[i][0][3] for i in xrange(len(multipartin))]
+    zin = [multipartin[i][0][4] for i in xrange(len(multipartin))]
+    zpin = [multipartin[i][0][5] for i in xrange(len(multipartin))]
+
+    alpha_x = twiss[0]
+    beta_x = twiss[1]
+    epsilon_rms_x = twiss[2]
+    alpha_y = twiss[3]
+    beta_y = twiss[4]
+    epsilon_rms_y = twiss[5]
+    alpha_z = twiss[6]
+    beta_z = twiss[7]
+    epsilon_rms_z = twiss[8]
+
+    xo = [multipartout[i][0][0] for i in xrange(len(multipartout))]
+    xpo = [multipartout[i][0][1] for i in xrange(len(multipartout))]
+    yo = [multipartout[i][0][2] for i in xrange(len(multipartout))]
+    ypo = [multipartout[i][0][3] for i in xrange(len(multipartout))]
+    zo = [multipartout[i][0][4] for i in xrange(len(multipartout))]
+    zpo = [multipartout[i][0][5] for i in xrange(len(multipartout))]
+
     plt.figure(0)
     ax1 = plt.subplot2grid((4,3), (0,0))
     plt.plot(xin,xpin,'ro')
@@ -18,15 +42,15 @@ def plotEverything(xin,xpin,yin,ypin,alpha_x,beta_x,epsilon_x,alpha_y,beta_y,eps
     plt.xlabel('x')
     plt.ylabel('y')
     ax4 = plt.subplot2grid((4,3), (1, 0), colspan=3)
-    plt.plot(envx[:,0],envx[:,1],'ro')
-    plt.title('Envelope in x by z')
-    plt.xlabel('z')
-    plt.ylabel('Envelope in x')
+    #plt.plot(envx[:,0],envx[:,1],'ro')
+   #plt.title('Envelope in x by z')
+   #plt.xlabel('z')
+   #plt.ylabel('Envelope in x')
     ax5 = plt.subplot2grid((4,3), (2, 0), colspan=3)
-    plt.plot(envy[:,0],envy[:,1],'bo')
-    plt.title('Envelope in y by z')
-    plt.xlabel('z')
-    plt.ylabel('Envelope in y')
+   #plt.plot(envy[:,0],envy[:,1],'bo')
+   #plt.title('Envelope in y by z')
+   #plt.xlabel('z')
+   #plt.ylabel('Envelope in y')
     ax6 = plt.subplot2grid((4,3), (3, 0))
     plt.plot(xo,xpo,'ro')
     plt.title('Values after FODO in x')
