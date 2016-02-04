@@ -34,6 +34,9 @@ class Lattice:
             multipart,envelope = elem.evaluate(multipart,envelope)
         return multipart,envelope
 
+    def relativityAtTheEnd(self, multipart,envelope):
+        return multipart,envelope
+
 class Element:
     def __init__(self,name, linear):
         self.name = name
