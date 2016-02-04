@@ -3,7 +3,7 @@ import numpy as np
 from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
-from particleFactory import straight, scanned, randomed, gaussian
+from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D
 from plotting import plotEverything, plotEnvelope
 from IOHandler import saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice
 
@@ -123,6 +123,9 @@ randomedparts = randomed(nbrOfParticles)
 
 gaussianparts = gaussian(nbrOfParticles)
 #print "gaussianparts: \n" + str(gaussianparts)
+
+gaussianTwiss3Dparts = gaussianTwiss3D(nbrOfParticles, twiss)
+#print "gaussianTwiss3Dparts: \n" + str(gaussianTwiss3Dparts)
 
 ### Leapfrog
 print "Leapfrog..."

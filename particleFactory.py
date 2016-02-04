@@ -1,4 +1,5 @@
 from __future__ import division # needed for 1/2 = 0.5
+import math
 import numpy as np
 import random
 
@@ -78,13 +79,36 @@ def gaussian(nbrOfParticles):
 
     #return x,xp,y,yp,z,zp
 
-def gaussiantwiss(nbrOfParticles, alpha, beta, epsilon):
+def gaussianTwiss3D(nbrOfParticles, twiss):
+    alpha_x = twiss[0]
+    beta_x = twiss[1]
+    epsilon_rms_x = twiss[2]
+    alpha_y = twiss[3]
+    beta_y = twiss[4]
+    epsilon_rms_y = twiss[5]
+    alpha_z = twiss[6]
+    beta_z = twiss[7]
+    epsilon_rms_z = twiss[8]
+
+    x, xp = gaussianTwiss1D(nbrOfParticles, alpha_x, beta_x, epsilon_rms_x)
+    y, yp = gaussianTwiss1D(nbrOfParticles, alpha_y, beta_y, epsilon_rms_y)
+    z, zp = gaussianTwiss1D(nbrOfParticles, alpha_z, beta_z, epsilon_rms_z)
+
+    s = np.linspace(0,0,nbrOfParticles)
+
+    bigMatrix = np.array([x, xp, y, yp, z, zp])
+
+    multipart = [[bigMatrix[:,i], s[i]] for i in xrange(nbrOfParticles)]
+
+    return multipart
+
+def gaussianTwiss1D(nbrOfParticles, alpha, beta, epsilon):
     xi = np.random.normal(0,1,nbrOfParticles)
     xip = np.random.normal(0,1,nbrOfParticles)
 
     M = np.array([
-        [1/sqrt(beta*epsilon), 0],
-        [alpha/sqrt(beta*epsilon), sqrt(beta/epsilon)]
+        [1/np.sqrt(beta*epsilon), 0],
+        [alpha/np.sqrt(beta*epsilon), np.sqrt(beta/epsilon)]
         ])
 
     Minv = np.linalg.inv(M)
