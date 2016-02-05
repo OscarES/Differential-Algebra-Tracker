@@ -595,6 +595,13 @@ class LieAlgebra():
             [diff(protoFuns[3],self.qx), diff(protoFuns[3],self.qy), diff(protoFuns[3],self.qz), diff(protoFuns[3],self.px), diff(protoFuns[3],self.py), diff(protoFuns[3],self.pz)],
             [diff(protoFuns[5],self.qx), diff(protoFuns[5],self.qy), diff(protoFuns[5],self.qz), diff(protoFuns[5],self.px), diff(protoFuns[5],self.py), diff(protoFuns[5],self.pz)],
             ]) # from 1.80 in ref C
+
+        approxOffsetQ = 0.01
+        approxOffsetP = 0.00001
+        for i in range(0,6):
+            for j in range(0,6):
+                J[i,j] = J[i,j].subs([(self.qx,approxOffsetQ),(self.qy,approxOffsetQ),(self.qz,approxOffsetQ),(self.px,approxOffsetP),(self.py,approxOffsetP),(self.pz,approxOffsetP)])
+
         J_transpose = np.transpose(J)
         LHS = np.dot(J_transpose, np.dot(S, J)) # from 1.81 in ref C
         LHSminusS = LHS - S
@@ -602,13 +609,12 @@ class LieAlgebra():
 
         ### Pick one of these
         ## symplecticity check with det of J
-        #if abs(detOfJ-1) <0.000001:
-        #    print "det of J is 1!"
-        #    return 1
+        if abs(detOfJ-1) <0.000001:
+            return 1
 
         ## symplecticity check with 1.81 in ref C (checks if J^T*S*J = S)
-        if sum(sum(np.isclose(LHSminusS.astype(np.float64), np.zeros((2*size,2*size)).astype(np.float64)))) == LHSminusS.size: # if all elements are close the sum will be a sum of ones
-            return 1
+        #if sum(sum(np.isclose(LHSminusS.astype(np.float64), np.zeros((2*size,2*size)).astype(np.float64)))) == LHSminusS.size: # if all elements are close the sum will be a sum of ones
+        #    return 1
 
         return 0
 
