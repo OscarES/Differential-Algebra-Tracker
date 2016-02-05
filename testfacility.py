@@ -182,13 +182,13 @@ print "IOHandling..."
 #loadedlattice = loadLattice(filenameLattice)
 #print "loaded lattice: \n" + loadedlattice.printLattice()
 
-#filename = "saved"
-#saveAll(filename, multipart2, twiss, envelope, lattice)
-#multipartload, twissload, envelopeload, latticeload = loadAll(filename)
-#print "multipartload: \n" + str(multipartload)
-#print "twissload: \n" + str(twissload)
-#print "envelopeload: \n" + str(envelopeload)
-#print "latticeload: \n" + str(latticeload.printLattice())
+filename = "data/" + "saved"
+saveAll(filename, multipart2, twiss, envelope, lattice)
+multipartload, twissload, envelopeload, latticeload = loadAll(filename)
+print "multipartload: \n" + str(multipartload)
+print "twissload: \n" + str(twissload)
+print "envelopeload: \n" + str(envelopeload)
+print "latticeload: \n" + str(latticeload.printLattice())
 
 ### Plotting
 print "Plotting..."
