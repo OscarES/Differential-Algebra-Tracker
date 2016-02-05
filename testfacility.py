@@ -232,7 +232,7 @@ sextuStrength = 0.6
 LAcomp = LieAlgebra()
 compOrder = 6
 sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, envelopeInComp)
-#compLattice.appendElement(sextu)
+compLattice.appendElement(sextu)
 
 compLattice.appendElement(compDrift)
 
