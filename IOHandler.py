@@ -79,9 +79,32 @@ def loadLattice(filename):
 def saveSummer2015Format():
     return 0
 
-def loadSummer2015Format():
+def loadSummer2015Format(datafilepart, datafiletwiss):
     try:
-        return 0
+        x, xp, y, yp = np.loadtxt(datafilepart,unpack = True)
+        alpha_x, beta_x, epsilon_x, alpha_y, beta_y, epsilon_y = np.loadtxt(datafiletwiss,unpack = True)
+
+        nbrOfParticles = len(x)
+
+        z = np.linspace(0,0,nbrOfParticles)
+        zp = np.linspace(0,0,nbrOfParticles)
+
+        s = np.linspace(0,0,nbrOfParticles)
+
+        bigMatrix = np.array([x, xp, y, yp, z, zp])
+
+        multipart = [[bigMatrix[:,i], s[i]] for i in xrange(nbrOfParticles)]
+
+        epsilon_rms_x = epsilon_x
+        epsilon_rms_y = epsilon_y
+
+        alpha_z = 0
+        beta_z = 0
+        epsilon_rms_z = 0
+
+        twiss = np.array([alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z])
+
+        return multipart, twiss
     except:
         print 'Bad datafile!'
         quit()

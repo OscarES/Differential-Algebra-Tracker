@@ -5,7 +5,7 @@ from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
-from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format
+from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, loadSummer2015Format
 
 
 sigma = 0.001 # the standard deviation that the user will enter
@@ -182,13 +182,19 @@ print "IOHandling..."
 #loadedlattice = loadLattice(filenameLattice)
 #print "loaded lattice: \n" + loadedlattice.printLattice()
 
-filename = "data/" + "saved"
-saveAll(filename, multipart2, twiss, envelope, lattice)
-multipartload, twissload, envelopeload, latticeload = loadAll(filename)
-print "multipartload: \n" + str(multipartload)
-print "twissload: \n" + str(twissload)
-print "envelopeload: \n" + str(envelopeload)
-print "latticeload: \n" + str(latticeload.printLattice())
+#filename = "data/" + "saved"
+#saveAll(filename, multipart2, twiss, envelope, lattice)
+#multipartload, twissload, envelopeload, latticeload = loadAll(filename)
+#print "multipartload: \n" + str(multipartload)
+#print "twissload: \n" + str(twissload)
+#print "envelopeload: \n" + str(envelopeload)
+#print "latticeload: \n" + str(latticeload.printLattice())
+#
+#datafilepart = "data/" + "inpart1000" + ".txt"
+#datafiletwiss = "data/" + "intwiss" + ".txt"
+#multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
+#print "multipartfromold: \n" + str(multipartfromold)
+#print "twissfromold: \n" + str(twissfromold)
 
 ### Plotting
 print "Plotting..."
