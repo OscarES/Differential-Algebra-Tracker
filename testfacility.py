@@ -213,7 +213,7 @@ fQName = "fQ"
 fQuadLength = 0.4
 fQuadStrength = -0.8 # this is k
 fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, envelopeInComp)
-#compLattice.appendElement(fQ)
+compLattice.appendElement(fQ)
 
 driftName = "drift"
 driftLength = 1.0
