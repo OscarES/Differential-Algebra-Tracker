@@ -76,7 +76,7 @@ def loadLattice(filename):
         quit()
         return 0
 
-def saveSummer2015Format():
+def saveSummer2015Format(multipart, twiss):
     return 0
 
 def loadSummer2015Format(datafilepart, datafiletwiss):
