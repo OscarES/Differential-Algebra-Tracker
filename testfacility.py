@@ -5,7 +5,7 @@ from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
-from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, loadSummer2015Format
+from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format
 import copy
 
 
@@ -239,7 +239,7 @@ compLattice.appendElement(compDrift)
 ## Calculate
 partresInComp, envresInComp = compLattice.evaluate(multipartfromold,envelopeInComp) # Does eval still change input?
 
-print "partresInComp: \n" + str(partresInComp)
+saveSummer2015Format("data/" + "outpartFODSO" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
 plotEverything(multipartfromoldcopy, twissfromold, partresInComp)
 
