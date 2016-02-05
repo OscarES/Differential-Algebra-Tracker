@@ -224,7 +224,7 @@ dQName = "dQ"
 dQuadLength = 0.4
 dQuadStrength = 0.8
 dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, envelopeInComp)
-#compLattice.appendElement(dQ)
+compLattice.appendElement(dQ)
 
 sextuName = "sextu"
 sextuLength = 0.3
@@ -234,7 +234,7 @@ compOrder = 6
 sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, envelopeInComp)
 #compLattice.appendElement(sextu)
 
-#compLattice.appendElement(compDrift)
+compLattice.appendElement(compDrift)
 
 ## Calculate
 partresInComp, envresInComp = compLattice.evaluate(multipartfromold,envelopeInComp) # Does eval still change input?
