@@ -6,6 +6,7 @@ from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
 from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, loadSummer2015Format
+import copy
 
 
 sigma = 0.001 # the standard deviation that the user will enter
@@ -190,11 +191,55 @@ print "IOHandling..."
 #print "envelopeload: \n" + str(envelopeload)
 #print "latticeload: \n" + str(latticeload.printLattice())
 #
-#datafilepart = "data/" + "inpart1000" + ".txt"
-#datafiletwiss = "data/" + "intwiss" + ".txt"
-#multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
+
+### Compare with old code
+print "Compare with old code..."
+## Load the same particles
+datafilepart = "data/" + "inpart1000" + ".txt"
+datafiletwiss = "data/" + "intwiss" + ".txt"
+multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
+multipartfromoldcopy = copy.copy(multipartfromold)
 #print "multipartfromold: \n" + str(multipartfromold)
 #print "twissfromold: \n" + str(twissfromold)
+
+## No space charge since unsupported by old code
+spaceChargeOnInComp = 0
+envelopeInComp = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0]) # since space-charge won't be tested this won't matter
+
+## the lattice will be a FODSO cell (Focusing Quad, Drift, Defocusing Quad, Sextupole, Drift)
+compLattice = Lattice('compLattice')
+
+fQName = "fQ"
+fQuadLength = 0.4
+fQuadStrength = -0.8 # this is k
+fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, envelopeInComp)
+compLattice.appendElement(fQ)
+
+driftName = "drift"
+driftLength = 1.0
+compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, envelopeInComp)
+compLattice.appendElement(compDrift)
+
+dQName = "dQ"
+dQuadLength = 0.4
+dQuadStrength = 0.8
+dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, envelopeInComp)
+compLattice.appendElement(dQ)
+
+sextuName = "sextu"
+sextuLength = 0.3
+sextuStrength = 0.6
+LAcomp = LieAlgebra()
+compOrder = 6
+sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, envelopeInComp)
+compLattice.appendElement(sextu)
+
+compLattice.appendElement(compDrift)
+
+## Calculate
+partresInComp, envresInComp = lattice.evaluate(multipartfromold,envelopeInComp) # Does eval still change input?
+
+plotEverything(multipartfromoldcopy, twissfromold, partresInComp)
 
 ### Plotting
 print "Plotting..."
@@ -210,7 +255,7 @@ multipartout = multipartin
 
 multipartout, envelopeout = lattice.evaluate(multipartout, envelopeout)
 
-plotEverything(multipartin, twissin, multipartout)
+#plotEverything(multipartin, twissin, multipartout)
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
