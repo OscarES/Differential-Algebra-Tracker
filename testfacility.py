@@ -57,7 +57,7 @@ octupoleham = -l/2*(2/4*k*(qx**4-6*qx**2*qy**2+qy**4)+(px**2+py**2)) # same deci
 #particle1 = np.array([zvector, s])
 #particle2 = np.array([-zvector, s]) # careful, if this is the same expression as for particle1 there will only be one object!
 #multipart = np.array([particle1, particle2])
-#multipart2 = np.array([particle1, particle2])
+#multipart2 = copy.copy(multipart)
 ##print "len(np.atleast_1d(multipart))" + str(len(np.atleast_1d(multipart)))
 ##print "multipart[0][0:6]" + str(multipart[0][0:6])
 ##print "multipart[1] (s)" + str(multipart[1])
