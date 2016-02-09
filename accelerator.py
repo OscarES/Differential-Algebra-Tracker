@@ -317,7 +317,7 @@ class SpaceCharge(LinearElement):
         Yp = -alpha_y*sqrt(5*epsilon_rms_y/beta_y)
 
         Z = sqrt(5*beta_z*epsilon_rms_z)
-        print "beta_z: " + str(beta_z)
+        #print "beta_z: " + str(beta_z)
         Zp = -alpha_z*sqrt(5*epsilon_rms_z/beta_z)
 
         # <.> is called "norm_of_."
