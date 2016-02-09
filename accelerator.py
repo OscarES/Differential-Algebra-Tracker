@@ -124,9 +124,9 @@ class Drift(LinearElement):
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
             multipart, envelope = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
-            twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
-            twiss[4] = envelope[3] / twiss[5]
-            twiss[7] = envelope[6] / twiss[8]
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #twiss[7] = envelope[6] / twiss[8]
         return multipart, envelope, twiss
 
     def evaluateMT(self,multipart,envelope):
@@ -221,9 +221,11 @@ class Quad(LinearElement):
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
             multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
-            twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
-            twiss[4] = envelope[3] / twiss[5]
-            twiss[7] = envelope[6] / twiss[8]
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
+            #twiss[7] = envelope[6] / twiss[8]
+            #print "twiss[7] after: " + str(twiss[7])
         return multipart, envelope, twiss
 
     def evaluateM(self,multipart,envelope):
@@ -315,6 +317,7 @@ class SpaceCharge(LinearElement):
         Yp = -alpha_y*sqrt(5*epsilon_rms_y/beta_y)
 
         Z = sqrt(5*beta_z*epsilon_rms_z)
+        print "beta_z: " + str(beta_z)
         Zp = -alpha_z*sqrt(5*epsilon_rms_z/beta_z)
 
         # <.> is called "norm_of_."
@@ -727,9 +730,9 @@ class LieAlgElement(Element):
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
             multipart, envelope = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
-            twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
-            twiss[4] = envelope[3] / twiss[5]
-            twiss[7] = envelope[6] / twiss[8]
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #twiss[7] = envelope[6] / twiss[8]
         return multipart, envelope, twiss
 
     def evaluateNumFun(self,multipart,envelope):
