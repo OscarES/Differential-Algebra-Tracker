@@ -212,7 +212,7 @@ nbrOfParticles = 10
 multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
 multipartfromoldcopy = copy.copy(multipartfromold)
 
-spaceChargeOnInComp = 2
+spaceChargeOnInComp = 1
 
 E = 2e9*constants.e # 2GeV to joule from ref F.
 freq = 704.42e6 # (Hz) from ref. F

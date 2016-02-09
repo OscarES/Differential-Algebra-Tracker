@@ -121,3 +121,28 @@ def gaussianTwiss1D(nbrOfParticles, alpha, beta, epsilon):
         xp[i] = Minv[1,0]*xi[i] + Minv[1,1]*xip[i]
 
     return x,xp
+
+def envelopeFromMultipart(multipart):
+    x = [multipart[i][0][0] for i in xrange(len(multipart))]
+    xp = [multipart[i][0][1] for i in xrange(len(multipart))]
+    y = [multipart[i][0][2] for i in xrange(len(multipart))]
+    yp = [multipart[i][0][3] for i in xrange(len(multipart))]
+    z = [multipart[i][0][4] for i in xrange(len(multipart))]
+    zp = [multipart[i][0][5] for i in xrange(len(multipart))]
+
+    sigma_x = np.mean(x) # sigma isn't std! It is mean instead!
+    sigma_xp = np.mean(xp)
+    sigma_y = np.mean(y)
+    sigma_yp = np.mean(yp)
+    sigma_z = np.mean(z)
+    sigma_zp = np.mean(zp)
+
+    #sigma_x = np.std(x) # sigma isn't std! It is mean instead!
+    #sigma_xp = np.std(xp)
+    #sigma_y = np.std(y)
+    #sigma_yp = np.std(yp)
+    #sigma_z = np.std(z)
+    #sigma_zp = np.std(zp)
+
+    envelope = [sigma_x**2, sigma_x*sigma_xp, sigma_xp**2, sigma_y**2, sigma_y*sigma_yp, sigma_yp**2, sigma_z**2, sigma_z*sigma_zp, sigma_zp**2]
+    return envelope
