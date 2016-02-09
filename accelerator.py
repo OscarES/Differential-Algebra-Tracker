@@ -269,7 +269,9 @@ class SpaceCharge(LinearElement):
 
     def R_D(self, x, y, z):
         # from (110) in ref 1.
+        print "hello1"
         result = quad(lambda t : 3/2*1/(sqrt(t+x) * sqrt(t+y) * (t+z)**(3/2)), 0, inf)
+        print "hello2"
         # result[0] is the result and result[1] is the error
         return result[0]
 
