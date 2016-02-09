@@ -5,4 +5,5 @@ from sympy import *
 
 # assumes a large energy
 def betaFromE(m_0,E):
-    return sqrt(1-m_0**2*constants.c**4/E**2)
+    gammaSquared = E**2/m_0**2/constants.c**4+2*E/m_0/constants.c**2+1
+    return sqrt(1-1/gammaSquared)
