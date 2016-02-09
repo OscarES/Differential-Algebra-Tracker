@@ -271,7 +271,10 @@ class SpaceCharge(LinearElement):
         # from (110) in ref 1.
         print "hello1"
         print "x: " + str(x)
+        print "y: " + str(y)
+        print "z: " + str(z)
         result = quad(lambda t : 3/2*1/(sqrt(t+x) * sqrt(t+y) * (t+z)**(3/2)), 0, inf)
+        print "result: " + str(result)
         print "hello2"
         # result[0] is the result and result[1] is the error
         return result[0]
