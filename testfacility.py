@@ -262,7 +262,7 @@ compLattice.appendElement(compDrift)
 ## Calculate
 partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
 
-saveSummer2015Format("data/" + "outpartFODSOspaceChargetest" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
+saveSummer2015Format("data/" + "outpartFODSOspaceChargetestt" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
 plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
 
