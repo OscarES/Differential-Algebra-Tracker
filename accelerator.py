@@ -33,7 +33,7 @@ class Lattice:
     def evaluate(self, multipart,envelope,twiss):
         for elem in self.lattice:
             multipart,envelope, twiss = elem.evaluate(multipart,envelope,twiss)
-            print "twiss: " + str(twiss)
+            #print "twiss: " + str(twiss)
         return multipart,envelope, twiss
 
     def relativityAtTheEnd(self, multipart,envelope):
@@ -269,13 +269,13 @@ class SpaceCharge(LinearElement):
 
     def R_D(self, x, y, z):
         # from (110) in ref 1.
-        print "hello1"
-        print "x: " + str(x)
-        print "y: " + str(y)
-        print "z: " + str(z)
+        #print "hello1"
+        #print "x: " + str(x)
+        #print "y: " + str(y)
+        #print "z: " + str(z)
         result = quad(lambda t : 3/2*1/(sqrt(t+x) * sqrt(t+y) * (t+z)**(3/2)), 0, inf)
-        print "result: " + str(result)
-        print "hello2"
+        #print "result: " + str(result)
+        #print "hello2"
         # result[0] is the result and result[1] is the error
         return result[0]
 
@@ -458,17 +458,17 @@ class SpaceChargeEllipticalIntegral(LinearElement):
 
         ## envelope X, Xp, Y, Yp, Z and Zp
         X = sqrt(5*beta_x*epsilon_rms_x)
-        print "X: " + str(X)
+        #print "X: " + str(X)
         Xp = -alpha_x*sqrt(5*epsilon_rms_x/beta_x)
         #print "Xp: " + str(Xp)
 
         Y = sqrt(5*beta_y*epsilon_rms_y)
-        print "Y: " + str(Y)
+        #print "Y: " + str(Y)
         Yp = -alpha_y*sqrt(5*epsilon_rms_y/beta_y)
         #print "Yp: " + str(Yp)
 
         Z = sqrt(5*beta_z*epsilon_rms_z)
-        print "Z: " + str(Z)
+        #print "Z: " + str(Z)
         Zp = -alpha_z*sqrt(5*epsilon_rms_z/beta_z)
         #print "Zp: " + str(Zp)
 
@@ -497,41 +497,41 @@ class SpaceChargeEllipticalIntegral(LinearElement):
 
         # Eliptical integral
         g = gamma*r_z/sqrt(r_x*r_y) # eqn 40 from ref E.
-        print "g: " + str(g)
+        #print "g: " + str(g)
         f_of_g_integral = g/2*quad(lambda t : 1/((t+1)*(t+g**2)**(3/2)), 0, inf)[0] # eqn 41 from ref E.
-        print "f_of_g_integral: " + str(f_of_g_integral)
+        #print "f_of_g_integral: " + str(f_of_g_integral)
 
         G_x = 3*(1-f_of_g_integral)*x/(r_x*(r_x+r_y)*r_z) # eqn 36 from ref E.
-        print "G_x: " + str(G_x)
+        #print "G_x: " + str(G_x)
         G_y = 3*(1-f_of_g_integral)*y/(r_y*(r_x+r_y)*r_z) # eqn 37 from ref E.
-        print "G_y: " + str(G_y)
+        #print "G_y: " + str(G_y)
         G_z = 3*f_of_g_integral*z/(r_x*r_y*r_z) # eqn 38 from ref E.
-        print "G_z: " + str(G_z)
+        #print "G_z: " + str(G_z)
 
         U_scx = I*rf_lambda*G_x/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 33 from ref E.
-        print "U_scx: " + str(U_scx)
+        #print "U_scx: " + str(U_scx)
         U_scy = I*rf_lambda*G_y/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 34 from ref E.
-        print "U_scy: " + str(U_scy)
+        #print "U_scy: " + str(U_scy)
         U_scz = I*rf_lambda*G_z/(4*math.pi*constants.epsilon_0*c) # eqn 35 from ref E.
-        print "U_scz: " + str(U_scz)
+        #print "U_scz: " + str(U_scz)
 
         delta_P_x = q*U_scx*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
-        print "delta_P_x: " + str(delta_P_x)
+        #print "delta_P_x: " + str(delta_P_x)
         delta_P_y = q*U_scy*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
-        print "delta_P_y: " + str(delta_P_y)
+        #print "delta_P_y: " + str(delta_P_y)
         delta_P_z = q*U_scz*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
-        print "delta_P_z: " + str(delta_P_z)
+        #print "delta_P_z: " + str(delta_P_z)
 
         # Converting from delta_P to delta_xp
         v = beta*c
         p = gamma*m*v
-        print "p: " + str(p)
+        #print "p: " + str(p)
         delta_xp = delta_P_x/p # xp = p_x/p. eqn 150 and 151 from ref 1.
-        print "delta_xp: " + str(delta_xp)
+        #print "delta_xp: " + str(delta_xp)
         delta_yp = delta_P_y/p # yp = p_y/p. eqn 150 and 151 from ref 1.
-        print "delta_yp: " + str(delta_yp)
+        #print "delta_yp: " + str(delta_yp)
         delta_zp = delta_P_z/p # zp = p_z/p. eqn 150 and 151 from ref 1.
-        print "delta_zp: " + str(delta_zp)
+        #print "delta_zp: " + str(delta_zp)
 
         Msc = np.array([
                 [1.0,0.0,0.0,0.0,0.0,0.0,0.0],

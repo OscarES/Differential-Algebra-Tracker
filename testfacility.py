@@ -208,9 +208,9 @@ twissfromold[7] = twissfromold[1]
 twissfromold[8] = twissfromold[2]
 twissfromoldcopy = copy.copy(twissfromold)
 
-nbrOfParticles = 10
-multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
-multipartfromoldcopy = copy.copy(multipartfromold)
+#nbrOfParticles = 10
+#multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
+#multipartfromoldcopy = copy.copy(multipartfromold)
 
 spaceChargeOnInComp = 1
 
@@ -262,7 +262,7 @@ compLattice.appendElement(compDrift)
 ## Calculate
 partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
 
-saveSummer2015Format("data/" + "outpartFODSOspaceCharge1" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
+saveSummer2015Format("data/" + "outpartFODSOspaceChargetest" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
 plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
 
