@@ -65,14 +65,14 @@ class LinearElement(Element):
 
 ### DRIFT !!!!
 class Drift(LinearElement):
-    def __init__(self, name, L, spaceChargeOn, multipart, twiss, beamdata):
+    def __init__(self, name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
         LinearElement.__init__(self, name)
         self.L = L
         self.M = self.createMatrixM(L) # M should be a 6x6 matrix
         self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
 
         # disunite the matrices, CLEAN UP THIS CODE!!!!!! (should disunite be removed or kept?)
-        self.n = 5
+        self.n = nbrOfSplits
         self.Lsp = self.L/self.n
         self.Msp, self.Tsp = self.disunite(self.M,self.T,self.n)
 
@@ -119,6 +119,7 @@ class Drift(LinearElement):
         # some for loop that goes through all of the disunited parts
         for i in range(0,self.n):
             if self.spaceChargeOn:
+                self.sc.space
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
             multipart, envelope = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
         return multipart, envelope
@@ -135,7 +136,7 @@ class Drift(LinearElement):
 
 ### QUAD
 class Quad(LinearElement):
-    def __init__(self, name, K, L, spaceChargeOn, multipart, twiss, beamdata):
+    def __init__(self, name, K, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
         LinearElement.__init__(self, name)
         #self.name = name
         self.K = K
@@ -144,7 +145,7 @@ class Quad(LinearElement):
         self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
         
         # disunite matrices
-        self.n = 5
+        self.n = nbrOfSplits
         self.Lsp = self.L/self.n
         self.Msp, self.Tsp = self.disunite(self.M,self.T,self.n)
 
@@ -231,8 +232,9 @@ class SpaceCharge(LinearElement):
         self.deltas = deltas
         self.multipart = multipart
         self.twiss = twiss
+        self.beamdata = beamdata
 
-        self.Msc = self.spaceChargeMatrix(multipart,twiss, beamdata)
+        self.Msc = self.spaceChargeMatrix(multipart,twiss, self.beamdata)
 
     def updateBeam(self, twiss):
         self.twiss = twiss
@@ -250,6 +252,8 @@ class SpaceCharge(LinearElement):
 #        for bla
 #            diff += diff_each_variable
         return diff
+
+    def updateMatrix():
 
     def R_D(self, x, y, z):
         # from (110) in ref 1.
@@ -367,8 +371,9 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         self.deltas = deltas
         self.multipart = multipart
         self.twiss = twiss
+        self.beamdata = beamdata
 
-        self.Msc = self.spaceChargeMatrix(multipart,twiss, beamdata)
+        self.Msc = self.spaceChargeMatrix(multipart,twiss, self.beamdata)
 
     def updateBeam(self, twiss):
         self.twiss = twiss
@@ -395,8 +400,10 @@ class SpaceChargeEllipticalIntegral(LinearElement):
 
     def spaceChargeMatrix(self, multipart, twiss, beamdata):        
         print "\n\n\nNew element!"
+        print "deltas: " + str(self.deltas)
         # beamdata: beta (speed), lambda (RF-wavelength), mass, charge
         beta = beamdata[0]
+        print "beta: " + str(beta)
         rf_lambda = beamdata[1]
         m = beamdata[2]
         q = beamdata[3]
@@ -405,10 +412,12 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         N = len(multipart) # this info should come from the multipart (len(multipart))
         Q = q*N # from (19) in ref 1.
         gamma = 1/sqrt(1-beta**2)
+        print "gamma: " + str(gamma)
         c = constants.c # in metric (metric for everything perhaps?)
         vac_perm = constants.epsilon_0
 
         I = N*q*c/rf_lambda # from ref. E #I = 0.065 # beam data from ref F
+        print "I: " + str(I)
 
         ## Courant-Snyder or Twiss params
         # envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
@@ -438,30 +447,32 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         Zp = -alpha_z*sqrt(5*epsilon_rms_z/beta_z)
         print "Zp: " + str(Zp)
 
-        ## Deviations from multipart (x,y,z). So there should really be one matrix per particle
-        x = multipart[0][0][0]
-        print "x: " + str(x)
-        y = multipart[0][0][2]
-        print "y: " + str(y)
-        z = multipart[0][0][4]
-        print "z: " + str(z)
+        ## Deviations from multipart (x,y,z). So there should really be one matrix per particle. Now I just use one particle's data
+        #r_x = multipart[0][0][0]
+        r_x = X
+        print "r_x: " + str(r_x)
+        #r_y = multipart[0][0][2]
+        r_y = Y
+        print "r_y: " + str(r_y)
+        #r_z = multipart[0][0][4]
+        r_z = Z
+        print "r_z: " + str(r_z)
 
         ## Eliptical integral?
         #s = Z/sqrt(X*Y)
         #epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf)[0] # eqn 5 in ref B
 
         # Eliptical integral
-        # r_x = X, r_y = Y, r_z = Z
-        g = gamma*Z/sqrt(X*Y) # eqn 40 from ref E.
+        g = gamma*r_z/sqrt(r_x*r_y) # eqn 40 from ref E.
         print "g: " + str(g)
         f_of_g_integral = g/2*quad(lambda t : 1/((t+1)*(t+g**2)**(3/2)), 0, inf)[0] # eqn 41 from ref E.
         print "f_of_g_integral: " + str(f_of_g_integral)
 
-        G_x = 3*(1-f_of_g_integral)*x/(X*(X+Y)*Z) # eqn 36 from ref E.
+        G_x = 3*(1-f_of_g_integral)*r_x/(X*(X+Y)*Z) # eqn 36 from ref E.
         print "G_x: " + str(G_x)
-        G_y = 3*(1-f_of_g_integral)*y/(Y*(X+Y)*Z) # eqn 37 from ref E.
+        G_y = 3*(1-f_of_g_integral)*r_y/(Y*(X+Y)*Z) # eqn 37 from ref E.
         print "G_y: " + str(G_y)
-        G_z = 3*f_of_g_integral*z/(X*Y*Z) # eqn 38 from ref E.
+        G_z = 3*f_of_g_integral*r_z/(X*Y*Z) # eqn 38 from ref E.
         print "G_z: " + str(G_z)
 
         U_scx = I*rf_lambda*G_x/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 33 from ref E.
@@ -477,7 +488,6 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         print "delta_P_y: " + str(delta_P_y)
         delta_P_z = q*U_scz*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
         print "delta_P_z: " + str(delta_P_z)
-        #print ": " + str()
 
         # Converting from delta_P to delta_xp
         v = beta*c
@@ -655,12 +665,12 @@ class LieAlgebra():
 
 # General class for elements from Hamiltonians, can be linear but since all is based on differential algebra "linear" is set to 0
 class LieAlgElement(Element):
-    def __init__(self, name, LA, ham, K, L, order, spaceChargeOn, multipart, twiss, beamdata):
+    def __init__(self, name, LA, ham, K, L, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
         Element.__init__(self, name, 0)
 
         self.L = L
         self.K = K
-        self.n = 1 # matches matrix approach well
+        self.n = nbrOfSplits # matches matrix approach well
         #self.n = 5 # matches matrix approach not as well but is needed for split
         self.Lsp = L/self.n
 

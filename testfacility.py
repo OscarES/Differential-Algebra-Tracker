@@ -225,24 +225,26 @@ beamdata = [beta, rf_lambda, m, q]
 
 envelopeInComp = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0]) # since space-charge won't be tested this won't matter
 
+nbrOfSplits = 1
+
 ## the lattice will be a FODSO cell (Focusing Quad, Drift, Defocusing Quad, Sextupole, Drift)
 compLattice = Lattice('compLattice')
 
 fQName = "fQ"
 fQuadLength = 0.4
 fQuadStrength = -0.8 # this is k
-fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata)
+fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 compLattice.appendElement(fQ)
 
 driftName = "drift"
 driftLength = 1.0
-compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata)
+compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 compLattice.appendElement(compDrift)
 
 dQName = "dQ"
 dQuadLength = 0.4
 dQuadStrength = 0.8
-dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata)
+dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 compLattice.appendElement(dQ)
 
 sextuName = "sextu"
@@ -250,7 +252,7 @@ sextuLength = 0.3
 sextuStrength = 0.6
 LAcomp = LieAlgebra()
 compOrder = 6
-sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata)
+sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 compLattice.appendElement(sextu)
 
 compLattice.appendElement(compDrift)
