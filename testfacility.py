@@ -3,7 +3,7 @@ import numpy as np
 from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
-from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D
+from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D, envelopeFromMultipart
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
 from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format
 import copy
@@ -223,7 +223,9 @@ beta = betaFromE(m, E)
 q = constants.e
 beamdata = [beta, rf_lambda, m, q]
 
-envelopeInComp = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0]) # since space-charge won't be tested this won't matter
+#envelopeInComp = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0])
+envelopeInComp = envelopeFromMultipart(multipartfromold)
+#print "envelopeInComp: " + str(envelopeInComp)
 
 nbrOfSplits = 1
 
@@ -258,7 +260,7 @@ compLattice.appendElement(sextu)
 compLattice.appendElement(compDrift)
 
 ## Calculate
-partresInComp, envresInComp = compLattice.evaluate(multipartfromold,twissfromold) # Does eval still change input?
+partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
 
 saveSummer2015Format("data/" + "outpartFODSOspaceCharge1" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
