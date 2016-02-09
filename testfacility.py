@@ -7,9 +7,11 @@ from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
 from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format
 import copy
+from scipy import constants
+from relativity import betaFromE
 
 
-sigma = 0.001 # the standard deviation that the user will enter
+#sigma = 0.001 # the standard deviation that the user will enter
 #epsilon = sqrt(sigmax**2*sigmaxp**2-sigmaxxp**2)
 
 ## Symbols
@@ -193,17 +195,34 @@ print "IOHandling..."
 #
 
 ### Compare with old code
-print "Compare with old code..."
-## Load the same particles
+print "Compare with old code/ compare space charges..."
+## Load the same particles (old code comp)
 datafilepart = "data/" + "inpart1000" + ".txt"
 datafiletwiss = "data/" + "intwiss" + ".txt"
 multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
 multipartfromoldcopy = copy.copy(multipartfromold)
-#print "multipartfromold: \n" + str(multipartfromold)
-#print "twissfromold: \n" + str(twissfromold)
 
-## No space charge since unsupported by old code
-spaceChargeOnInComp = 0
+# the twiss can't be zero in z since there is a /beta in spaceCharge elem
+twissfromold[6] = twissfromold[0]
+twissfromold[7] = twissfromold[1] 
+twissfromold[8] = twissfromold[2]
+twissfromoldcopy = copy.copy(twissfromold)
+
+nbrOfParticles = 10
+multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
+multipartfromoldcopy = copy.copy(multipartfromold)
+
+spaceChargeOnInComp = 2
+
+E = 2e9*constants.e # 2GeV to joule from ref F.
+freq = 704.42e6 # (Hz) from ref. F
+
+rf_lambda = constants.c/freq  # beam data needed
+m = constants.m_p
+beta = betaFromE(m, E)
+q = constants.e
+beamdata = [beta, rf_lambda, m, q]
+
 envelopeInComp = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0]) # since space-charge won't be tested this won't matter
 
 ## the lattice will be a FODSO cell (Focusing Quad, Drift, Defocusing Quad, Sextupole, Drift)
@@ -212,18 +231,18 @@ compLattice = Lattice('compLattice')
 fQName = "fQ"
 fQuadLength = 0.4
 fQuadStrength = -0.8 # this is k
-fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, envelopeInComp)
+fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata)
 compLattice.appendElement(fQ)
 
 driftName = "drift"
 driftLength = 1.0
-compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, envelopeInComp)
+compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata)
 compLattice.appendElement(compDrift)
 
 dQName = "dQ"
 dQuadLength = 0.4
 dQuadStrength = 0.8
-dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, envelopeInComp)
+dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata)
 compLattice.appendElement(dQ)
 
 sextuName = "sextu"
@@ -231,17 +250,17 @@ sextuLength = 0.3
 sextuStrength = 0.6
 LAcomp = LieAlgebra()
 compOrder = 6
-sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, envelopeInComp)
+sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata)
 compLattice.appendElement(sextu)
 
 compLattice.appendElement(compDrift)
 
 ## Calculate
-partresInComp, envresInComp = compLattice.evaluate(multipartfromold,envelopeInComp) # Does eval still change input?
+partresInComp, envresInComp = compLattice.evaluate(multipartfromold,twissfromold) # Does eval still change input?
 
-saveSummer2015Format("data/" + "outpartFODSO" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
+saveSummer2015Format("data/" + "outpartFODSOspaceCharge1" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
-plotEverything(multipartfromoldcopy, twissfromold, partresInComp)
+plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
 
 ### Plotting
 print "Plotting..."
@@ -266,3 +285,4 @@ print "Plotting..."
 # C. Accelerator-Recipies.pdf by E. Laface
 # D. The leapfrog method and other symplectic algorithms for integrating Newtons laws of motion Peter Young Dated April 21 2014
 # E. ESS Linac simulator
+# F. WEPEA 040
