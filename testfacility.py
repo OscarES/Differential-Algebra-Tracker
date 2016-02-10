@@ -208,9 +208,9 @@ twissfromold[7] = twissfromold[1]
 twissfromold[8] = twissfromold[2]
 twissfromoldcopy = copy.copy(twissfromold)
 
-#nbrOfParticles = 10
-#multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
-#multipartfromoldcopy = copy.copy(multipartfromold)
+nbrOfParticles = 10
+multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
+multipartfromoldcopy = copy.copy(multipartfromold)
 
 spaceChargeOnInComp = 2
 
@@ -227,7 +227,7 @@ beamdata = [beta, rf_lambda, m, q]
 envelopeInComp = envelopeFromMultipart(multipartfromold)
 #print "envelopeInComp: " + str(envelopeInComp)
 
-nbrOfSplits = 1
+nbrOfSplits = 10
 
 ## the lattice will be a FODSO cell (Focusing Quad, Drift, Defocusing Quad, Sextupole, Drift)
 compLattice = Lattice('compLattice')
@@ -235,8 +235,8 @@ compLattice = Lattice('compLattice')
 fQName = "fQ"
 fQuadLength = 0.4
 fQuadStrength = -0.8 # this is k
-fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-compLattice.appendElement(fQ)
+#fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+#compLattice.appendElement(fQ)
 
 driftName = "drift"
 driftLength = 1.0
@@ -246,18 +246,18 @@ compLattice.appendElement(compDrift)
 dQName = "dQ"
 dQuadLength = 0.4
 dQuadStrength = 0.8
-dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-compLattice.appendElement(dQ)
+#dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+#compLattice.appendElement(dQ)
 
 sextuName = "sextu"
 sextuLength = 0.3
 sextuStrength = 0.6
 LAcomp = LieAlgebra()
 compOrder = 6
-sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-compLattice.appendElement(sextu)
+#sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+#compLattice.appendElement(sextu)
 
-compLattice.appendElement(compDrift)
+#compLattice.appendElement(compDrift)
 
 ## Calculate
 partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
