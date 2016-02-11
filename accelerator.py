@@ -77,7 +77,7 @@ class Drift(LinearElement):
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
         self.Msp, self.Tsp = self.disunite(self.M,self.T,self.n)
-        print "self.Tsp: \n" + str(self.Tsp)
+        #print "self.Tsp: \n" + str(self.Tsp)
 
         # space charge class
         self.spaceChargeOn = spaceChargeOn
@@ -123,7 +123,7 @@ class Drift(LinearElement):
             if self.spaceChargeOn:
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
-                print "envelope[0]: " + str(envelope[0])
+                #print "envelope[0]: " + str(envelope[0])
                 twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
                 twiss[4] = envelope[3] / twiss[5]
                 twiss[7] = envelope[6] / twiss[8]
@@ -136,7 +136,7 @@ class Drift(LinearElement):
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
         #envelope = np.dot(self.Tsp, envelope)
-        print "Envelope from multipart instead!"
+        #print "Envelope from multipart instead!"
         envelope = envelopeFromMultipart(multipart)
         return multipart, envelope
 
@@ -430,13 +430,13 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         return result[0]
 
     def spaceChargeMatrix(self, multipart, twiss, beamdata):        
-        print "\n\n\nNew element!"
-        print "deltas: " + str(self.deltas)
+        #print "\n\n\nNew element!"
+        #print "deltas: " + str(self.deltas)
         # beamdata: beta (speed), lambda (RF-wavelength), mass, charge
         beta = beamdata[0]
-        print "beta: " + str(beta)
+        #print "beta: " + str(beta)
         rf_lambda = beamdata[1]
-        print "rf_lambda: " + str(rf_lambda)
+        #print "rf_lambda: " + str(rf_lambda)
         m = beamdata[2]
         q = beamdata[3]
         
@@ -444,20 +444,20 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         N = len(multipart) # this info should come from the multipart (len(multipart))
         Q = q*N # from (19) in ref 1.
         gamma = 1/sqrt(1-beta**2)
-        print "gamma: " + str(gamma)
+        #print "gamma: " + str(gamma)
         c = constants.c # in metric (metric for everything perhaps?)
         vac_perm = constants.epsilon_0
 
         I = N*q*c/rf_lambda # from ref. E #I = 0.065 # beam data from ref F
-        print "I: " + str(I)
+        #print "I: " + str(I)
 
         ## Courant-Snyder or Twiss params
         # envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
         alpha_x = twiss[0]
         beta_x = twiss[1]
-        print "beta_x: " + str(beta_x)
+        #print "beta_x: " + str(beta_x)
         epsilon_rms_x = twiss[2]
-        print "epsilon_rms_x: " + str(epsilon_rms_x)
+        #print "epsilon_rms_x: " + str(epsilon_rms_x)
         alpha_y = twiss[3]
         beta_y = twiss[4]
         epsilon_rms_y = twiss[5]
@@ -484,24 +484,24 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         ## Deviations from multipart (x,y,z). So there should really be one matrix per particle. Now I just use one particle's data
         #r_x = multipart[0][0][0]
         r_x = X
-        print "r_x: " + str(r_x)
+        #print "r_x: " + str(r_x)
         #r_y = multipart[0][0][2]
         r_y = Y
-        print "r_y: " + str(r_y)
+        #print "r_y: " + str(r_y)
         #r_z = multipart[0][0][4]
         r_z = Z
-        print "r_z: " + str(r_z)
+        #print "r_z: " + str(r_z)
         
         #r_x = 1 # semi-axes of the ellipsiod. What are they really? putting them to one works
         #r_y = 1
         #r_z = 1
 
-        x = multipart[0][0][0]
-        print "x: " + str(x)
-        y = multipart[0][0][2]
-        print "y: " + str(y)
-        z = multipart[0][0][4]
-        print "z: " + str(z)
+        #x = multipart[0][0][0]
+        #print "x: " + str(x)
+        #y = multipart[0][0][2]
+        #print "y: " + str(y)
+        #z = multipart[0][0][4]
+        #print "z: " + str(z)
 
         ## Eliptical integral?
         #s = Z/sqrt(X*Y)
@@ -509,67 +509,67 @@ class SpaceChargeEllipticalIntegral(LinearElement):
 
         # Eliptical integral
         g = gamma*r_z/sqrt(r_x*r_y) # eqn 40 from ref E.
-        print "g: " + str(g)
+        #print "g: " + str(g)
         f_of_g_integral = g/2*quad(lambda t : 1/((t+1)*(t+g**2)**(3/2)), 0, inf)[0] # eqn 41 from ref E.
-        print "f_of_g_integral: " + str(f_of_g_integral)
+        #print "f_of_g_integral: " + str(f_of_g_integral)
 
-        G_x = 3*(1-f_of_g_integral)*x/(r_x*(r_x+r_y)*r_z) # eqn 36 from ref E.
-        print "G_x: " + str(G_x)
-        G_y = 3*(1-f_of_g_integral)*y/(r_y*(r_x+r_y)*r_z) # eqn 37 from ref E.
-        print "G_y: " + str(G_y)
-        G_z = 3*f_of_g_integral*z/(r_x*r_y*r_z) # eqn 38 from ref E.
-        print "G_z: " + str(G_z)
+        #G_x = 3*(1-f_of_g_integral)*x/(r_x*(r_x+r_y)*r_z) # eqn 36 from ref E.
+        #print "G_x: " + str(G_x)
+        #G_y = 3*(1-f_of_g_integral)*y/(r_y*(r_x+r_y)*r_z) # eqn 37 from ref E.
+        #print "G_y: " + str(G_y)
+        #G_z = 3*f_of_g_integral*z/(r_x*r_y*r_z) # eqn 38 from ref E.
+        #print "G_z: " + str(G_z)
 
         G_x_without_x = 3*(1-f_of_g_integral)/(r_x*(r_x+r_y)*r_z) # saving x for eval (x will come from multipart)
         G_y_without_y = 3*(1-f_of_g_integral)/(r_y*(r_x+r_y)*r_z)
         G_z_without_z = 3*f_of_g_integral/(r_x*r_y*r_z)
 
-        U_scx = I*rf_lambda*G_x/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 33 from ref E.
-        print "U_scx: " + str(U_scx)
-        U_scy = I*rf_lambda*G_y/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 34 from ref E.
-        print "U_scy: " + str(U_scy)
-        U_scz = I*rf_lambda*G_z/(4*math.pi*constants.epsilon_0*c) # eqn 35 from ref E.
-        print "U_scz: " + str(U_scz)
+        #U_scx = I*rf_lambda*G_x/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 33 from ref E.
+        #print "U_scx: " + str(U_scx)
+        #U_scy = I*rf_lambda*G_y/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 34 from ref E.
+        #print "U_scy: " + str(U_scy)
+        #U_scz = I*rf_lambda*G_z/(4*math.pi*constants.epsilon_0*c) # eqn 35 from ref E.
+        #print "U_scz: " + str(U_scz)
 
         U_scx_without_x = I*rf_lambda*G_x_without_x/(4*math.pi*constants.epsilon_0*c*gamma**2)
         U_scy_without_y = I*rf_lambda*G_y_without_y/(4*math.pi*constants.epsilon_0*c*gamma**2)
         U_scz_without_z = I*rf_lambda*G_z_without_z/(4*math.pi*constants.epsilon_0*c)
 
-        delta_P_x = q*U_scx*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
-        print "delta_P_x: " + str(delta_P_x)
-        delta_P_y = q*U_scy*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
-        print "delta_P_y: " + str(delta_P_y)
-        delta_P_z = q*U_scz*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
-        print "delta_P_z: " + str(delta_P_z)
+        #delta_P_x = q*U_scx*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
+        #print "delta_P_x: " + str(delta_P_x)
+        #delta_P_y = q*U_scy*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
+        #print "delta_P_y: " + str(delta_P_y)
+        #delta_P_z = q*U_scz*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
+        #print "delta_P_z: " + str(delta_P_z)
 
         delta_P_x_without_x = q*U_scx_without_x*self.deltas/(m*c**2*beta)
         delta_P_y_without_y = q*U_scy_without_y*self.deltas/(m*c**2*beta)
         delta_P_z_without_z = q*U_scz_without_z*self.deltas/(m*c**2*beta)
 
         # Converting from delta_P to delta_xp
-        v = beta*c
-        p = gamma*m*v
-        #print "p: " + str(p)
-        delta_xp = delta_P_x/p # xp = p_x/p. eqn 150 and 151 from ref 1.
-        print "delta_xp: " + str(delta_xp)
-        delta_yp = delta_P_y/p # yp = p_y/p. eqn 150 and 151 from ref 1.
-        print "delta_yp: " + str(delta_yp)
-        delta_zp = delta_P_z/p # zp = p_z/p. eqn 150 and 151 from ref 1.
-        print "delta_zp: " + str(delta_zp)
+        #v = beta*c
+        #p = gamma*m*v
+        ##print "p: " + str(p)
+        #delta_xp = delta_P_x/p # xp = p_x/p. eqn 150 and 151 from ref 1.
+        #print "delta_xp: " + str(delta_xp)
+        #delta_yp = delta_P_y/p # yp = p_y/p. eqn 150 and 151 from ref 1.
+        #print "delta_yp: " + str(delta_yp)
+        #delta_zp = delta_P_z/p # zp = p_z/p. eqn 150 and 151 from ref 1.
+        #print "delta_zp: " + str(delta_zp)
 
         delta_xp_without_x = delta_P_x_without_x#/p # #/p means that delta_P_i is actually delta_ip
         delta_yp_without_y = delta_P_y_without_y#/p
         delta_zp_without_z = delta_P_z_without_z#/p
 
-        Msc = np.array([
-                [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
-                [0.0,1.0,0.0,0.0,0.0,0.0,delta_xp],
-                [0.0,0.0,1.0,0.0,0.0,0.0,0.0],
-                [0.0,0.0,0.0,1.0,0.0,0.0,delta_yp],
-                [0.0,0.0,0.0,0.0,1.0,0.0,0.0],
-                [0.0,0.0,0.0,0.0,0.0,1.0,delta_zp],
-                [0.0,0.0,0.0,0.0,0.0,0.0,1.0]
-            ])
+        #Msc = np.array([
+        #        [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
+        #        [0.0,1.0,0.0,0.0,0.0,0.0,delta_xp],
+        #        [0.0,0.0,1.0,0.0,0.0,0.0,0.0],
+        #        [0.0,0.0,0.0,1.0,0.0,0.0,delta_yp],
+        #        [0.0,0.0,0.0,0.0,1.0,0.0,0.0],
+        #        [0.0,0.0,0.0,0.0,0.0,1.0,delta_zp],
+        #        [0.0,0.0,0.0,0.0,0.0,0.0,1.0]
+        #    ])
 
         Msc_new_from_without = np.array([
                 [1.0,0.0,0.0,0.0,0.0,0.0],
