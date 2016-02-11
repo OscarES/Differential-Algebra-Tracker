@@ -241,7 +241,7 @@ fQuadStrength = -0.8 # this is k
 #compLattice.appendElement(fQ)
 
 driftName = "drift"
-driftLength = 100.0
+driftLength = 1.0
 compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 compLattice.appendElement(compDrift)
 
