@@ -1,6 +1,7 @@
 import numpy as np
 import pickle
 import os
+import copy
 
 def saveAll(filename, multipart, twiss, envelope, lattice):
     saveMultipart(filename + "multipart", multipart)
@@ -141,6 +142,37 @@ def loadSummer2015Format(datafilepart, datafiletwiss):
         alpha_z = 0
         beta_z = 0
         epsilon_rms_z = 0
+
+        twiss = np.array([alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z])
+
+        return multipart, twiss
+    except:
+        print 'Bad datafile!'
+        quit()
+        return 0
+
+def loadSummer2015Formatzasx(datafilepart, datafiletwiss):
+    try:
+        x, xp, y, yp = np.loadtxt(datafilepart,unpack = True)
+        alpha_x, beta_x, epsilon_x, alpha_y, beta_y, epsilon_y = np.loadtxt(datafiletwiss,unpack = True)
+
+        nbrOfParticles = len(x)
+
+        z = copy.deepcopy(x)
+        zp = copy.deepcopy(xp)
+
+        s = np.linspace(0,0,nbrOfParticles)
+
+        bigMatrix = np.array([x, xp, y, yp, z, zp])
+
+        multipart = [[bigMatrix[:,i], s[i]] for i in xrange(nbrOfParticles)]
+
+        epsilon_rms_x = epsilon_x
+        epsilon_rms_y = epsilon_y
+
+        alpha_z = copy.deepcopy(alpha_x)
+        beta_z = copy.deepcopy(beta_x)
+        epsilon_rms_z = copy.deepcopy(epsilon_rms_x)
 
         twiss = np.array([alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z])
 
