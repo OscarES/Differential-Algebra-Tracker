@@ -2,9 +2,9 @@ import numpy as np
 
 ##### Diff between particle data, data should be stored as x column xp column y column yp
 firstdata = raw_input('Enter first datafile name:')
-if len(firstdata) < 1 : firstdata = "data/comparison/" + "outjustFODSOpartfromlie.txt" # if no filename given, this file will be used
+if len(firstdata) < 1 : firstdata = "data/compareSC/" + "outpartFODSOspaceChargetest1.txt" # if no filename given, this file will be used
 seconddata = raw_input('Enter second datafile name:')
-if len(seconddata) < 1 : seconddata = "data/comparison/" + "outpartFODSOfromDAT.txt" # if no filename given, this file will be used
+if len(seconddata) < 1 : seconddata = "data/compareSC/" + "outpartFODSOspaceChargetest2.txt" # if no filename given, this file will be used
 
 firstx, firstxp, firsty, firstyp = np.loadtxt(firstdata,unpack = True)
 secondx, secondxp, secondy, secondyp = np.loadtxt(seconddata,unpack = True)

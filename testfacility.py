@@ -5,7 +5,7 @@ from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D, envelopeFromMultipart
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
-from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format
+from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format, loadSummer2015Formatzasx
 import copy
 from scipy import constants
 from relativity import betaFromE
@@ -199,19 +199,20 @@ print "Compare with old code/ compare space charges..."
 ## Load the same particles (old code comp)
 datafilepart = "data/" + "inpart1000" + ".txt"
 datafiletwiss = "data/" + "intwiss" + ".txt"
-multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
-multipartfromoldcopy = copy.deepcopy(multipartfromold)
+#multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
+#multipartfromoldcopy = copy.deepcopy(multipartfromold)
+#print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
 
-# the twiss can't be zero in z since there is a /beta in spaceCharge elem
-twissfromold[6] = twissfromold[0]
-twissfromold[7] = twissfromold[1] 
-twissfromold[8] = twissfromold[2]
+# sets z as x from old format
+multipartfromold, twissfromold = loadSummer2015Formatzasx(datafilepart, datafiletwiss)
+multipartfromoldcopy = copy.deepcopy(multipartfromold)
 twissfromoldcopy = copy.deepcopy(twissfromold)
 
-nbrOfParticles = 10
-multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
-multipartfromoldcopy = copy.deepcopy(multipartfromold)
-print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
+
+#nbrOfParticles = 1000
+#multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
+#multipartfromoldcopy = copy.deepcopy(multipartfromold)
+#print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
 
 spaceChargeOnInComp = 2
 
@@ -240,7 +241,7 @@ fQuadStrength = -0.8 # this is k
 #compLattice.appendElement(fQ)
 
 driftName = "drift"
-driftLength = 1.0
+driftLength = 100.0
 compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 compLattice.appendElement(compDrift)
 
@@ -263,7 +264,7 @@ compOrder = 6
 ## Calculate
 partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
 
-saveSummer2015Format("data/" + "outpartFODSOspaceChargetestt" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
+saveSummer2015Format("data/" + "outpartFODSOspaceChargetesttest" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
 plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
 

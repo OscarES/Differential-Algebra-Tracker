@@ -557,9 +557,9 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         delta_zp = delta_P_z/p # zp = p_z/p. eqn 150 and 151 from ref 1.
         print "delta_zp: " + str(delta_zp)
 
-        delta_xp_without_x = delta_P_x_without_x/p
-        delta_yp_without_y = delta_P_y_without_y/p
-        delta_zp_without_z = delta_P_z_without_z/p
+        delta_xp_without_x = delta_P_x_without_x#/p # #/p means that delta_P_i is actually delta_ip
+        delta_yp_without_y = delta_P_y_without_y#/p
+        delta_zp_without_z = delta_P_z_without_z#/p
 
         Msc = np.array([
                 [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
