@@ -520,6 +520,10 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         G_z = 3*f_of_g_integral*z/(r_x*r_y*r_z) # eqn 38 from ref E.
         print "G_z: " + str(G_z)
 
+        G_x_without_x = 3*(1-f_of_g_integral)/(r_x*(r_x+r_y)*r_z) # saving x for eval (x will come from multipart)
+        G_y_without_y = 3*(1-f_of_g_integral)/(r_y*(r_x+r_y)*r_z)
+        G_z_without_z = 3*f_of_g_integral/(r_x*r_y*r_z)
+
         U_scx = I*rf_lambda*G_x/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 33 from ref E.
         print "U_scx: " + str(U_scx)
         U_scy = I*rf_lambda*G_y/(4*math.pi*constants.epsilon_0*c*gamma**2) # eqn 34 from ref E.
@@ -527,12 +531,20 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         U_scz = I*rf_lambda*G_z/(4*math.pi*constants.epsilon_0*c) # eqn 35 from ref E.
         print "U_scz: " + str(U_scz)
 
+        U_scx_without_x = I*rf_lambda*G_x_without_x/(4*math.pi*constants.epsilon_0*c*gamma**2)
+        U_scy_without_y = I*rf_lambda*G_y_without_y/(4*math.pi*constants.epsilon_0*c*gamma**2)
+        U_scz_without_z = I*rf_lambda*G_z_without_z/(4*math.pi*constants.epsilon_0*c)
+
         delta_P_x = q*U_scx*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
         print "delta_P_x: " + str(delta_P_x)
         delta_P_y = q*U_scy*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
         print "delta_P_y: " + str(delta_P_y)
         delta_P_z = q*U_scz*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
         print "delta_P_z: " + str(delta_P_z)
+
+        delta_P_x_without_x = q*U_scx_without_x*self.deltas/(m*c**2*beta)
+        delta_P_y_without_y = q*U_scy_without_y*self.deltas/(m*c**2*beta)
+        delta_P_z_without_z = q*U_scz_without_z*self.deltas/(m*c**2*beta)
 
         # Converting from delta_P to delta_xp
         v = beta*c
@@ -545,6 +557,10 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         delta_zp = delta_P_z/p # zp = p_z/p. eqn 150 and 151 from ref 1.
         print "delta_zp: " + str(delta_zp)
 
+        delta_xp_without_x = delta_P_x_without_x/p
+        delta_yp_without_y = delta_P_y_without_y/p
+        delta_zp_without_z = delta_P_z_without_z/p
+
         Msc = np.array([
                 [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
                 [0.0,1.0,0.0,0.0,0.0,0.0,delta_xp],
@@ -554,7 +570,18 @@ class SpaceChargeEllipticalIntegral(LinearElement):
                 [0.0,0.0,0.0,0.0,0.0,1.0,delta_zp],
                 [0.0,0.0,0.0,0.0,0.0,0.0,1.0]
             ])
-        return Msc
+
+        Msc_new_from_without = np.array([
+                [1.0,0.0,0.0,0.0,0.0,0.0],
+                [delta_xp_without_x,1.0,0.0,0.0,0.0,0.0],
+                [0.0,0.0,1.0,0.0,0.0,0.0],
+                [0.0,0.0,delta_yp_without_y,1.0,0.0,0.0],
+                [0.0,0.0,0.0,0.0,1.0,0.0],
+                [0.0,0.0,0.0,0.0,delta_zp_without_z,1.0]
+            ])
+
+        return Msc_new_from_without
+        #return Msc
 
     def evaluateSC(self,multipart,envelope):
         for j in range(0,len(np.atleast_1d(multipart))):
@@ -562,10 +589,16 @@ class SpaceChargeEllipticalIntegral(LinearElement):
             #if beamChanged(envelope):
                 #self.Msc, self.Tsc = spaceChargeMatrix(envlope)
 
-            extendedphasespace = np.append(multipart[j][0][0:6], 1) # adds the dispersion 1 term
-            extendedphasespace = np.dot(self.Msc, extendedphasespace) # here calculations are made
-            reducedphasespace = extendedphasespace[0:6] # throws away the dispersion 1 term
-            multipart[j] = np.array([reducedphasespace, multipart[j][1]]) # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
+            #zz
+            #extendedphasespace = np.append(multipart[j][0][0:6], 1) # adds the dispersion 1 term
+            #extendedphasespace = np.dot(self.Msc, extendedphasespace) # here calculations are made
+            #reducedphasespace = extendedphasespace[0:6] # throws away the dispersion 1 term
+            #multipart[j] = np.array([reducedphasespace, multipart[j][1]]) # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
+            #zz
+
+            ### New way of calculating (from the without params)
+            multipart[j][0][0:6] = np.dot(self.Msc, multipart[j][0][0:6]) # self.Msc was set to the new matrix
+
         #envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
         return multipart,envelope
 

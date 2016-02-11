@@ -200,17 +200,18 @@ print "Compare with old code/ compare space charges..."
 datafilepart = "data/" + "inpart1000" + ".txt"
 datafiletwiss = "data/" + "intwiss" + ".txt"
 multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
-multipartfromoldcopy = copy.copy(multipartfromold)
+multipartfromoldcopy = copy.deepcopy(multipartfromold)
 
 # the twiss can't be zero in z since there is a /beta in spaceCharge elem
 twissfromold[6] = twissfromold[0]
 twissfromold[7] = twissfromold[1] 
 twissfromold[8] = twissfromold[2]
-twissfromoldcopy = copy.copy(twissfromold)
+twissfromoldcopy = copy.deepcopy(twissfromold)
 
 nbrOfParticles = 10
 multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
-multipartfromoldcopy = copy.copy(multipartfromold)
+multipartfromoldcopy = copy.deepcopy(multipartfromold)
+print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
 
 spaceChargeOnInComp = 2
 
