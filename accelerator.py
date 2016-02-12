@@ -141,7 +141,87 @@ class Drift(LinearElement):
         return multipart, envelope
 
 ### DIPOLE
-# class Dipole(LinearElement):
+class Dipole(LinearElement):
+    def __init__(self, name, rho, alpha, n, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
+        LinearElement.__init__(self, name)
+        self.rho = rho
+        self.alpha = alpha
+        self.nparam = n
+        self.beta = beamdata[0]
+        self.gamma = 1/sqrt(1-self.beta**2)
+        self.L = rho*alpha
+        self.K_x = sqrt(1-self.nparam)/rho
+        self.K_y = self.nparam/rho
+        self.M = self.createMatrixM(self.rho, self.L, self.K_x, self.K_y, self.beta, self.gamma) # M should be a 6x6 matrix
+        self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
+        
+        # disunite matrices
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+        self.Msp, self.Tsp = self.disunite(self.M,self.T,self.n)
+
+        # space charge class
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
+
+    """ taken from lie code where K = sqrt(k)"""
+    def createMatrixM(self, rho, L, K_x, K_y, beta, gamma):
+        return np.array([
+            [cos(K_x*L),sin(K_x*L)/K_x,0,0,0,(1-cos(K_x*L))/rho/K_x**2],
+            [-K_x*sin(K_x*L),cos(K_x*L),0,0,0,sin(K_x*L)/rho/K_x],
+            [0,0,cos(K_y*L),sin(K_y*L)/K_y,0,0],
+            [0,0,-K_y*sin(K_y*L),cos(K_y*L),0,0],
+            [-sin(K_x*L)/rho/K_x,-(1-cos(K_x*L))/rho/K_x/L**2,0,0,1,-(K_x*L*beta**2-sin(K_x*L))/(rho**2*K_x**3)+(L/gamma**2)*(1-1/rho**2/K_x**2)],
+            [0,0,0,0,0,1]
+            ])
+
+    def createMatrixT(self, M):
+        # T is size 9x9 and defined from eqn (1.56) in ref C
+        return np.array([
+                [M[0,0]**2, 2*M[0,0]*M[0,1], M[0,1]**2, 0, 0, 0, 0, 0, 0],
+                [M[0,0]*M[1,0], M[0,0]*M[1,1]+M[0,1]*M[1,0], M[0,1]*M[1,1], 0, 0, 0, 0, 0, 0],
+                [M[1,0]**2, 2*M[1,0]*M[1,1], M[1,1]**2, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, M[2,2]**2, 2*M[2,2]*M[2,3], M[2,3]**2, 0, 0, 0],
+                [0, 0, 0, M[2,2]*M[3,2], M[2,2]*M[3,3]+M[2,3]*M[3,2], M[2,3]*M[3,3], 0, 0, 0],
+                [0, 0, 0, M[3,2]**2, 2*M[3,2]*M[3,3], M[3,3]**2, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, M[4,4]**2, 2*M[4,4]*M[4,5], M[4,5]**2],
+                [0, 0, 0, 0, 0, 0, M[4,4]*M[5,4], M[4,4]*M[5,5]+M[4,5]*M[5,4], M[4,5]*M[5,5]],
+                [0, 0, 0, 0, 0, 0, M[5,4]**2, 2*M[5,4]*M[5,5], M[5,5]**2]
+                ])
+
+    def disunite(self,M,T,n):
+        Msp = self.createMatrixM(self.rho, self.Lsp, self.K_x, self.K_y, self.beta, self.gamma)
+        Tsp = self.createMatrixT(Msp)
+        return Msp, Tsp
+
+    def printInfo(self):
+        return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t K_x: " + str(self.K_x) + "\t K_y: " + str(self.K_y) + "\t beta: " + str(self.beta) + "\t gamma: " + str(self.gamma)
+
+    def evaluate(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        #print "hej fran quad"
+        for i in range(0,self.n):
+            if self.spaceChargeOn:
+                self.sc.updateMatrix(multipart,twiss)
+                multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
+            multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
+            #twiss[7] = envelope[6] / twiss[8]
+            #print "twiss[7] after: " + str(twiss[7])
+        return multipart, envelope, twiss
+
+    def evaluateM(self,multipart,envelope):
+        # should just go through a disunited part
+        # each loop iteration is for a new particle
+        for j in range(0,len(np.atleast_1d(multipart))):
+            multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
+        envelope = np.dot(self.Tsp, envelope)
+        return multipart, envelope
 
 ### QUAD
 class Quad(LinearElement):

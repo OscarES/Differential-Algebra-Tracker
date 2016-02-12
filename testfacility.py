@@ -1,6 +1,6 @@
 from __future__ import division # needed for 1/2 = 0.5
 import numpy as np
-from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog
+from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D, envelopeFromMultipart
@@ -9,6 +9,7 @@ from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss,
 import copy
 from scipy import constants
 from relativity import betaFromE
+import math
 
 
 #sigma = 0.001 # the standard deviation that the user will enter
@@ -260,6 +261,13 @@ compOrder = 6
 #compLattice.appendElement(sextu)
 
 #compLattice.appendElement(compDrift)
+
+dipoleName = "dipole"
+dipoleRho = 100
+dipoleAlpha = math.pi/4 
+dipolen = 0.5
+compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+compLattice.appendElement(compDipole)
 
 ## Calculate
 partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
