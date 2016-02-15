@@ -29,7 +29,6 @@ class Lattice:
             text = text + elem.printInfo() + "\n"
         return text
 
-
     def evaluate(self, multipart,envelope,twiss):
         for elem in self.lattice:
             multipart,envelope, twiss = elem.evaluate(multipart,envelope,twiss)
@@ -68,7 +67,7 @@ class LinearElement(Element):
 ### DRIFT !!!!
 class Drift(LinearElement):
     def __init__(self, name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
-        LinearElement.__init__(self, name)
+        LinearElement.__init__(self, "drift " + name)
         self.L = L
         self.M = self.createMatrixM(L) # M should be a 6x6 matrix
         self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
@@ -143,7 +142,7 @@ class Drift(LinearElement):
 ### DIPOLE
 class Dipole(LinearElement):
     def __init__(self, name, rho, alpha, n, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
-        LinearElement.__init__(self, name)
+        LinearElement.__init__(self, "dipole " + name)
         self.rho = rho
         self.alpha = alpha
         self.nparam = n
@@ -226,7 +225,7 @@ class Dipole(LinearElement):
 ### QUAD
 class Quad(LinearElement):
     def __init__(self, name, K, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
-        LinearElement.__init__(self, name)
+        LinearElement.__init__(self, "quad " + name)
         #self.name = name
         self.K = K
         self.L = L
@@ -825,7 +824,7 @@ class LieAlgebra():
 # General class for elements from Hamiltonians, can be linear but since all is based on differential algebra "linear" is set to 0
 class LieAlgElement(Element):
     def __init__(self, name, LA, ham, K, L, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
-        Element.__init__(self, name, 0)
+        Element.__init__(self, "liealgelem " + name, 0)
 
         self.L = L
         self.K = K
