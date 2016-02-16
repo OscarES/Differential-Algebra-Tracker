@@ -61,8 +61,8 @@ def loadEnvelope(filename):
         quit()
         return 0
 
+#Can't handle LieAlgElements!!!!!!
 def saveLattice(filename, lattice):
-    #np.save(filename, lattice)
     if not os.path.isfile(filename):
         os.mknod(filename)
     pickle.dump(lattice, open(filename, 'wb'))

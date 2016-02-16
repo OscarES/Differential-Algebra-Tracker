@@ -215,7 +215,7 @@ twissfromoldcopy = copy.deepcopy(twissfromold)
 #multipartfromoldcopy = copy.deepcopy(multipartfromold)
 #print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
 
-spaceChargeOnInComp = 2
+spaceChargeOnInComp = 0
 
 E = 2e9*constants.e # 2GeV to joule from ref F.
 freq = 704.42e6 # (Hz) from ref. F
@@ -230,7 +230,7 @@ beamdata = [beta, rf_lambda, m, q]
 envelopeInComp = envelopeFromMultipart(multipartfromold)
 #print "envelopeInComp: " + str(envelopeInComp)
 
-nbrOfSplits = 10
+nbrOfSplits = 1
 
 ## the lattice will be a FODSO cell (Focusing Quad, Drift, Defocusing Quad, Sextupole, Drift)
 compLattice = Lattice('compLattice')
@@ -238,8 +238,8 @@ compLattice = Lattice('compLattice')
 fQName = "fQ"
 fQuadLength = 0.4
 fQuadStrength = -0.8 # this is k
-#fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-#compLattice.appendElement(fQ)
+fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+compLattice.appendElement(fQ)
 
 driftName = "drift"
 driftLength = 1.0
@@ -249,8 +249,8 @@ compLattice.appendElement(compDrift)
 dQName = "dQ"
 dQuadLength = 0.4
 dQuadStrength = 0.8
-#dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-#compLattice.appendElement(dQ)
+dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+compLattice.appendElement(dQ)
 
 sextuName = "sextu"
 sextuLength = 0.3
@@ -260,14 +260,34 @@ compOrder = 6
 #sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 #compLattice.appendElement(sextu)
 
-#compLattice.appendElement(compDrift)
+compLattice.appendElement(compDrift)
 
 dipoleName = "dipole"
 dipoleRho = 100
 dipoleAlpha = math.pi/4 
 dipolen = 0.5
-compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-compLattice.appendElement(compDipole)
+#compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+#compLattice.appendElement(compDipole)
+
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
+
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
+
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
+
+saveLattice("data/" + "savedlattice" + ".npy", compLattice)
 
 ## Calculate
 partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
