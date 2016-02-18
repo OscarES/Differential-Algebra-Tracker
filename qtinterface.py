@@ -7,8 +7,8 @@ from OpenGL.GLUT import *
 from OpenGL import GLU
 from PyQt5 import QtGui
 from PyQt5.QtOpenGL import *
-from PyQt5.QtWidgets import QMainWindow, QApplication, QGridLayout, QPushButton, QWidget, QHBoxLayout
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from IOHandler import loadLattice
@@ -17,12 +17,13 @@ from numpy import array
 import numpy as np
 from scipy import *
 import time
+from facility import *
 
 class LatticeOverviewWidget(QGLWidget):
     '''
     Widget for giving an overview of the lattice
     '''
-    def __init__(self, lattice, parent=None):
+    def __init__(self, lattice, facility, parent=None):
         self.parent = parent
         QtOpenGL.QGLWidget.__init__(self, parent)
 
@@ -404,13 +405,33 @@ class LatticeEditor(QWidget):
     Widget for editing the lattice
     '''
 
-    def __init__(self, parent):
+    def __init__(self, parent, facility):
         QGLWidget.__init__(self, parent)
         self.setMinimumSize(500, 500)
 
+        self.facility = facility
+
+        grid = QGridLayout()
+        self.setLayout(grid)
+
+        createDriftButton = QPushButton("createDrift")
+        createDriftButton.clicked.connect(self.createDrift) # here arguments should be passed
+        grid.addWidget(createDriftButton, 0,0)
+
+        textL = QLabel("L:")
+        grid.addWidget(textL, 1, 0)
+
+
+        enterL = QLineEdit()
+        grid.addWidget(enterL, 1, 1)
+        # make sure that only floats and number can be written. Pass the entered value to createDrift
+
+    def createDrift(self, name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
+        self.facility.createDrift(name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+
 # layout manager (aranges the different widgets)
 class FormWidget(QWidget):
-    def __init__(self, parent):        
+    def __init__(self, parent, facility):        
         #  Initialize GLUT and process user parameters
         glutInit(sys.argv);
 
@@ -423,17 +444,17 @@ class FormWidget(QWidget):
         super(FormWidget, self).__init__(parent)
         self.layout = QHBoxLayout(self)
 
-        self.rotatingcube = GLWidget(self)
-        self.layout.addWidget(self.rotatingcube)
+        #self.rotatingcube = GLWidget(self)
+        #self.layout.addWidget(self.rotatingcube)
 
         try:
             lattice = loadLattice("data/" + "savedlattice" + ".npy")
         except:
             print "Baaaaaaaad lattice file!"
-        self.latticeoverview = LatticeOverviewWidget(lattice, self)
+        self.latticeoverview = LatticeOverviewWidget(lattice, facility, self)
         self.layout.addWidget(self.latticeoverview)
 
-        self.latticeeditor = LatticeEditor(self)
+        self.latticeeditor = LatticeEditor(self, facility)
         self.layout.addWidget(self.latticeeditor)
 
         self.setLayout(self.layout)
@@ -446,8 +467,9 @@ class DATWidgetInterface(QMainWindow):
     ''' Example class for using SpiralWidget'''
     
     def __init__(self):
-        QMainWindow.__init__(self)  
-        self.widget = FormWidget(self)
+        QMainWindow.__init__(self)
+        self.facility = Facility()
+        self.widget = FormWidget(self, self.facility)
         self.setCentralWidget(self.widget)
 
     def keyPressEvent(self, e):
