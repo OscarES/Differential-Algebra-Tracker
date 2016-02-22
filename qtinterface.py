@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
+from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
 from IOHandler import loadLattice
 from accelerator import Lattice
 from numpy import array
@@ -18,6 +19,7 @@ import numpy as np
 from scipy import *
 import time
 from facility import *
+import re
 
 class LatticeOverviewWidget(QGLWidget):
     '''
@@ -64,8 +66,8 @@ class LatticeOverviewWidget(QGLWidget):
         self.facility = facility
         self.lattice = self.facility.getLattice()
 
-
     def loadLattice(self):
+        self.lattice = self.facility.getLattice()
         lattticeString = self.lattice.printLattice()
         self.elements = []
         nextWillBeL = 0
@@ -428,6 +430,27 @@ class DATWidgetInterface(QMainWindow):
         self.widget = FormWidget(self, self.facility)
         self.setCentralWidget(self.widget)
 
+        exitAction = QAction(QtGui.QIcon('icons/delete.png'), 'Exit', self)
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.triggered.connect(qApp.quit)
+
+        loadAction = QAction(QtGui.QIcon('icons/open.png'), 'Load', self)
+        loadAction.setShortcut('Ctrl+O')
+        loadAction.triggered.connect(self.openFile)
+
+        saveAction = QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
+        saveAction.setShortcut('Ctrl+S')
+        saveAction.triggered.connect(self.saveFile)
+        
+        self.toolbar = self.addToolBar('Exit')
+        self.toolbar.addAction(exitAction)
+        self.toolbar = self.addToolBar('Load')
+        self.toolbar.addAction(loadAction)
+        self.toolbar = self.addToolBar('Save')
+        self.toolbar.addAction(saveAction)
+
+
+
     def keyPressEvent(self, e):
         
         if e.key() == Qt.Key_Escape:
@@ -472,6 +495,27 @@ class DATWidgetInterface(QMainWindow):
         self.widget.latticeoverview.paintGL()
         self.widget.latticeoverview.updateGL()
 
+    def openFile(self):
+        fname = str(QFileDialog.getOpenFileName(self, 'Open file', ''))
+        #f = open(fname, 'r')
+        try:
+            fnameasstring = re.search('\'(.+?)\'', fname).group(1)
+            loadedLattice = loadLattice(fnameasstring)
+            self.facility.setLattice(loadedLattice)
+            self.widget.latticeoverview.initializeGL()
+            self.widget.latticeoverview.paintGL()
+        except AttributeError:
+            fnameasstring = ''
+        #loadedLattice = loadLattice(fnameasstring)
+        #with f:        
+        #    data = f.read()
+        #    self.textEdit.setText(data)
+
+    def saveFile(self):
+        fname = QFileDialog.getSaveFileName(self, 'Save file', '')
+        f = open(fname, 'w')
+        with f:
+            f.save(self.facility)
 
 if __name__ == '__main__':
     app = QApplication(['DAT Widget Interface'])

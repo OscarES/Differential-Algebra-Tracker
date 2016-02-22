@@ -23,3 +23,6 @@ class Facility():
 
     def getLattice(self):
         return self.lattice
+
+    def setLattice(self,lattice):
+        self.lattice = lattice
