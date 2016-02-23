@@ -823,7 +823,7 @@ class LieAlgebra():
 
 # General class for elements from Hamiltonians, can be linear but since all is based on differential algebra "linear" is set to 0
 class LieAlgElement(Element):
-    def __init__(self, name, ham, K, L, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
+    def __init__(self, name, hamToUse, K, L, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
         Element.__init__(self, "liealgelem " + name, 0)
 
         self.L = L
@@ -847,11 +847,22 @@ class LieAlgElement(Element):
         ## Hamiltonians
         self.driftham = -self.l/2*(self.px**2 + self.py**2 + self.pz**2)
         self.quadham = -self.l/2*(self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
-        self.quadhamdefocus = -self.l/2*(-self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
+        self.quaddefocusham = -self.l/2*(-self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
         self.sextupoleham = -self.l/2*(2/3*self.k**2*(self.qx**3-3*self.qx*self.qy**2)+(self.px**2+self.py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
         self.octupoleham = -self.l/2*(2/4*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+(self.px**2+self.py**2)) # same decision as above
 
-        self.numFuns = self.LA.hamToNumFuns(ham, K, self.Lsp, order) # assumes that the element can be split
+        if hamToUse == "drift":
+            self.numFuns = self.LA.hamToNumFuns(self.driftham, K, self.Lsp, order)
+        elif hamToUse == "quad":
+            self.numFuns = self.LA.hamToNumFuns(self.quadham, K, self.Lsp, order)
+        elif hamToUse == "quaddefocusham":
+            self.numFuns = self.LA.hamToNumFuns(self.quaddefocusham, K, self.Lsp, order)
+        elif hamToUse == "sextupoleham":
+            self.numFuns = self.LA.hamToNumFuns(self.sextupoleham, K, self.Lsp, order)
+        elif hamToUse == "octupoleham":
+            self.numFuns = self.LA.hamToNumFuns(self.octupoleham, K, self.Lsp, order)
+
+        self.hamUsed = hamToUse
 
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
@@ -860,7 +871,7 @@ class LieAlgElement(Element):
             self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
 
     def printInfo(self):
-        return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K)
+        return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K) + "\t HamUsed: " +  str(self.hamUsed)
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts

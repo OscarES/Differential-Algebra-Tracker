@@ -1,8 +1,8 @@
 from __future__ import division # needed for 1/2 = 0.5
 import numpy as np
 from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole
-from sympy.parsing.sympy_parser import parse_expr
-from sympy import *
+#from sympy.parsing.sympy_parser import parse_expr
+#from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D, envelopeFromMultipart
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
 from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format, loadSummer2015Formatzasx
@@ -14,23 +14,6 @@ import math
 
 #sigma = 0.001 # the standard deviation that the user will enter
 #epsilon = sqrt(sigmax**2*sigmaxp**2-sigmaxxp**2)
-
-## Symbols
-qx = Symbol('qx')
-qy = Symbol('qy')
-qz = Symbol('qz')
-px = Symbol('px')
-py = Symbol('py')
-pz = Symbol('pz')
-l = Symbol('l') # arbitrary length
-k = Symbol('k')
-
-## Hamiltonians
-driftham = -l/2*(px**2 + py**2 + pz**2)
-quadham = -l/2*(k**2*(qx**2-qy**2)+px**2+py**2+pz**2) # replace k with -k for defocus. Without quad term in z dir
-quadhamdefocus = -l/2*(-k**2*(qx**2-qy**2)+px**2+py**2+pz**2) # replace k with -k for defocus. Without quad term in z dir
-sextupoleham = -l/2*(2/3*k**2*(qx**3-3*qx*qy**2)+(px**2+py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
-octupoleham = -l/2*(2/4*k*(qx**4-6*qx**2*qy**2+qy**4)+(px**2+py**2)) # same decision as above
 
 ### Non-linear
 #order = 5 # user sets this
@@ -253,10 +236,11 @@ dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfrom
 compLattice.appendElement(dQ)
 
 sextuName = "sextu"
+hamToUse = "sextupoleham"
 sextuLength = 0.3
 sextuStrength = 0.6
 compOrder = 6
-sextu = LieAlgElement(sextuName, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+sextu = LieAlgElement(sextuName, hamToUse, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 compLattice.appendElement(sextu)
 
 compLattice.appendElement(compDrift)
