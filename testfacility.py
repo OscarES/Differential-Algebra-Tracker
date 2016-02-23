@@ -198,8 +198,8 @@ print "IOHandling..."
 ### Compare with old code
 print "Compare with old code/ compare space charges..."
 ## Load the same particles (old code comp)
-datafilepart = "data/" + "inpart1000" + ".txt"
-datafiletwiss = "data/" + "intwiss" + ".txt"
+datafilepart = "../data/" + "inpart1000" + ".txt"
+datafiletwiss = "../data/" + "intwiss" + ".txt"
 #multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
 #multipartfromoldcopy = copy.deepcopy(multipartfromold)
 #print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
@@ -287,12 +287,12 @@ compLattice.appendElement(compDrift)
 compLattice.appendElement(dQ)
 compLattice.appendElement(compDrift)
 
-saveLattice("data/" + "savedlattice" + ".npy", compLattice)
+saveLattice("../data/" + "savedlattice" + ".npy", compLattice)
 
 ## Calculate
 partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
 
-saveSummer2015Format("data/" + "outpartFODSOspaceChargetesttest" + ".txt","data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
+saveSummer2015Format("../data/" + "outpartFODSOspaceChargetesttest" + ".txt","../data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
 plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
 
