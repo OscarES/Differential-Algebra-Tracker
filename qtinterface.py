@@ -404,7 +404,7 @@ class FormWidget(QWidget):
         self.parent = parent
 
         try:
-            lattice = loadLattice("data/" + "savedlattice" + ".npy") # it should be facility.importLattice(........)
+            lattice = loadLattice("../data/" + "savedlattice" + ".npy") # it should be facility.importLattice(........)
         except:
             print "Baaaaaaaad lattice file!"
         self.latticeoverview = LatticeOverviewWidget(facility, self)
