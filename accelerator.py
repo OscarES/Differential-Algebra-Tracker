@@ -714,7 +714,7 @@ class LieAlgebra():
         self.pz = Symbol('pz')
 
         self.l = Symbol('l') # arbitrary length
-        self.k = Symbol('k')
+        self.k = Symbol('k')        
 
     def lieop(self, f,g):
         dfdqx = f.diff(self.qx) 
@@ -839,12 +839,15 @@ class LieAlgElement(Element):
         self.py = Symbol('py')
         self.pz = Symbol('pz')
 
+        self.l = Symbol('l') # arbitrary length
+        self.k = Symbol('k')
+
         ## Hamiltonians
-        self.driftham = -l/2*(px**2 + py**2 + pz**2)
-        self.quadham = -l/2*(k**2*(qx**2-qy**2)+px**2+py**2+pz**2) # replace k with -k for defocus. Without quad term in z dir
-        self.quadhamdefocus = -l/2*(-k**2*(qx**2-qy**2)+px**2+py**2+pz**2) # replace k with -k for defocus. Without quad term in z dir
-        self.sextupoleham = -l/2*(2/3*k**2*(qx**3-3*qx*qy**2)+(px**2+py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
-        self.octupoleham = -l/2*(2/4*k*(qx**4-6*qx**2*qy**2+qy**4)+(px**2+py**2)) # same decision as above
+        self.driftham = -self.l/2*(self.px**2 + self.py**2 + self.pz**2)
+        self.quadham = -self.l/2*(self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
+        self.quadhamdefocus = -self.l/2*(-self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
+        self.sextupoleham = -self.l/2*(2/3*self.k**2*(self.qx**3-3*self.qx*self.qy**2)+(self.px**2+self.py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
+        self.octupoleham = -self.l/2*(2/4*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+(self.px**2+self.py**2)) # same decision as above
 
         self.numFuns = LA.hamToNumFuns(ham, K, self.Lsp, order) # assumes that the element can be split
 
