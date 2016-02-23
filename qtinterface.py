@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
-from IOHandler import loadLattice
+from IOHandler import loadLattice, saveLattice
 from accelerator import Lattice
 from numpy import array
 import numpy as np
@@ -496,26 +496,23 @@ class DATWidgetInterface(QMainWindow):
         self.widget.latticeoverview.updateGL()
 
     def openFile(self):
-        fname = str(QFileDialog.getOpenFileName(self, 'Open file', ''))
-        #f = open(fname, 'r')
+        fname = QFileDialog.getOpenFileName(self, 'Open file', '')
         try:
-            fnameasstring = re.search('\'(.+?)\'', fname).group(1)
-            loadedLattice = loadLattice(fnameasstring)
+            loadedLattice = loadLattice(fname[0])
             self.facility.setLattice(loadedLattice)
             self.widget.latticeoverview.initializeGL()
             self.widget.latticeoverview.paintGL()
         except AttributeError:
             fnameasstring = ''
-        #loadedLattice = loadLattice(fnameasstring)
-        #with f:        
-        #    data = f.read()
-        #    self.textEdit.setText(data)
 
     def saveFile(self):
         fname = QFileDialog.getSaveFileName(self, 'Save file', '')
-        f = open(fname, 'w')
-        with f:
-            f.save(self.facility)
+        try:
+            latticeToSave = self.facility.getLattice()
+            saveLattice(fname[0],latticeToSave) # fname[0] is the path string
+        except AttributeError:
+            fnameasstring = ''
+
 
 if __name__ == '__main__':
     app = QApplication(['DAT Widget Interface'])
