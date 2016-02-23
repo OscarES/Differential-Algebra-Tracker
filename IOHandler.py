@@ -1,4 +1,5 @@
 import numpy as np
+#import dill as pickle# Vital for storing DiffAlgElem's lambda functions in lattice save/load
 import pickle
 import os
 import copy

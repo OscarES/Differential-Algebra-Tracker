@@ -270,7 +270,7 @@ compLattice.appendElement(compDrift)
 compLattice.appendElement(dQ)
 compLattice.appendElement(compDrift)
 
-#saveLattice("../data/" + "savedlattice" + ".npy", compLattice)
+saveLattice("../data/" + "savedlatticewithsextu" + ".npy", compLattice)
 
 ## Calculate
 partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
