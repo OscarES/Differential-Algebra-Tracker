@@ -823,7 +823,7 @@ class LieAlgebra():
 
 # General class for elements from Hamiltonians, can be linear but since all is based on differential algebra "linear" is set to 0
 class LieAlgElement(Element):
-    def __init__(self, name, LA, ham, K, L, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
+    def __init__(self, name, ham, K, L, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
         Element.__init__(self, "liealgelem " + name, 0)
 
         self.L = L
@@ -842,6 +842,8 @@ class LieAlgElement(Element):
         self.l = Symbol('l') # arbitrary length
         self.k = Symbol('k')
 
+        self.LA = LieAlgebra() # Lie algebra object
+
         ## Hamiltonians
         self.driftham = -self.l/2*(self.px**2 + self.py**2 + self.pz**2)
         self.quadham = -self.l/2*(self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
@@ -849,7 +851,7 @@ class LieAlgElement(Element):
         self.sextupoleham = -self.l/2*(2/3*self.k**2*(self.qx**3-3*self.qx*self.qy**2)+(self.px**2+self.py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
         self.octupoleham = -self.l/2*(2/4*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+(self.px**2+self.py**2)) # same decision as above
 
-        self.numFuns = LA.hamToNumFuns(ham, K, self.Lsp, order) # assumes that the element can be split
+        self.numFuns = self.LA.hamToNumFuns(ham, K, self.Lsp, order) # assumes that the element can be split
 
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:

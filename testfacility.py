@@ -255,10 +255,9 @@ compLattice.appendElement(dQ)
 sextuName = "sextu"
 sextuLength = 0.3
 sextuStrength = 0.6
-LAcomp = LieAlgebra()
 compOrder = 6
-#sextu = LieAlgElement(sextuName, LAcomp, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-#compLattice.appendElement(sextu)
+sextu = LieAlgElement(sextuName, sextupoleham, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+compLattice.appendElement(sextu)
 
 compLattice.appendElement(compDrift)
 
