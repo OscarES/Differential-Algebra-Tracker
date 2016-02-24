@@ -240,8 +240,8 @@ hamToUse = "sextupoleham"
 sextuLength = 0.3
 sextuStrength = 0.6
 compOrder = 6
-sextu = LieAlgElement(sextuName, hamToUse, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-compLattice.appendElement(sextu)
+#sextu = LieAlgElement(sextuName, hamToUse, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+#compLattice.appendElement(sextu)
 
 compLattice.appendElement(compDrift)
 
