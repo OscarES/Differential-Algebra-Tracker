@@ -197,7 +197,7 @@ class Dipole(LinearElement):
         return Msp, Tsp
 
     def printInfo(self):
-        return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t K_x: " + str(self.K_x) + "\t K_y: " + str(self.K_y) + "\t beta: " + str(self.beta) + "\t gamma: " + str(self.gamma)
+        return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t K_x: " + str(self.K_x) + "\t K_y: " + str(self.K_y) + "\t beta: " + str(self.beta) + "\t Alpha: " + str(self.alpha) + "\t nparam: " + str(self.nparam)
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
@@ -865,6 +865,7 @@ class LieAlgElement(Element):
             self.numFuns = self.LA.hamToNumFuns(self.octupoleham, K, self.Lsp, order)
 
         self.hamUsed = hamToUse
+        self.order = order
 
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
@@ -873,7 +874,7 @@ class LieAlgElement(Element):
             self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
 
     def printInfo(self):
-        return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K) + "\t HamUsed: " +  str(self.hamUsed)
+        return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K) + "\t HamUsed: " +  str(self.hamUsed) + "\t Order: " +  str(self.order)
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts

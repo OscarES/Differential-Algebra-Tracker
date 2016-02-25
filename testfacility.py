@@ -5,7 +5,7 @@ from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra
 #from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D, envelopeFromMultipart
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
-from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format, loadSummer2015Formatzasx
+from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format, loadSummer2015Formatzasx, parseLatticeString, saveLatticeString, loadLatticeString
 import copy
 from scipy import constants
 from relativity import betaFromE
@@ -240,8 +240,8 @@ hamToUse = "sextupoleham"
 sextuLength = 0.3
 sextuStrength = 0.6
 compOrder = 6
-#sextu = LieAlgElement(sextuName, hamToUse, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-#compLattice.appendElement(sextu)
+sextu = LieAlgElement(sextuName, hamToUse, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+compLattice.appendElement(sextu)
 
 compLattice.appendElement(compDrift)
 
@@ -249,8 +249,8 @@ dipoleName = "dipole"
 dipoleRho = 100
 dipoleAlpha = math.pi/4 
 dipolen = 0.5
-#compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-#compLattice.appendElement(compDipole)
+compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+compLattice.appendElement(compDipole)
 
 compLattice.appendElement(fQ)
 compLattice.appendElement(compDrift)
@@ -270,10 +270,20 @@ compLattice.appendElement(compDrift)
 compLattice.appendElement(dQ)
 compLattice.appendElement(compDrift)
 
-saveLattice("../data/" + "savedlatticewithsextu" + ".npy", compLattice)
+print compLattice.printLattice()
+parsedLattice = parseLatticeString(compLattice.printLattice(), spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+print "parsedLattice: \n" + parsedLattice.printLattice()
+
+saveLatticeString("../data/" + "savedlatticestringwithsextu" + ".npy", parsedLattice)
+
+loadedLatticeString = loadLatticeString("../data/" + "savedlatticestringwithsextu" + ".npy")
+print "loadedLatticeString: \n" + loadedLatticeString
+
+#saveLattice("../data/" + "savedlatticewithsextu" + ".npy", compLattice)
 
 ## Calculate
-partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input?
+partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
+#partresInComp, envresInComp, twissresInComp = parsedLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
 
 saveSummer2015Format("../data/" + "outpartFODSOspaceChargetesttest" + ".txt","../data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 

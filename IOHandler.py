@@ -1,8 +1,9 @@
+import dill as pickle # Vital for storing DiffAlgElem's lambda functions in lattice save/load
 import numpy as np
-#import dill as pickle# Vital for storing DiffAlgElem's lambda functions in lattice save/load
-import pickle
+#import pickle
 import os
 import copy
+from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole
 
 def saveAll(filename, multipart, twiss, envelope, lattice):
     saveMultipart(filename + "multipart", multipart)
@@ -73,6 +74,51 @@ def loadLattice(filename):
     try:
         lattice = pickle.load(open(filename, 'rb'))
         return lattice
+    except:
+        print 'Bad datafile!'
+        quit()
+        return 0
+
+# Can handle sextupole elements!
+# creates a lattice equal to that described by text (which is output from a printLattice call)
+def parseLatticeString(text, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
+    lattice = Lattice('ParsedLattice')
+    for line in iter(text.splitlines()):
+        words = line.split()
+        typeOfElem = words[0]
+        name = words[1]
+        l = float(words[words.index("L:") + 1]) #what comes after "L:"
+        if typeOfElem == "dipole":
+            rho = float(words[words.index("rho:") + 1]) #what comes after "rho:"
+            #k_x = what comes after "K_x: "
+            #k_y = what comes after "K_y: " # not needed for construction
+            beta = beamdata[0]
+            nparam = float(words[words.index("nparam:") + 1]) #what comes after "nparam:"
+            alpha = float(words[words.index("Alpha:") + 1]) #what comes after "Alpha:"
+            elem = Dipole(name, rho, alpha, nparam, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+        elif typeOfElem != "drift":
+            k = float(words[words.index("K:") + 1]) #what comes after "K:"
+        if typeOfElem == "liealgelem":
+            hamToUse = words[words.index("HamUsed:") + 1] #what comes after "HamUsed:" and before next whitespace
+            order = int(words[words.index("Order:") + 1]) #what comes after "Order:"
+            elem = LieAlgElement(name, hamToUse, k, l, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+        
+        if typeOfElem == "quad":
+            elem = Quad(name, k, l, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+        if typeOfElem == "drift":
+            elem = Drift(name, l, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+        lattice.appendElement(elem)           
+    return lattice
+
+def saveLatticeString(filename, lattice):
+    latticeString = lattice.printLattice()
+    np.save(filename, latticeString)
+    return 1
+
+def loadLatticeString(filename):
+    try:
+        latticeString = str(np.load(filename))
+        return latticeString
     except:
         print 'Bad datafile!'
         quit()
