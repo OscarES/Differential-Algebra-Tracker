@@ -1,6 +1,5 @@
-import dill as pickle # Vital for storing DiffAlgElem's lambda functions in lattice save/load
 import numpy as np
-#import pickle
+import pickle
 import os
 import copy
 from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole
