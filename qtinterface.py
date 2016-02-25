@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
-from IOHandler import loadLattice, saveLattice
+from IOHandler import parseLatticeString, saveLatticeString, loadLatticeString, loadSummer2015Formatzasx #, loadLattice, saveLattice
 from accelerator import Lattice
 from numpy import array
 import numpy as np
@@ -498,7 +498,19 @@ class DATWidgetInterface(QMainWindow):
     def openFile(self):
         fname = QFileDialog.getOpenFileName(self, 'Open file', '')
         try:
-            loadedLattice = loadLattice(fname[0])
+            spaceChargeOn = 0
+
+            datafilepart = "../data/" + "inpart1000" + ".txt"
+            datafiletwiss = "../data/" + "intwiss" + ".txt"
+
+            multipart, twiss = loadSummer2015Formatzasx(datafilepart, datafiletwiss)
+            beamdata = getBeamdata()
+            nbrOfSplits = 1
+
+            #loadedLattice = loadLattice(fname[0])
+            loadedLatticeString = loadLatticeString(fname[0])
+            loadedLattice = parseLatticeString(loadedLatticeString, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+
             self.facility.setLattice(loadedLattice)
             self.widget.latticeoverview.initializeGL()
             self.widget.latticeoverview.paintGL()
@@ -512,6 +524,8 @@ class DATWidgetInterface(QMainWindow):
             saveLattice(fname[0],latticeToSave) # fname[0] is the path string
         except AttributeError:
             fnameasstring = ''
+
+    
 
 
 if __name__ == '__main__':

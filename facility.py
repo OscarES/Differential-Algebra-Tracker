@@ -1,4 +1,6 @@
 from accelerator import *
+from scipy import constants
+from relativity import betaFromE
 
 
 
@@ -26,3 +28,14 @@ class Facility():
 
     def setLattice(self,lattice):
         self.lattice = lattice
+
+def getBeamdata():
+        E = 2e9*constants.e # 2GeV to joule from ref F.
+        freq = 704.42e6 # (Hz) from ref. F
+        
+        rf_lambda = constants.c/freq  # beam data needed
+        m = constants.m_p
+        beta = betaFromE(m, E)
+        q = constants.e
+        beamdata = [beta, rf_lambda, m, q]
+        return beamdata

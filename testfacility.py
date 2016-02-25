@@ -246,7 +246,7 @@ compLattice.appendElement(sextu)
 compLattice.appendElement(compDrift)
 
 dipoleName = "dipole"
-dipoleRho = 100
+dipoleRho = 5
 dipoleAlpha = math.pi/4 
 dipolen = 0.5
 compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
