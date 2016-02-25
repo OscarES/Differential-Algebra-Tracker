@@ -250,31 +250,28 @@ dipoleRho = 5
 dipoleAlpha = math.pi/4 
 dipolen = 0.5
 compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-#compLattice.appendElement(compDipole)
+compLattice.appendElement(compDipole)
 
-#compLattice.appendElement(fQ)
-#compLattice.appendElement(compDrift)
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
 
-#compLattice.appendElement(dQ)
-#compLattice.appendElement(compDrift)
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
 
-#compLattice.appendElement(fQ)
-#compLattice.appendElement(compDrift)
-
-#compLattice.appendElement(dQ)
-#compLattice.appendElement(compDrift)
-
-#compLattice.appendElement(fQ)
-#compLattice.appendElement(compDrift)
-
-#compLattice.appendElement(dQ)
-#compLattice.appendElement(compDrift)
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
 
 print compLattice.printLattice()
 parsedLattice = parseLatticeString(compLattice.printLattice(), spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 print "parsedLattice: \n" + parsedLattice.printLattice()
 
-saveLatticeString("../data/" + "savedlatticestringonlysextu" + ".npy", parsedLattice)
+#saveLatticeString("../data/" + "savedlatticestringonlysextu" + ".npy", parsedLattice)
 
 loadedLatticeString = loadLatticeString("../data/" + "savedlatticestringwithsextu" + ".npy")
 print "loadedLatticeString: \n" + loadedLatticeString

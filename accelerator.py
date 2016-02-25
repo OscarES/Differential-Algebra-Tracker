@@ -948,14 +948,14 @@ def leapfrog(x_0, v_0, F, h, n):
 
 
 # just a copy of Quad so far. TODO: use the scraps from the lie code!
-class Cavity(NonLinearElement):
-    def __init__(self, name, K, L, M):
-        NonLinearElement.__init__(self, name)
+class Cavity(Element):
+    def __init__(self, name):#, K, L, M):
+        Element.__init__(self, name)
         #self.name = name
-        self.K = K
-        self.L = L
-        self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
-        self.T = self.createMatrixT(K, L) # M should be a 9x9 matrix
+        #self.K = K
+        #self.L = L
+        #self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
+        #self.T = self.createMatrixT(K, L) # M should be a 9x9 matrix
 
 
 
