@@ -66,6 +66,10 @@ class LatticeOverviewWidget(QGLWidget):
         self.facility = facility
         self.lattice = self.facility.getLattice()
 
+        # is mouse pressed
+        #self.mousePressed = 0
+        self.yRotDeg = 0.0
+
     def loadLattice(self):
         self.lattice = self.facility.getLattice()
         lattticeString = self.lattice.printLattice()
@@ -110,7 +114,10 @@ class LatticeOverviewWidget(QGLWidget):
 
             length = elem[1]
 
-            VtxArray, IdxArray, ClrArray = self.createGeomBlock(length, color)
+            if elem[0] == "liealgelem":
+                VtxArray, IdxArray, ClrArray = self.createHexaBlock(length, color)
+            else:
+                VtxArray, IdxArray, ClrArray = self.createGeomBlock(length, color)
             block = [VtxArray, IdxArray, ClrArray, length, elem[0]]
             self.array_of_blocks.append(block)
 
@@ -192,16 +199,22 @@ class LatticeOverviewWidget(QGLWidget):
         self.zsofar = self.zsofar + elem[3]
         glTranslate(self.cameraPos[0], self.cameraPos[1], self.cameraPos[2])
         glRotate(90, 0.0, 1.0, 0.0)
+        #glRotate(self.yRotDeg, 90.0, 1.0, 0.0)
         elemtype = elem[4]
         if elemtype == "quad":
             glRotate(45, 0.0, 0.0, 1.0)
+        elif elemtype == "liealgelem":
+            glTranslate(0.5, 0.5, 0.0)
         glTranslate(-0.5, -0.5, -0.5)
 
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
         glVertexPointerf(elem[0])
         glColorPointerf(elem[2])
-        glDrawElementsui(GL_QUADS, elem[1])
+        if elemtype == "liealgelem":
+            glDrawElementsui(GL_TRIANGLES, elem[1])
+        else:
+            glDrawElementsui(GL_QUADS, elem[1])
         
 
     def bluecube(self, z):
@@ -270,15 +283,62 @@ class LatticeOverviewWidget(QGLWidget):
         return blockVtxArray, blockIdxArray, blockClrArray
 
     # this will create the sextupole blocks
-    def createHexablock(self, z, color):
-        return 0
+    def createHexaBlock(self, z, color):
+        blockVtxArray = array(
+                [[0.866025, 0.5, 0.0],      # 0
+                 [0.0, 1.0, 0.0],           # 1
+                 [-0.866025, 0.5, 0.0],     # 2
+                 [-0.866025, -0.5, 0.0],    # 3
+                 [0.0,-1.0,0.0],            # 4
+                 [0.866025, -0.5,0.0],      # 5
+                 [0.0,0.0,0.0],             # 6
+                 [0.866025, 0.5, z],        # 7
+                 [0.0, 1.0, z],             # 8
+                 [-0.866025, 0.5, z],       # 9
+                 [-0.866025, -0.5, z],      # 10
+                 [0.0,-1.0,z],              # 11
+                 [0.866025, -0.5,z],        # 12
+                 [0.0,0.0,z]])              # 13
+        blockIdxArray = [
+                1, 0, 6,
+                2, 1, 6,
+                3, 2, 6,
+                4, 3, 6,
+                5, 4, 6,
+                0, 5, 6,
+                0, 1, 7,
+                1, 2, 8,
+                2, 3, 9,
+                3, 4, 10,
+                4, 5, 11,
+                5, 0, 12,
+                1, 8, 7,
+                2, 9, 8,
+                3, 10, 9,
+                4, 11, 10,
+                5, 12, 11,
+                0, 7, 12,
+                7, 8, 13,
+                8, 9, 13,
+                9, 10, 13,
+                10, 11, 13,
+                11, 12, 13,
+                12, 7, 13]
+        blockClrArray = np.zeros((14,3))
+        blockClrArray[:,0] = color[0]
+        blockClrArray[:,1] = color[1]
+        blockClrArray[:,2] = color[2]
+        return blockVtxArray, blockIdxArray, blockClrArray
 
     # If one clicks on the openGL panel it gets the focus
     def mousePressEvent(self, bla):
         self.setFocus()
+    #    self.mousePressed = 1
         self.updateGL()
 
-
+    def spin(self):
+        self.yRotDeg = (self.yRotDeg  + 1) % 360.0
+        self.updateGL()
 
 
 
@@ -384,11 +444,8 @@ class LatticeEditor(QWidget):
         self.parent.latticeoverview.initializeGL() # update the paint lattice in overview
         self.parent.parent.widget.latticeoverview.s_pressed = 1 # prepare a zoom out
         self.parent.parent.widget.latticeoverview.d_pressed = 1
-        self.parent.latticeoverview.mousePressEvent(0) # repaint by setting focus
-
-
-    #def createDrift(self, name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
-        #self.facility.createDrift(name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+        self.parent.latticeoverview.mousePressEvent(0) # repaint by setting focus    
+    
 
 # layout manager (aranges the different widgets)
 class FormWidget(QWidget):
@@ -458,8 +515,6 @@ class DATWidgetInterface(QMainWindow):
     def keyPressEvent(self, e):
         
         if e.key() == Qt.Key_Escape:
-            #print "hej"
-            self.widget.rotatingcube.spin()
             self.widget.latticeoverview.spin()
         #if e.key() == "t"
             #print "t was pressed"
