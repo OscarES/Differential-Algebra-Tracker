@@ -269,6 +269,10 @@ class LatticeOverviewWidget(QGLWidget):
         blockClrArray[:,2] = color[2]
         return blockVtxArray, blockIdxArray, blockClrArray
 
+    # this will create the sextupole blocks
+    def createHexablock(self, z, color):
+        return 0
+
     # If one clicks on the openGL panel it gets the focus
     def mousePressEvent(self, bla):
         self.setFocus()
@@ -404,7 +408,7 @@ class FormWidget(QWidget):
         self.parent = parent
 
         try:
-            lattice = loadLattice("../data/" + "savedlattice" + ".npy") # it should be facility.importLattice(........)
+            self.parent.openFile()
         except:
             print "Baaaaaaaad lattice file!"
         self.latticeoverview = LatticeOverviewWidget(facility, self)
@@ -507,7 +511,6 @@ class DATWidgetInterface(QMainWindow):
             beamdata = getBeamdata()
             nbrOfSplits = 1
 
-            #loadedLattice = loadLattice(fname[0])
             loadedLatticeString = loadLatticeString(fname[0])
             loadedLattice = parseLatticeString(loadedLatticeString, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
 
@@ -521,7 +524,7 @@ class DATWidgetInterface(QMainWindow):
         fname = QFileDialog.getSaveFileName(self, 'Save file', '')
         try:
             latticeToSave = self.facility.getLattice()
-            saveLattice(fname[0],latticeToSave) # fname[0] is the path string
+            saveLatticeString(fname[0],latticeToSave) # fname[0] is the path string
         except AttributeError:
             fnameasstring = ''
 
