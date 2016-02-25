@@ -947,63 +947,6 @@ def leapfrog(x_0, v_0, F, h, n):
 
 
 
-
-### Here the non-linear stuff starts
-
-class NonLinearElement(Element):
-    def __init__(self, name):
-        Element.__init__(self, name, 0)
-
-    def printInfo(self):
-        return self.name
-
-# just a copy of Quad so far. TODO: use the scraps from the lie code!
-class Sextu(NonLinearElement):
-    def __init__(self, name, K, L, M):
-        NonLinearElement.__init__(self, name)
-        #self.name = name
-        self.K = K
-        self.L = L
-        self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
-        self.T = self.createMatrixT(K, L) # M should be a 9x9 matrix
-
-    """ taken from lie code where K = sqrt(k)"""
-
-
-    def printInfo(self):
-        return self.name + "\n" + str(0)
-
-    def evaluate(self,multipart,envelope):
-        newmultipart, newenvelope = evaluateSC(multipart,envelope) # evaluate the SC
-        newmultipart, newenvelope = evaluateM(newmultipart,newenvelope) # use the new data for "normal" evaluation
-        return newmultipart, newenvelope
-
-    # Evaluate for Space Charges
-    def evaluateSC(self,multipart,envelope):
-        # disunite matrices
-        Msp, Tsp = disunite(M,T,n)
-        # evaluate the SC
-
-        return 0, 0
-
-    def disunite(self,M,T,n):
-        L_n = self.L/n
-        return 0, 0
-
-    def evaluateM(self,multipart,envelope):
-        # something M*multipart
-        return 0, 0
-
-# just a copy of Quad so far. TODO: use the scraps from the lie code!
-class Multi(NonLinearElement):
-    def __init__(self, name, K, L, M):
-        NonLinearElement.__init__(self, name)
-        #self.name = name
-        self.K = K
-        self.L = L
-        self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
-        self.T = self.createMatrixT(K, L) # M should be a 9x9 matrix
-
 # just a copy of Quad so far. TODO: use the scraps from the lie code!
 class Cavity(NonLinearElement):
     def __init__(self, name, K, L, M):
@@ -1013,6 +956,9 @@ class Cavity(NonLinearElement):
         self.L = L
         self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
         self.T = self.createMatrixT(K, L) # M should be a 9x9 matrix
+
+
+
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
