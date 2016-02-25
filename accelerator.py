@@ -947,16 +947,68 @@ def leapfrog(x_0, v_0, F, h, n):
 
 
 
-# just a copy of Quad so far. TODO: use the scraps from the lie code!
+# Comes from ref E.
 class Cavity(Element):
     def __init__(self, name):#, K, L, M):
-        Element.__init__(self, name)
+        Element.__init__(self, name, 0) # linear set to zero
         #self.name = name
         #self.K = K
         #self.L = L
         #self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
         #self.T = self.createMatrixT(K, L) # M should be a 9x9 matrix
 
+        ## Input
+
+        ## Made up values
+        gamma_i = 1000
+        gamma_f = 1100
+
+        q = 1
+        k = 1
+        E_0 = 1
+        T_of_beta = 1
+        phi_s = constants.pi/4
+        m = 1
+
+        ## Correct
+        beta_i = np.sqrt(1-1/gamma_i**2)
+        beta_f = np.sqrt(1-1/gamma_f**2)
+
+        beta_avg = (beta_i + beta_f)/2
+        gamma_avg = (gamma_i + gamma_f)/2
+
+        betaTimesGamma_i = beta_i*gamma_i
+        betaTimesGamma_f = beta_f*gamma_f
+
+        betaTimesGammaSquared_i = beta_i*gamma_i**2
+        betaTimesGammaSquared_f = beta_f*gamma_f**2
+
+        C = betaTimesGamma_i/betaTimesGamma_f
+
+        k_11_x = E_0*T_of_beta*cos(phi_s)
+        k_21_x = -q*k*E_0*T_of_beta*sin(phi_s)/(2*beta_avg*gamma_avg**2*m*constants.c**2)
+        k_22_x = E_0*T_of_beta*cos(phi_s)
+
+        G_x = np.array([[k_11_x*C, 0],
+            [k_21_x/betaTimesGamma_f, k_22_x*C]])
+        G_y = G_x # since in ref E. it says so after eqn 29
+
+        k_21_z = q*k*E_0*T_of_beta*sin(phi_s)/(beta_avg**2*m*constants.c)
+        G_z = np.array([[gamma_f/gamma_i, 0],
+            [k_21_z/(gamma_i*betaTimesGammaSquared_f), betaTimesGammaSquared_i/betaTimesGammaSquared_f]])
+
+
+        zeros_22 = np.zeros((2,2))
+        row0 = np.hstack((np.hstack((G_x, zeros_22)),zeros_22))
+        row1 = np.hstack((np.hstack((zeros_22, G_y)),zeros_22))
+        row2 = np.hstack((np.hstack((zeros_22, zeros_22)),G_z))
+
+        self.M = np.vstack((
+            np.vstack(
+            (row0, row1)
+            ),
+            row2))
+        print str(self.M)
 
 
 
