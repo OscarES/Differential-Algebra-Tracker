@@ -966,9 +966,15 @@ class Cavity(Element):
         q = 1
         k = 1
         E_0 = 1
-        T_of_beta = 1
-        phi_s = constants.pi/4
+        phi_s = constants.pi/4 # not the same as phi(s) in ref (related but not the same)
         m = 1
+
+        freq = freq = 704.42e6
+        rf_lambda = constants.c/freq
+        E_z0_of_s = lambda s: exp(-abs(s))
+        phi_s = 1
+
+        T_of_beta = 1
 
         ## Correct
         beta_i = np.sqrt(1-1/gamma_i**2)
@@ -984,6 +990,8 @@ class Cavity(Element):
         betaTimesGammaSquared_f = beta_f*gamma_f**2
 
         C = betaTimesGamma_i/betaTimesGamma_f
+
+        #T_of_beta = self.timeTransitFactor(beta_i, rf_lambda, E_0, E_z0_of_s, phi_s)
 
         k_11_x = E_0*T_of_beta*cos(phi_s)
         k_21_x = -q*k*E_0*T_of_beta*sin(phi_s)/(2*beta_avg*gamma_avg**2*m*constants.c**2)
@@ -1009,6 +1017,13 @@ class Cavity(Element):
             ),
             row2))
         print str(self.M)
+
+    #def timeTransitFactor(self, beta, rf_lambda, E_0, E_z0_of_s, phi_s):
+    #    phi_of_s = lambda s: 2*constants.pi/(beta*rf_lambda)*s
+    #    I = quad(lambda s: E_z0_of_s*cos(phi_of_s(s) - phi_s),-inf,inf)
+    #    res = I[0]
+    #    res = res/E_0
+    #    return res
 
 
 
