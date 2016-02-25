@@ -219,7 +219,8 @@ class Dipole(LinearElement):
         # each loop iteration is for a new particle
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
-        envelope = np.dot(self.Tsp, envelope)
+        #envelope = np.dot(self.Tsp, envelope)
+        envelope = envelopeFromMultipart(multipart)
         return multipart, envelope
 
 ### QUAD
@@ -316,7 +317,8 @@ class Quad(LinearElement):
         # each loop iteration is for a new particle
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
-        envelope = np.dot(self.Tsp, envelope)
+        #envelope = np.dot(self.Tsp, envelope)
+        envelope = envelopeFromMultipart(multipart)
         return multipart, envelope
 
 ### SPACE CHARGE!!!!! C. Allen's approach
@@ -461,7 +463,7 @@ class SpaceCharge(LinearElement):
             extendedphasespace = np.dot(self.Msc, extendedphasespace) # here calculations are made
             reducedphasespace = extendedphasespace[0:6] # throws away the dispersion 1 term
             multipart[j] = np.array([reducedphasespace, multipart[j][1]]) # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
-        #envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
+        envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
         return multipart,envelope
 
 
@@ -678,7 +680,7 @@ class SpaceChargeEllipticalIntegral(LinearElement):
             ### New way of calculating (from the without params)
             multipart[j][0][0:6] = np.dot(self.Msc, multipart[j][0][0:6]) # self.Msc was set to the new matrix
 
-        #envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
+        envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
         return multipart,envelope
 
 
@@ -907,6 +909,7 @@ class LieAlgElement(Element):
 
             particle[1] += self.Lsp
             # Doesn't change envelope at all
+        envelope = envelopeFromMultipart(multipart)
         return multipart, envelope
 
 
