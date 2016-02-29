@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
-from IOHandler import parseLatticeString, saveLatticeString, loadLatticeString, loadSummer2015Formatzasx #, loadLattice, saveLattice
+from IOHandler import parseLatticeString, saveLatticeString, loadLatticeString, loadSummer2015Formatzasx, loadTwiss, loadMultipart #, loadLattice, saveLattice
 from accelerator import Lattice
 from numpy import array
 import numpy as np
@@ -30,7 +30,7 @@ class LatticeOverviewWidget(QGLWidget):
         QtOpenGL.QGLWidget.__init__(self, parent)
 
         self.yRotDeg = 1.0
-        self.setMinimumSize(500, 500)
+        self.setMinimumSize(600, 500)
 
         self.z = 2.0
 
@@ -343,7 +343,56 @@ class LatticeOverviewWidget(QGLWidget):
         self.updateGL()
 
 
+class BeamEditor(QWidget):
+    '''
+    Widget for editing the input beam
+    '''
 
+    def __init__(self, parent, facility):
+        QGLWidget.__init__(self, parent)
+        #self.setMinimumSize(500, 500)
+
+        self.parent = parent
+
+        self.facility = facility
+
+        grid = QGridLayout()
+        self.setLayout(grid)
+
+        self.textBeamEditor = QLabel("Beam Editor")
+        grid.addWidget(self.textBeamEditor, 0, 0)
+
+        loadBeamdataButton = QPushButton("Load Beamdata")
+        loadBeamdataButton.clicked.connect(self.loadBeamdata)
+        grid.addWidget(loadBeamdataButton,1,0)
+
+        loadTwissButton = QPushButton("Load Twiss")
+        loadTwissButton.clicked.connect(self.loadTwissWithFname)
+        grid.addWidget(loadTwissButton,1,1)
+
+        loadMultipartButton = QPushButton("Load Multiparticles")
+        loadMultipartButton.clicked.connect(self.loadMultipartWithFname)
+        grid.addWidget(loadMultipartButton,1,2)
+
+    def loadTwissWithFname(self):
+        fname = QFileDialog.getOpenFileName(self, 'Open Twiss file', '')
+        try:
+            twiss = loadTwiss(fname[0])
+            # send to parent!!!!
+        except:
+            print "Bad twiss file!"
+
+    def loadMultipartWithFname(self):
+        fname = QFileDialog.getOpenFileName(self, 'Open Multipart file', '')
+        try:
+            multipart = loadMultipart(fname[0])
+            # send to parent!!!!
+        except:
+            print "Bad multipart file!"
+
+    # To be implemented, takes a beamdata files and gets the data that a beamdata array should have. Implement this in IOHandler
+    def loadBeamdata(self):
+        return
 
 class LatticeEditor(QWidget):
     '''
@@ -352,7 +401,7 @@ class LatticeEditor(QWidget):
 
     def __init__(self, parent, facility):
         QGLWidget.__init__(self, parent)
-        self.setMinimumSize(500, 500)
+        #self.setMinimumSize(500, 500)
 
         self.parent = parent
 
@@ -360,6 +409,33 @@ class LatticeEditor(QWidget):
 
         grid = QGridLayout()
         self.setLayout(grid)
+
+        self.textLatticeEditor = QLabel("Lattice Editor")
+        grid.addWidget(self.textLatticeEditor, 0, 0)
+
+        #loadAction = QAction(QtGui.QIcon('icons/open.png'), 'Load', self)
+        #loadAction.setShortcut('Ctrl+O')
+        #loadAction.triggered.connect(self.parent.parent.openFile)
+
+        loadButton = QPushButton("Load Lattice")
+        loadButton.clicked.connect(self.parent.parent.openFile)
+        grid.addWidget(loadButton,1,0)
+
+        #grid.addWidget(loadAction,0,0)
+        #self.toolbar = self.addToolBar('Load')
+        #self.toolbar.addAction(loadAction)
+
+        #saveAction = QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
+        #saveAction.setShortcut('Ctrl+S')
+        #saveAction.triggered.connect(self.parent.parent.saveFile)
+
+        saveButton = QPushButton("Save Lattice")
+        saveButton.clicked.connect(self.parent.parent.saveFile)
+        grid.addWidget(saveButton,1,1)
+
+        #grid.addWidget(saveAction,0,1)
+        #self.toolbar = self.addToolBar('Save')
+        #self.toolbar.addAction(saveAction)
 
         self.selectedElement = "Drift"
 
@@ -370,34 +446,34 @@ class LatticeEditor(QWidget):
         self.elementSelector.addItem("Sextupole")
         self.elementSelector.addItem("RF-cavity")
         self.elementSelector.addItem("Higher order element")
-        grid.addWidget(self.elementSelector, 0, 0)
+        grid.addWidget(self.elementSelector, 2, 0)
 
         self.elementSelector.activated[str].connect(self.activatedElementSelector)
         self.selectedElement = "Drift"
         
 
         self.textL = QLabel("L:")
-        grid.addWidget(self.textL, 1, 0)
+        grid.addWidget(self.textL, 3, 0)
 
         
         self.enterL = QLineEdit()
-        grid.addWidget(self.enterL, 1, 1)
+        grid.addWidget(self.enterL, 3, 1)
         # make sure that only floats and number can be written. Pass the entered value to createDrift
         valueOfL = self.enterL.text()
         #print str(valueOfL)
 
         self.textK = QLabel("K:")
-        grid.addWidget(self.textK, 2, 0)
+        grid.addWidget(self.textK, 4, 0)
         self.textK.hide()
 
         self.enterK = QLineEdit()
-        grid.addWidget(self.enterK, 2, 1)
+        grid.addWidget(self.enterK, 4, 1)
         self.enterK.hide()
         # make sure that only floats and number can be written. Pass the entered value to createDrift
 
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
-        grid.addWidget(createElementButton, 3,1)
+        grid.addWidget(createElementButton, 5,1)
 
     def activatedElementSelector(self, text):
         print text
@@ -448,6 +524,24 @@ class LatticeEditor(QWidget):
         self.parent.parent.widget.latticeoverview.d_pressed = 1
         self.parent.latticeoverview.mousePressEvent(0) # repaint by setting focus    
     
+class EvalWidget(QWidget):
+    def __init__(self, parent, facility):
+        QGLWidget.__init__(self, parent)
+        self.parent = parent
+
+        self.facility = facility
+
+        grid = QGridLayout()
+        self.setLayout(grid)
+
+        EvalButton = QPushButton("Evaluate!")
+        EvalButton.setStyleSheet("background-color:green")
+        EvalButton.clicked.connect(self.evaluate)
+        grid.addWidget(EvalButton,0,0)
+
+    def evaluate(self):
+        return
+        #self.facility.evaluate() # to be implemented
 
 # layout manager (aranges the different widgets)
 class FormWidget(QWidget):
@@ -464,6 +558,13 @@ class FormWidget(QWidget):
         super(FormWidget, self).__init__(parent)
         self.layout = QHBoxLayout(self)
 
+
+        self.layout.addStretch(1)
+        #self.layout.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+        #grid = QGridLayout()
+        #self.setLayout(grid)
+
         self.parent = parent
 
         try:
@@ -471,12 +572,34 @@ class FormWidget(QWidget):
         except:
             print "Baaaaaaaad lattice file!"
         self.latticeoverview = LatticeOverviewWidget(facility, self)
-        self.layout.addWidget(self.latticeoverview)
+        self.layout.addWidget(self.latticeoverview) # need to make this expand when increasing horizontal size as well
+        #policy = self.latticeoverview.sizePolicy()
+        #policy.setHorizontalPolicy(QSizePolicy.Maximum)
+        #self.setHorizontalPolicy()
+        #grid.addWidget(self.latticeoverview, 0, 0)
         self.latticeoverview.setFocus() # starts with focus
         self.latticeoverview.mousePressEvent(0) # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
 
+        #editorgrid = QGridLayout() # How can I make this work? (grid within grid) 
+        self.editorlayout = QVBoxLayout(self)
+
+        self.beameditor = BeamEditor(self, facility)
+        #self.layout.addWidget(self.beameditor)
+        self.editorlayout.addWidget(self.beameditor)
+        #grid.addWidget(self.beameditor, 0, 1)
+
         self.latticeeditor = LatticeEditor(self, facility)
-        self.layout.addWidget(self.latticeeditor)
+        #self.layout.addWidget(self.latticeeditor)
+        self.editorlayout.addWidget(self.latticeeditor)
+        #grid.addWidget(self.latticeeditor, 1, 1)
+
+        self.evalwidget = EvalWidget(self, facility)
+        #self.layout.addWidget(self.evalwidget)
+        self.editorlayout.addWidget(self.evalwidget)
+        #grid.addWidget(self.evalwidget, 2, 1)
+
+        #grid.addWidget(editorgrid,0,1)
+        self.layout.addLayout(self.editorlayout)
 
         self.setLayout(self.layout)
 
@@ -497,20 +620,20 @@ class DATWidgetInterface(QMainWindow):
         exitAction.setShortcut('Ctrl+Q')
         exitAction.triggered.connect(qApp.quit)
 
-        loadAction = QAction(QtGui.QIcon('icons/open.png'), 'Load', self)
-        loadAction.setShortcut('Ctrl+O')
-        loadAction.triggered.connect(self.openFile)
-
-        saveAction = QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
-        saveAction.setShortcut('Ctrl+S')
-        saveAction.triggered.connect(self.saveFile)
+        #loadAction = QAction(QtGui.QIcon('icons/open.png'), 'Load', self)
+        #loadAction.setShortcut('Ctrl+O')
+        #loadAction.triggered.connect(self.openFile)
+#
+        #saveAction = QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
+        #saveAction.setShortcut('Ctrl+S')
+        #saveAction.triggered.connect(self.saveFile)
         
         self.toolbar = self.addToolBar('Exit')
         self.toolbar.addAction(exitAction)
-        self.toolbar = self.addToolBar('Load')
-        self.toolbar.addAction(loadAction)
-        self.toolbar = self.addToolBar('Save')
-        self.toolbar.addAction(saveAction)
+        #self.toolbar = self.addToolBar('Load')
+        #self.toolbar.addAction(loadAction)
+        #self.toolbar = self.addToolBar('Save')
+        #self.toolbar.addAction(saveAction)
 
 
 
