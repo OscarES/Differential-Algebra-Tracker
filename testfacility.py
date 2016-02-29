@@ -219,7 +219,7 @@ nbrOfSplits = 1
 compLattice = Lattice('compLattice')
 
 cavityName = "cavity"
-cavityLength = 1.0
+cavityLength = 2.0
 cavityOscillations = 2
 cavityAmplitudeA = 0
 cavityAmplitudeB = 30 # 30 MeV / m
@@ -227,7 +227,7 @@ cavityE_0 = cavityAmplitudeB
 cavitySigma = 1
 cavityP = 3
 cavityEzofs = [cavityOscillations, cavityAmplitudeA, cavityAmplitudeB, cavityE_0, cavitySigma, cavityP]
-cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata)
+cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata, E)
 
 #fQName = "fQ"
 #fQuadLength = 0.4

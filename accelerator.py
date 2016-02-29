@@ -5,7 +5,7 @@ from scipy.misc import *
 #from scipy.linalg import *
 from scipy import linalg
 from scipy.integrate import quad
-from scipy import constants
+from scipy import constants, linspace
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import *
 import math
@@ -13,6 +13,7 @@ import random
 import matplotlib.pyplot as plt
 import abc
 from particleFactory import envelopeFromMultipart
+from relativity import betaFromE
 
 class Lattice:
     def __init__(self,name):
@@ -949,7 +950,7 @@ def leapfrog(x_0, v_0, F, h, n):
 
 # Comes from ref E.
 class Cavity(Element):
-    def __init__(self, name, L, Ezofs, beamdata):#, K, M):
+    def __init__(self, name, L, Ezofs, beamdata, E_i):#, K, M):
         Element.__init__(self, name, 0) # linear set to zero
         #self.name = name
         #self.K = K
@@ -973,51 +974,44 @@ class Cavity(Element):
         self.m = beamdata[2]
         self.q = beamdata[3]
 
-        ## Made up values
-        #gamma_i = 1000
-        gamma_f = 1100
+        # calc params
+        self.k = 2*constants.pi/self.beta_i/self.rf_lambda
+        self.phi_s = self.findPhi_s(self.beta_i)
+        print "self.phi_s: " + str(self.phi_s)
 
-        #q = 1
-        k = 1
-        self.phi_s = 0.0 # not the same as phi(s) in ref (related but not the same)
-        #m = 1
-
-        #freq = freq = 704.42e6
-        #rf_lambda = constants.c/freq
-        #E_z0_of_s = 1 # should be an array which specifies the field so that it can later be constructed inside the TTF function's quad
-        #phi_s = 1
-
-        #T_of_beta = 1
-
-        ## Correct
-        #beta_i = np.sqrt(1-1/gamma_i**2)
-        beta_f = np.sqrt(1-1/gamma_f**2)
-
-        gamma_i = 1/sqrt(1-self.beta_i**2)
-
-        beta_avg = (self.beta_i + beta_f)/2
-        gamma_avg = (gamma_i + gamma_f)/2
-
-        betaTimesGamma_i = self.beta_i*gamma_i
-        betaTimesGamma_f = beta_f*gamma_f
-
-        betaTimesGammaSquared_i = self.beta_i*gamma_i**2
-        betaTimesGammaSquared_f = beta_f*gamma_f**2
-
-        C = betaTimesGamma_i/betaTimesGamma_f
-
+        ## Calculations
         T_of_beta = self.timeTransitFactor(self.beta_i)
         print "T_of_beta: " + str(T_of_beta)
 
+        deltaW = self.q*self.E_0*T_of_beta*cos(self.phi_s)
+        print "deltaW: " + str(deltaW)
+        self.E_f = E_i + deltaW
+        self.beta_f = betaFromE(self.m, self.E_f)
+        beamdata[0] = self.beta_f
+
+        gamma_i = 1/sqrt(1-self.beta_i**2)
+        gamma_f = 1/sqrt(1-self.beta_f**2)
+
+        beta_avg = (self.beta_i + self.beta_f)/2
+        gamma_avg = (gamma_i + gamma_f)/2
+
+        betaTimesGamma_i = self.beta_i*gamma_i
+        betaTimesGamma_f = self.beta_f*gamma_f
+
+        betaTimesGammaSquared_i = self.beta_i*gamma_i**2
+        betaTimesGammaSquared_f = self.beta_f*gamma_f**2
+
+        C = betaTimesGamma_i/betaTimesGamma_f
+
         k_11_x = self.E_0*T_of_beta*cos(self.phi_s)
-        k_21_x = -self.q*k*self.E_0*T_of_beta*sin(self.phi_s)/(2*beta_avg*gamma_avg**2*self.m*constants.c**2)
+        k_21_x = -self.q*self.k*self.E_0*T_of_beta*sin(self.phi_s)/(2*beta_avg*gamma_avg**2*self.m*constants.c**2)
         k_22_x = self.E_0*T_of_beta*cos(self.phi_s)
 
         G_x = np.array([[k_11_x*C, 0],
             [k_21_x/betaTimesGamma_f, k_22_x*C]])
         G_y = G_x # since in ref E. it says so after eqn 29
 
-        k_21_z = self.q*k*self.E_0*T_of_beta*sin(self.phi_s)/(beta_avg**2*self.m*constants.c)
+        k_21_z = self.q*self.k*self.E_0*T_of_beta*sin(self.phi_s)/(beta_avg**2*self.m*constants.c)
         G_z = np.array([[gamma_f/gamma_i, 0],
             [k_21_z/(gamma_i*betaTimesGammaSquared_f), betaTimesGammaSquared_i/betaTimesGammaSquared_f]])
 
@@ -1056,6 +1050,36 @@ class Cavity(Element):
         res = I1[0]+I2[0]+I3[0]
         res = res/self.E_0
         return res
+
+    def findPhi_s(self, beta):
+        # E_z0_of_s
+        z1z2 = -2*self.halfnbrofoscillations*self.L/3 # /3 since A = 0 and B =/= 0
+        #print "z1z2: " + str(z1z2)
+        z4z5 = 2*self.halfnbrofoscillations*self.L/3 # /3 since A = 0 and B =/= 0
+        #print "z4z5: " + str(z4z5)
+         
+        Ithatgoeswithphi_s = inf
+        for i in linspace(0,2*constants.pi,30):
+            ## Integral
+            # -inf to z1|z2
+            I1 = quad(lambda s: self.amplitudeB*exp(((s+z1z2)/self.sigma)**self.p)*sin(2*constants.pi/(beta*self.rf_lambda)*s - i),-inf,z1z2)
+            #print "I1: " + str(I1)
+            # z2 to z4||z5
+            I2 = quad(lambda s: (self.amplitudeA*cos(constants.pi*s/self.L)+self.amplitudeB*cos(3*constants.pi*s/self.L))*sin(2*constants.pi/(beta*self.rf_lambda)*s - i),z1z2,z4z5)
+            #print "I2: " + str(I2)
+            # z5 to inf
+            I3 = quad(lambda s: self.amplitudeB*exp((-(s-z4z5)/self.sigma)**self.p)*sin(2*constants.pi/(beta*self.rf_lambda)*s - i),z4z5,inf)
+            #print "I3: " + str(I3)
+    
+            # sum up
+            res = I1[0]+I2[0]+I3[0]
+
+            if abs(res) < Ithatgoeswithphi_s:
+                phi_s = i
+                Ithatgoeswithphi_s = abs(res)
+
+        print "Ithatgoeswithphi_s: " + str(Ithatgoeswithphi_s)
+        return phi_s
 
 
 
