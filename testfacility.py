@@ -220,7 +220,14 @@ compLattice = Lattice('compLattice')
 
 cavityName = "cavity"
 cavityLength = 1.0
-cavity = Cavity(cavityName, cavityLength)
+cavityOscillations = 2
+cavityAmplitudeA = 0
+cavityAmplitudeB = 30 # 30 MeV / m
+cavityE_0 = cavityAmplitudeB
+cavitySigma = 1
+cavityP = 3
+cavityEzofs = [cavityOscillations, cavityAmplitudeA, cavityAmplitudeB, cavityE_0, cavitySigma, cavityP]
+cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata)
 
 #fQName = "fQ"
 #fQuadLength = 0.4
