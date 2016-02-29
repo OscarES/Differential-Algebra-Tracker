@@ -227,7 +227,9 @@ cavityE_0 = cavityAmplitudeB
 cavitySigma = 1
 cavityP = 3
 cavityEzofs = [cavityOscillations, cavityAmplitudeA, cavityAmplitudeB, cavityE_0, cavitySigma, cavityP]
-cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata, E)
+cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata, E, nbrOfSplits) # Changes beta in beamdata!
+E = cavity.getNewE() # Updates the energy
+compLattice.appendElement(cavity)
 
 #fQName = "fQ"
 #fQuadLength = 0.4
@@ -290,12 +292,12 @@ cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata, E)
 #saveLattice("../data/" + "savedlatticewithsextu" + ".npy", compLattice)
 
 ## Calculate
-#partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
+partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
 #partresInComp, envresInComp, twissresInComp = parsedLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
 
 #saveSummer2015Format("../data/" + "outpartFODSOspaceChargetesttest" + ".txt","../data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
-#plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
+plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
 
 ### Plotting
 print "Plotting..."

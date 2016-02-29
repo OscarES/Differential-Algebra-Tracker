@@ -950,7 +950,7 @@ def leapfrog(x_0, v_0, F, h, n):
 
 # Comes from ref E.
 class Cavity(Element):
-    def __init__(self, name, L, Ezofs, beamdata, E_i):#, K, M):
+    def __init__(self, name, L, Ezofs, beamdata, E_i, nbrOfSplits):#, K, M):
         Element.__init__(self, name, 0) # linear set to zero
         #self.name = name
         #self.K = K
@@ -960,6 +960,7 @@ class Cavity(Element):
 
         ## Input
         self.L = L
+        self.n = nbrOfSplits
         # E-field
         self.oscillations = Ezofs[0]
         self.halfnbrofoscillations = self.oscillations/2
@@ -1028,6 +1029,9 @@ class Cavity(Element):
             row2))
         print str(self.M)
 
+        self.Msp = self.M # splitting doesn't do anything
+        self.Lsp = self.L
+
     # with E_z0 from ref C.
     def timeTransitFactor(self, beta):
         # E_z0_of_s
@@ -1080,6 +1084,33 @@ class Cavity(Element):
 
         print "Ithatgoeswithphi_s: " + str(Ithatgoeswithphi_s)
         return phi_s
+
+    def getNewE(self):
+        return self.E_f
+
+    def evaluate(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        #print "hej fran quad"
+        for i in range(0,self.n):
+            #if self.spaceChargeOn:
+                #self.sc.updateMatrix(multipart,twiss)
+                #multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
+            multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
+            #twiss[7] = envelope[6] / twiss[8]
+            #print "twiss[7] after: " + str(twiss[7])
+        return multipart, envelope, twiss
+
+    def evaluateM(self,multipart,envelope):
+        # should just go through a disunited part
+        # each loop iteration is for a new particle
+        for j in range(0,len(np.atleast_1d(multipart))):
+            multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
+        #envelope = np.dot(self.Tsp, envelope)
+        envelope = envelopeFromMultipart(multipart)
+        return multipart, envelope
 
 
 
