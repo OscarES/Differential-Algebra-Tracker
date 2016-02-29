@@ -951,7 +951,7 @@ def leapfrog(x_0, v_0, F, h, n):
 # Comes from ref E.
 class Cavity(Element):
     def __init__(self, name, L, Ezofs, beamdata, E_i, nbrOfSplits):#, K, M):
-        Element.__init__(self, name, 0) # linear set to zero
+        Element.__init__(self, "cavity " + name, 0) # linear set to zero
         #self.name = name
         #self.K = K
         #self.L = L
@@ -1087,6 +1087,9 @@ class Cavity(Element):
 
     def getNewE(self):
         return self.E_f
+
+    def printInfo(self):
+        return self.name + "\t L: " + str(self.L) + "\t Oscillations: " + str(self.oscillations) + "\t AmplitudeA: " + str(self.amplitudeA) + "\t AmplitudeB: " + str(self.amplitudeB) + "\t E_0: " + str(self.E_0) + "\t sigma: " + str(self.sigma) + "\t p: " + str(self.p)
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts

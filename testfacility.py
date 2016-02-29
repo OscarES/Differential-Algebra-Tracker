@@ -230,74 +230,74 @@ cavityEzofs = [cavityOscillations, cavityAmplitudeA, cavityAmplitudeB, cavityE_0
 cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata, E, nbrOfSplits) # Changes beta in beamdata!
 E = cavity.getNewE() # Updates the energy
 compLattice.appendElement(cavity)
+print compLattice.printLattice()
 
-#fQName = "fQ"
-#fQuadLength = 0.4
-#fQuadStrength = -0.8 # this is k
-#fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-##compLattice.appendElement(fQ)
-#
-#driftName = "drift"
-#driftLength = 1.0
-#compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-##compLattice.appendElement(compDrift)
-#
-#dQName = "dQ"
-#dQuadLength = 0.4
-#dQuadStrength = 0.8
-#dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-##compLattice.appendElement(dQ)
-#
-#sextuName = "sextu"
-#hamToUse = "sextupoleham"
-#sextuLength = 0.3
-#sextuStrength = 0.6
-#compOrder = 6
-#sextu = LieAlgElement(sextuName, hamToUse, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-#compLattice.appendElement(sextu)
-#
-##compLattice.appendElement(compDrift)
-#
-#dipoleName = "dipole"
-#dipoleRho = 5
-#dipoleAlpha = math.pi/4 
-#dipolen = 0.5
-#compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
-#compLattice.appendElement(compDipole)
-#
+fQName = "fQ"
+fQuadLength = 0.4
+fQuadStrength = -0.8 # this is k
+fQ = Quad(fQName, fQuadStrength, fQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 #compLattice.appendElement(fQ)
-#compLattice.appendElement(compDrift)
-#compLattice.appendElement(dQ)
-#compLattice.appendElement(compDrift)
-#
-#compLattice.appendElement(fQ)
-#compLattice.appendElement(compDrift)
-#compLattice.appendElement(dQ)
-#compLattice.appendElement(compDrift)
-#
-#compLattice.appendElement(fQ)
-#compLattice.appendElement(compDrift)
-#compLattice.appendElement(dQ)
+
+driftName = "drift"
+driftLength = 1.0
+compDrift = Drift(driftName, driftLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 #compLattice.appendElement(compDrift)
 
-#print compLattice.printLattice()
+dQName = "dQ"
+dQuadLength = 0.4
+dQuadStrength = 0.8
+dQ = Quad(dQName, dQuadStrength, dQuadLength, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+#compLattice.appendElement(dQ)
+
+sextuName = "sextu"
+hamToUse = "sextupoleham"
+sextuLength = 0.3
+sextuStrength = 0.6
+compOrder = 6
+sextu = LieAlgElement(sextuName, hamToUse, sextuStrength, sextuLength, compOrder, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+compLattice.appendElement(sextu)
+
+#compLattice.appendElement(compDrift)
+
+dipoleName = "dipole"
+dipoleRho = 5
+dipoleAlpha = math.pi/4 
+dipolen = 0.5
+compDipole = Dipole(dipoleName, dipoleRho, dipoleAlpha, dipolen, spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
+compLattice.appendElement(compDipole)
+
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
+
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
+
+compLattice.appendElement(fQ)
+compLattice.appendElement(compDrift)
+compLattice.appendElement(dQ)
+compLattice.appendElement(compDrift)
+print compLattice.printLattice()
 #parsedLattice = parseLatticeString(compLattice.printLattice(), spaceChargeOnInComp, multipartfromold, twissfromold, beamdata, nbrOfSplits)
 #print "parsedLattice: \n" + parsedLattice.printLattice()
 
-#saveLatticeString("../data/" + "savedlatticestringonlysextu" + ".npy", parsedLattice)
+#saveLatticeString("../data/" + "savedlatticestringsextudipolecavity" + ".npy", compLattice)
 
 #loadedLatticeString = loadLatticeString("../data/" + "savedlatticestringwithsextu" + ".npy")
 #print "loadedLatticeString: \n" + loadedLatticeString
 
-#saveLattice("../data/" + "savedlatticewithsextu" + ".npy", compLattice)
+#saveLattice("../data/" + "savedlatticestringsextudipolecavity" + ".npy", compLattice)
 
 ## Calculate
-partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
+#partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
 #partresInComp, envresInComp, twissresInComp = parsedLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
 
 #saveSummer2015Format("../data/" + "outpartFODSOspaceChargetesttest" + ".txt","../data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
-plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
+#plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
 
 ### Plotting
 print "Plotting..."
