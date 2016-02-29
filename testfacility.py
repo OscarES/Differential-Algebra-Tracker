@@ -219,7 +219,8 @@ nbrOfSplits = 1
 compLattice = Lattice('compLattice')
 
 cavityName = "cavity"
-cavity = Cavity(cavityName)
+cavityLength = 1.0
+cavity = Cavity(cavityName, cavityLength)
 
 #fQName = "fQ"
 #fQuadLength = 0.4
