@@ -950,7 +950,7 @@ def leapfrog(x_0, v_0, F, h, n):
 
 # Comes from ref E.
 class Cavity(Element):
-    def __init__(self, name, L, Ezofs, beamdata, E_i, nbrOfSplits):#, K, M):
+    def __init__(self, name, L, Ezofs, beamdata, nbrOfSplits):#, K, M):
         Element.__init__(self, "cavity " + name, 0) # linear set to zero
         #self.name = name
         #self.K = K
@@ -974,6 +974,7 @@ class Cavity(Element):
         self.rf_lambda = beamdata[1]
         self.m = beamdata[2]
         self.q = beamdata[3]
+        E_i = beamdata[4]
 
         # calc params
         self.k = 2*constants.pi/self.beta_i/self.rf_lambda

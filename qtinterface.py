@@ -80,7 +80,7 @@ class LatticeOverviewWidget(QGLWidget):
             if nextWillBeL:
                 self.elements.append([tempword, float(line)])
                 nextWillBeL = 0
-            if line == "drift" or line == "dipole" or line == "quad" or line == "liealgelem":  
+            if line == "drift" or line == "dipole" or line == "quad" or line == "liealgelem" or line == "cavity":  
                 tempword = line
             if line == "L:":
                 nextWillBeL = 1
@@ -111,6 +111,8 @@ class LatticeOverviewWidget(QGLWidget):
                 color = [1, 0, 0]
             elif elem[0] == "liealgelem":
                 color = [0, 0, 1]
+            elif elem[0] == "cavity":
+                color = [1, 1, 0]
 
             length = elem[1]
 
@@ -568,7 +570,7 @@ class DATWidgetInterface(QMainWindow):
 
             loadedLatticeString = loadLatticeString(fname[0])
             loadedLattice = parseLatticeString(loadedLatticeString, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
-
+            print "lattice loaded"
             self.facility.setLattice(loadedLattice)
             self.widget.latticeoverview.initializeGL()
             self.widget.latticeoverview.paintGL()

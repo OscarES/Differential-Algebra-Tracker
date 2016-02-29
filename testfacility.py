@@ -207,7 +207,7 @@ rf_lambda = constants.c/freq  # beam data needed
 m = constants.m_p
 beta = betaFromE(m, E)
 q = constants.e
-beamdata = [beta, rf_lambda, m, q]
+beamdata = [beta, rf_lambda, m, q, E]
 
 #envelopeInComp = np.array([1, 0, 0, 1, 0, 0, 1, 0, 0])
 envelopeInComp = envelopeFromMultipart(multipartfromold)
@@ -227,7 +227,7 @@ cavityE_0 = cavityAmplitudeB
 cavitySigma = 1
 cavityP = 3
 cavityEzofs = [cavityOscillations, cavityAmplitudeA, cavityAmplitudeB, cavityE_0, cavitySigma, cavityP]
-cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata, E, nbrOfSplits) # Changes beta in beamdata!
+cavity = Cavity(cavityName, cavityLength, cavityEzofs, beamdata, nbrOfSplits) # Changes beta in beamdata!
 E = cavity.getNewE() # Updates the energy
 compLattice.appendElement(cavity)
 print compLattice.printLattice()

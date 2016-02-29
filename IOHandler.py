@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 import os
 import copy
-from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole
+from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole, Cavity
 
 def saveAll(filename, multipart, twiss, envelope, lattice):
     saveMultipart(filename + "multipart", multipart)
@@ -87,6 +87,16 @@ def parseLatticeString(text, spaceChargeOn, multipart, twiss, beamdata, nbrOfSpl
         typeOfElem = words[0]
         name = words[1]
         l = float(words[words.index("L:") + 1]) #what comes after "L:"
+        if typeOfElem == "cavity":
+            cavityOscillations = float(words[words.index("Oscillations:") + 1])
+            cavityAmplitudeA = float(words[words.index("AmplitudeA:") + 1])
+            cavityAmplitudeB = float(words[words.index("AmplitudeB:") + 1])
+            cavityE_0 = float(words[words.index("E_0:") + 1])
+            cavitySigma = float(words[words.index("sigma:") + 1])
+            cavityP = float(words[words.index("p:") + 1])
+
+            cavityEzofs = [cavityOscillations, cavityAmplitudeA, cavityAmplitudeB, cavityE_0, cavitySigma, cavityP]
+            elem = Cavity(name, l, cavityEzofs, beamdata, nbrOfSplits)
         if typeOfElem == "dipole":
             rho = float(words[words.index("rho:") + 1]) #what comes after "rho:"
             #k_x = what comes after "K_x: "
@@ -95,7 +105,7 @@ def parseLatticeString(text, spaceChargeOn, multipart, twiss, beamdata, nbrOfSpl
             nparam = float(words[words.index("nparam:") + 1]) #what comes after "nparam:"
             alpha = float(words[words.index("Alpha:") + 1]) #what comes after "Alpha:"
             elem = Dipole(name, rho, alpha, nparam, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
-        elif typeOfElem != "drift":
+        elif typeOfElem != "drift" and typeOfElem != "cavity":
             k = float(words[words.index("K:") + 1]) #what comes after "K:"
         if typeOfElem == "liealgelem":
             hamToUse = words[words.index("HamUsed:") + 1] #what comes after "HamUsed:" and before next whitespace
