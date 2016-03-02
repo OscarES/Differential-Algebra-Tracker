@@ -614,7 +614,9 @@ class FormWidget(QWidget):
         newWidth = max(self.frameGeometry().width()-420,0) # 420 is magic number for getting the correct width
         #print "newWidth: " + str(newWidth)
         #self.latticeoverview.setMinimumSize(newWidth, 500)
-        self.latticeoverview.setFixedWidth(newWidth)
+        #self.latticeoverview.setFixedWidth(newWidth)
+        #self.latticeoverview.resize(newWidth, self.latticeoverview.height())
+        self.latticeoverview.setGeometry(4,4,newWidth, self.latticeoverview.height())
         return
 
     
