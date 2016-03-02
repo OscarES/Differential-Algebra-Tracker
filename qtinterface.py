@@ -605,17 +605,7 @@ class FormWidget(QWidget):
         self.setLayout(self.layout)
 
     def resizeEvent(self, event):
-        #print "hej"
-        #self.resize(self.parent.frameGeometry().width(), self.parent.frameGeometry().height())
-        #print str(self.frameGeometry().width())
-        #self.latticeoverview.setMinimumSize(self.frameGeometry().width()-518, 500)
-        #editorWidth = self.beameditor.frameGeometry().width()
-        #print "editorWidth: " + str(editorWidth)
         newWidth = max(self.frameGeometry().width()-420,0) # 420 is magic number for getting the correct width
-        #print "newWidth: " + str(newWidth)
-        #self.latticeoverview.setMinimumSize(newWidth, 500)
-        #self.latticeoverview.setFixedWidth(newWidth)
-        #self.latticeoverview.resize(newWidth, self.latticeoverview.height())
         self.latticeoverview.setGeometry(4,4,newWidth, self.latticeoverview.height())
         return
 
@@ -731,23 +721,7 @@ class DATWidgetInterface(QMainWindow):
             fnameasstring = ''
 
     def resizeEvent(self, event):
-
-        #result = super(DATWidgetInterface, self).resizeEvent(event)
-        #print str(result)
-
         if self.widget is not None:
-            #print str(self.sizeHint())
-            #print str(self.widget.sizeHint())
-            #print str(QDesktopWidget().screenGeometry())
-            #print str(self.frameGeometry())
-            #print str(self.frameGeometry().width()) + " " + str(self.frameGeometry().height())
-            #self.widget.resize(self.frameGeometry().width(), self.frameGeometry().height())
-            #self.widget.setFixedWidth(self.frameGeometry().width())
-            #self.widget.updateGeometry()
-            #newWidth = max(self.widget.frameGeometry().width()-420,0)
-            #self.widget.latticeoverview.setFixedWidth(newWidth)
-            #self.updateGeometry()
-            #self.setFixedWidth(self.frameGeometry().width())
             self.widget.resizeEvent(event)
 
     
