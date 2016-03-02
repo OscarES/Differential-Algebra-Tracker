@@ -558,7 +558,7 @@ class FormWidget(QWidget):
         super(FormWidget, self).__init__(parent)
         self.layout = QHBoxLayout(self)
 
-
+        self.layout.setAlignment(QtCore.Qt.AlignLeft)
         self.layout.addStretch(1)
         #self.layout.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -572,6 +572,7 @@ class FormWidget(QWidget):
         except:
             print "Baaaaaaaad lattice file!"
         self.latticeoverview = LatticeOverviewWidget(facility, self)
+        #self.latticeoverview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.layout.addWidget(self.latticeoverview) # need to make this expand when increasing horizontal size as well
         #policy = self.latticeoverview.sizePolicy()
         #policy.setHorizontalPolicy(QSizePolicy.Maximum)
@@ -603,6 +604,19 @@ class FormWidget(QWidget):
 
         self.setLayout(self.layout)
 
+    def resizeEvent(self, event):
+        #print "hej"
+        #self.resize(self.parent.frameGeometry().width(), self.parent.frameGeometry().height())
+        #print str(self.frameGeometry().width())
+        #self.latticeoverview.setMinimumSize(self.frameGeometry().width()-518, 500)
+        #editorWidth = self.beameditor.frameGeometry().width()
+        #print "editorWidth: " + str(editorWidth)
+        newWidth = max(self.frameGeometry().width()-420,0) # 420 is magic number for getting the correct width
+        #print "newWidth: " + str(newWidth)
+        #self.latticeoverview.setMinimumSize(newWidth, 500)
+        self.latticeoverview.setFixedWidth(newWidth)
+        return
+
     
 
         
@@ -613,12 +627,18 @@ class DATWidgetInterface(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.facility = Facility()
+
+        #self.mainlayout = QVBoxLayout(self)
+
         self.widget = FormWidget(self, self.facility)
         self.setCentralWidget(self.widget)
+        #self.mainlayout.addWidget(self.widget)
 
-        exitAction = QAction(QtGui.QIcon('icons/delete.png'), 'Exit', self)
-        exitAction.setShortcut('Ctrl+Q')
-        exitAction.triggered.connect(qApp.quit)
+        #self.setLayout(self.mainlayout)
+
+        #exitAction = QAction(QtGui.QIcon('icons/delete.png'), 'Exit', self)
+        #exitAction.setShortcut('Ctrl+Q')
+        #exitAction.triggered.connect(qApp.quit)
 
         #loadAction = QAction(QtGui.QIcon('icons/open.png'), 'Load', self)
         #loadAction.setShortcut('Ctrl+O')
@@ -628,8 +648,8 @@ class DATWidgetInterface(QMainWindow):
         #saveAction.setShortcut('Ctrl+S')
         #saveAction.triggered.connect(self.saveFile)
         
-        self.toolbar = self.addToolBar('Exit')
-        self.toolbar.addAction(exitAction)
+        #self.toolbar = self.addToolBar('Exit')
+        #self.toolbar.addAction(exitAction)
         #self.toolbar = self.addToolBar('Load')
         #self.toolbar.addAction(loadAction)
         #self.toolbar = self.addToolBar('Save')
@@ -707,6 +727,26 @@ class DATWidgetInterface(QMainWindow):
             saveLatticeString(fname[0],latticeToSave) # fname[0] is the path string
         except AttributeError:
             fnameasstring = ''
+
+    def resizeEvent(self, event):
+
+        #result = super(DATWidgetInterface, self).resizeEvent(event)
+        #print str(result)
+
+        if self.widget is not None:
+            #print str(self.sizeHint())
+            #print str(self.widget.sizeHint())
+            #print str(QDesktopWidget().screenGeometry())
+            #print str(self.frameGeometry())
+            #print str(self.frameGeometry().width()) + " " + str(self.frameGeometry().height())
+            #self.widget.resize(self.frameGeometry().width(), self.frameGeometry().height())
+            #self.widget.setFixedWidth(self.frameGeometry().width())
+            #self.widget.updateGeometry()
+            #newWidth = max(self.widget.frameGeometry().width()-420,0)
+            #self.widget.latticeoverview.setFixedWidth(newWidth)
+            #self.updateGeometry()
+            #self.setFixedWidth(self.frameGeometry().width())
+            self.widget.resizeEvent(event)
 
     
 
