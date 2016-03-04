@@ -17,7 +17,6 @@ from accelerator import Lattice
 from numpy import array
 import numpy as np
 from scipy import *
-import time
 from facility import *
 import re
 
@@ -29,7 +28,6 @@ class LatticeOverviewWidget(QGLWidget):
         self.parent = parent
         QtOpenGL.QGLWidget.__init__(self, parent)
 
-        self.yRotDeg = 1.0
         self.setMinimumSize(600, 500)
 
         self.z = 2.0
@@ -38,10 +36,6 @@ class LatticeOverviewWidget(QGLWidget):
         self.a_pressed = 0
         self.s_pressed = 0
         self.d_pressed = 0
-
-        self.radius = 1
-        self.camX = sin(time.time()) * self.radius;
-        self.camY = cos(time.time()) * self.radius;
 
         self.cameraPos = np.array([0.0, 0.0, 1.0])
         self.cameraTarget = np.array([0.0, 0.0, 0.0])
@@ -57,15 +51,12 @@ class LatticeOverviewWidget(QGLWidget):
         self.facility = facility
         self.lattice = self.facility.getLattice()
 
-        self.yRotDeg = 0.0
-
     def loadLattice(self):
         self.lattice = self.facility.getLattice()
         lattticeString = self.lattice.printLattice()
         self.elements = []
         nextWillBeL = 0
         for line in lattticeString.split():
-            #print "line: " + line
             if nextWillBeL:
                 self.elements.append([tempword, float(line)])
                 nextWillBeL = 0
@@ -121,48 +112,30 @@ class LatticeOverviewWidget(QGLWidget):
                     [direction[0], direction[1], direction[2], 0.0],
                     [0.0, 0.0, 0.0, 1.0]
                     ])
-        #print "a: " + str(a)
         b = np.array([
                     [1.0, 0.0, 0.0, -position[0]],
                     [0.0, 1.0, 0.0, -position[1]],
                     [0.0, 0.0, 1.0, -position[2]],
                     [0.0, 0.0, 0.0, 1.0]
                     ])
-        #print "b: " + str(b)
         return a*b
 
     def paintGL(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        #glLoadIdentity()
-        #gluLookAt(0.0, 105.0, 105.0,
-        #  0.0, 0.0, 0.0,
-        #  0.0, 1.0, 0.0)
-        #glRotatef(self.yRotDeg, 0.0, 1.0, 0.0)
-
-        self.camX = sin(time.time()) * self.radius;
-        self.camY = cos(time.time()) * self.radius;
-
         cameraSpeed = 0.5
         if self.w_pressed:
             self.cameraPos += self.cameraDirection*cameraSpeed
             self.w_pressed = 0
-            #print "Camera moved from w"
-            #print "cameraPos: " + str(self.cameraPos)
         if self.s_pressed:
             self.cameraPos -= self.cameraDirection*cameraSpeed
             self.s_pressed = 0
-            #print "Camera moved from s"
-            #print "cameraPos: " + str(self.cameraPos)
         if self.a_pressed:
-            #print "Camera moved from a"
             tempCross = np.cross(self.cameraDirection, self.up)
             normTempCross = tempCross/np.linalg.norm(tempCross)
             self.cameraPos -= normTempCross*cameraSpeed
             self.a_pressed = 0
-            #print "cameraPos: " + str(self.cameraPos)
         if self.d_pressed:
-            #print "Camera moved from d"
             tempCross = np.cross(self.cameraDirection, self.up)
             normTempCross = tempCross/np.linalg.norm(tempCross)
             self.cameraPos += normTempCross*cameraSpeed
@@ -267,14 +240,9 @@ class LatticeOverviewWidget(QGLWidget):
         blockClrArray[:,2] = color[2]
         return blockVtxArray, blockIdxArray, blockClrArray
 
-    # If one clicks on the openGL panel it gets the focus
-    def mousePressEvent(self, bla):
+    # If one clicks on the openGL panel it gets the focus, also this will be called if focus on opengl is required
+    def mousePressEvent(self):
         self.setFocus()
-    #    self.mousePressed = 1
-        self.updateGL()
-
-    def spin(self):
-        self.yRotDeg = (self.yRotDeg  + 1) % 360.0
         self.updateGL()
 
 
@@ -285,7 +253,6 @@ class BeamEditor(QWidget):
 
     def __init__(self, parent, facility):
         QGLWidget.__init__(self, parent)
-        #self.setMinimumSize(500, 500)
 
         self.parent = parent
 
@@ -474,7 +441,7 @@ class LatticeEditor(QWidget):
         self.parent.latticeoverview.initializeGL() # update the paint lattice in overview
         self.parent.parent.widget.latticeoverview.s_pressed = 1 # prepare a zoom out
         self.parent.parent.widget.latticeoverview.d_pressed = 1
-        self.parent.latticeoverview.mousePressEvent(0) # repaint by setting focus
+        self.parent.latticeoverview.mousePressEvent() # repaint by setting focus
 
     def saveLattice(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Lattice file', '')
@@ -539,7 +506,7 @@ class FormWidget(QWidget):
         self.layout.addWidget(self.latticeoverview)
 
         self.latticeoverview.setFocus() # starts with focus
-        self.latticeoverview.mousePressEvent(0) # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
+        self.latticeoverview.mousePressEvent() # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
 
         ## Editor layout
         self.editorlayout = QVBoxLayout() # no need for self as param since layout will later set this as its child
@@ -564,11 +531,7 @@ class FormWidget(QWidget):
     def resizeEvent(self, event):
         newWidth = max(self.frameGeometry().width()-420,0) # 420 is magic number for getting the correct width
         self.latticeoverview.setGeometry(4,4,newWidth, self.latticeoverview.height())
-        return
-
-    
-
-        
+        return     
 
 class DATWidgetInterface(QMainWindow):
     ''' Example class for using SpiralWidget'''
@@ -577,12 +540,8 @@ class DATWidgetInterface(QMainWindow):
         QMainWindow.__init__(self)
         self.facility = Facility()
 
-        #self.mainlayout = QVBoxLayout(self)
-
         self.widget = FormWidget(self, self.facility)
         self.setCentralWidget(self.widget)
-
-
 
     def keyPressEvent(self, e):
         
@@ -594,7 +553,6 @@ class DATWidgetInterface(QMainWindow):
             return
         if chr(e.key()) == 'W':
             self.widget.latticeoverview.w_pressed = 1
-            #print "W pressed!!!!!"
         if chr(e.key()) == 'A':
             self.widget.latticeoverview.a_pressed = 1
         if chr(e.key()) == 'S':
