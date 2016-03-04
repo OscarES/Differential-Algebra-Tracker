@@ -29,7 +29,7 @@ def saveBeamdata(filename, beamdata):
 
 def loadBeamdata(filename):
     try:
-        beamdata = np.load(beamdata)
+        beamdata = np.load(filename)
         return beamdata
     except:
         print 'Bad datafile!'

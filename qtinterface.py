@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
-from IOHandler import parseLatticeString, saveLatticeString, loadLatticeString, loadSummer2015Formatzasx, loadTwiss, loadMultipart #, loadLattice, saveLattice
+from IOHandler import parseLatticeString, saveLatticeString, loadLatticeString, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart # loadLattice, saveLattice
 from accelerator import Lattice
 from numpy import array
 import numpy as np
@@ -85,7 +85,7 @@ class LatticeOverviewWidget(QGLWidget):
             if line == "L:":
                 nextWillBeL = 1
 
-        print "self.elements: \n" + str(self.elements)
+        #print "self.elements: \n" + str(self.elements) # prints the current lattice
 
 
     def initializeGL(self):
@@ -362,37 +362,75 @@ class BeamEditor(QWidget):
         self.textBeamEditor = QLabel("Beam Editor")
         grid.addWidget(self.textBeamEditor, 0, 0)
 
+        saveBeamdataButton = QPushButton("Save Beamdata")
+        saveBeamdataButton.clicked.connect(self.saveBeamdata)
+        grid.addWidget(saveBeamdataButton,1,0)
+
+        saveTwissButton = QPushButton("Save Twiss")
+        saveTwissButton.clicked.connect(self.saveTwiss)
+        grid.addWidget(saveTwissButton,1,1)
+
+        saveMultipartButton = QPushButton("Save Multiparticles")
+        saveMultipartButton.clicked.connect(self.saveMultipart)
+        grid.addWidget(saveMultipartButton,1,2)
+
         loadBeamdataButton = QPushButton("Load Beamdata")
         loadBeamdataButton.clicked.connect(self.loadBeamdata)
-        grid.addWidget(loadBeamdataButton,1,0)
+        grid.addWidget(loadBeamdataButton,2,0)
 
         loadTwissButton = QPushButton("Load Twiss")
-        loadTwissButton.clicked.connect(self.loadTwissWithFname)
-        grid.addWidget(loadTwissButton,1,1)
+        loadTwissButton.clicked.connect(self.loadTwiss)
+        grid.addWidget(loadTwissButton,2,1)
 
         loadMultipartButton = QPushButton("Load Multiparticles")
-        loadMultipartButton.clicked.connect(self.loadMultipartWithFname)
-        grid.addWidget(loadMultipartButton,1,2)
+        loadMultipartButton.clicked.connect(self.loadMultipart)
+        grid.addWidget(loadMultipartButton,2,2)
 
-    def loadTwissWithFname(self):
+    def saveBeamdata(self):
+        fname = QFileDialog.getSaveFileName(self, 'Save Beamdata file', '')
+        try:
+            saveBeamdata(fname[0],self.facility.getBeamdata()) # fname[0] is the path string
+        except AttributeError:
+            fnameasstring = ''
+
+    def loadBeamdata(self):
+        fname = QFileDialog.getOpenFileName(self, 'Open Beamdata file', '')
+        try:
+            beamdata = loadBeamdata(fname[0])
+            self.facility.setBeamdata(beamdata)
+        except:
+            print "Bad beamdata file!"
+
+    def saveTwiss(self):
+        fname = QFileDialog.getSaveFileName(self, 'Save Twiss file', '')
+        try:
+            saveTwiss(fname[0],self.facility.getTwiss()) # fname[0] is the path string
+        except AttributeError:
+            fnameasstring = ''
+
+    def loadTwiss(self):
         fname = QFileDialog.getOpenFileName(self, 'Open Twiss file', '')
         try:
             twiss = loadTwiss(fname[0])
-            # send to parent!!!!
+            self.facility.setTwiss(twiss)
         except:
             print "Bad twiss file!"
 
-    def loadMultipartWithFname(self):
+    def saveMultipart(self):
+        fname = QFileDialog.getSaveFileName(self, 'Save Multipart file', '')
+        try:
+            saveMultipart(fname[0],self.facility.getMultipart()) # fname[0] is the path string
+        except AttributeError:
+            fnameasstring = ''
+
+    def loadMultipart(self):
         fname = QFileDialog.getOpenFileName(self, 'Open Multipart file', '')
         try:
             multipart = loadMultipart(fname[0])
-            # send to parent!!!!
+            self.facility.setMultipart(multipart)
         except:
             print "Bad multipart file!"
-
-    # To be implemented, takes a beamdata files and gets the data that a beamdata array should have. Implement this in IOHandler
-    def loadBeamdata(self):
-        return
+    
 
 class LatticeEditor(QWidget):
     '''
@@ -562,8 +600,8 @@ class FormWidget(QWidget):
         self.layout.addStretch(1)
         #self.layout.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
-        #grid = QGridLayout()
-        #self.setLayout(grid)
+        #zzz#grid = QGridLayout()
+        
 
         self.parent = parent
 
@@ -574,10 +612,11 @@ class FormWidget(QWidget):
         self.latticeoverview = LatticeOverviewWidget(facility, self)
         #self.latticeoverview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.layout.addWidget(self.latticeoverview) # need to make this expand when increasing horizontal size as well
+        #zzz#grid.addWidget(self.latticeoverview, 0, 0, 3, 2)#, 2, 0)
+
         #policy = self.latticeoverview.sizePolicy()
         #policy.setHorizontalPolicy(QSizePolicy.Maximum)
         #self.setHorizontalPolicy()
-        #grid.addWidget(self.latticeoverview, 0, 0)
         self.latticeoverview.setFocus() # starts with focus
         self.latticeoverview.mousePressEvent(0) # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
 
@@ -587,22 +626,23 @@ class FormWidget(QWidget):
         self.beameditor = BeamEditor(self, facility)
         #self.layout.addWidget(self.beameditor)
         self.editorlayout.addWidget(self.beameditor)
-        #grid.addWidget(self.beameditor, 0, 1)
+        #zzz#grid.addWidget(self.beameditor, 0, 1)
 
         self.latticeeditor = LatticeEditor(self, facility)
         #self.layout.addWidget(self.latticeeditor)
         self.editorlayout.addWidget(self.latticeeditor)
-        #grid.addWidget(self.latticeeditor, 1, 1)
+        #zzz#grid.addWidget(self.latticeeditor, 1, 1)
 
         self.evalwidget = EvalWidget(self, facility)
         #self.layout.addWidget(self.evalwidget)
         self.editorlayout.addWidget(self.evalwidget)
-        #grid.addWidget(self.evalwidget, 2, 1)
+        #zzz#grid.addWidget(self.evalwidget, 2, 1)
 
         #grid.addWidget(editorgrid,0,1)
         self.layout.addLayout(self.editorlayout)
 
         self.setLayout(self.layout)
+        #zzz#self.setLayout(grid)
 
     def resizeEvent(self, event):
         newWidth = max(self.frameGeometry().width()-420,0) # 420 is magic number for getting the correct width
