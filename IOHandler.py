@@ -23,6 +23,19 @@ def loadAll(filename):
         quit()
         return 0
 
+def saveBeamdata(filename, beamdata):
+    np.save(filename, beamdata)
+    return 1
+
+def loadBeamdata(filename):
+    try:
+        beamdata = np.load(beamdata)
+        return beamdata
+    except:
+        print 'Bad datafile!'
+        quit()
+        return 0
+
 def saveMultipart(filename, multipart):
     np.save(filename, multipart)
     return 1
