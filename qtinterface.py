@@ -489,29 +489,33 @@ class LatticeEditor(QWidget):
         self.elementSelector.activated[str].connect(self.activatedElementSelector)
         self.selectedElement = "Drift"
         
+        self.textName = QLabel("Name:")
+        grid.addWidget(self.textName, 3, 0)
+
+        self.enterName = QLineEdit()
+        grid.addWidget(self.enterName, 3, 1)
+        name = self.enterName.text()
 
         self.textL = QLabel("L:")
-        grid.addWidget(self.textL, 3, 0)
-
+        grid.addWidget(self.textL, 4, 0)
         
         self.enterL = QLineEdit()
-        grid.addWidget(self.enterL, 3, 1)
+        grid.addWidget(self.enterL, 4, 1)
         # make sure that only floats and number can be written. Pass the entered value to createDrift
         valueOfL = self.enterL.text()
-        #print str(valueOfL)
 
         self.textK = QLabel("K:")
-        grid.addWidget(self.textK, 4, 0)
+        grid.addWidget(self.textK, 5, 0)
         self.textK.hide()
 
         self.enterK = QLineEdit()
-        grid.addWidget(self.enterK, 4, 1)
+        grid.addWidget(self.enterK, 5, 1)
         self.enterK.hide()
         # make sure that only floats and number can be written. Pass the entered value to createDrift
 
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
-        grid.addWidget(createElementButton, 5,1)
+        grid.addWidget(createElementButton, 6,1)
 
     def activatedElementSelector(self, text):
         print text
@@ -525,13 +529,14 @@ class LatticeEditor(QWidget):
 
     def createElement(self):
         ## Take the inputs in fields
+        name = self.enterName.text()
+
         valueOfL = self.enterL.text()
         try:
             L = float(valueOfL)
         except:
             print "Not a number! L set to 0.0"
             L = 0.0
-        #print str(L)
 
         if not self.enterK.isHidden():
             valueOfK = self.enterK.text()
@@ -540,19 +545,12 @@ class LatticeEditor(QWidget):
             except:
                 print "Not a number! K set to 0.0"
                 K = 0.0
-            #print "K is " + str(K)
 
-        name = "new element"
-        spaceChargeOn = 0
-        multipart = 0
-        twiss = 0
-        beamdata = 0
-        nbrOfSplits = 1
-
+        ## Make new elements
         if self.selectedElement == "Drift":
-            self.facility.createDrift(name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            self.facility.createDrift(name, L)
         elif self.selectedElement == "Quadrupole":
-            self.facility.createQuad(name, K, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            self.facility.createQuad(name, K, L)
         else:
             return
         

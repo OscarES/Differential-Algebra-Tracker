@@ -13,6 +13,7 @@ class Facility():
     def __init__(self):
         self.lattice = Lattice("Facility")
 
+        ## Start with just a drift
         self.getDefaultLatticeElement()
 
         ## Beam properties
@@ -20,12 +21,16 @@ class Facility():
         self.twiss = self.getDefaultTwiss()
         self.multipart = gaussianTwiss3D(self.beamdata[5], self.twiss)
 
-    def createDrift(self, name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
-        drift = Drift(name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+        ## space-charge, not sure how these shall be represented in the GUI. spaceChargeOn can be a radio button, nbrOfSplits can be a text field
+        self.spaceChargeOn = 0
+        self.nbrOfSplits = 1
+
+    def createDrift(self, name, L):
+        drift = Drift(name, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.lattice.appendElement(drift)
 
-    def createQuad(self, name, K, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
-        quad = Quad(name, K, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+    def createQuad(self, name, K, L):
+        quad = Quad(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.lattice.appendElement(quad)
 
     def getDefaultLatticeElement(self):
@@ -60,6 +65,9 @@ class Facility():
     def getMultipart(self):
         return self.multipart
 
+    def getSpaceChargeOn(self):
+        return self.spaceChargeOn
+
     def setLattice(self,lattice):
         self.lattice = lattice
 
@@ -71,6 +79,9 @@ class Facility():
 
     def setMultipart(self,multipart):
         self.multipart = multipart
+
+    def setSpaceChargeOn(self, spaceChargeOn):
+        self.spaceChargeOn = spaceChargeOn
 
 def getBeamdata():
         E = 2e9*constants.e # 2GeV to joule from ref F.
