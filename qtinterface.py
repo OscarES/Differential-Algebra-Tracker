@@ -34,13 +34,6 @@ class LatticeOverviewWidget(QGLWidget):
 
         self.z = 2.0
 
-        #self.timer = QtCore.QTimer(self)
-        #self.timer.setInterval(20)
-        #self.trigger = pyqtSignal()
-        #print str(dir(self))
-        #connect(self.timer, QtCore.SIGNAL('timeout()'), self.spin)
-        #self.timer.start()
-
         self.w_pressed = 0
         self.a_pressed = 0
         self.s_pressed = 0
@@ -50,8 +43,6 @@ class LatticeOverviewWidget(QGLWidget):
         self.camX = sin(time.time()) * self.radius;
         self.camY = cos(time.time()) * self.radius;
 
-        #cameraPos = np.array([0.0, 0.0, 3.0])
-        #self.cameraPos = np.array([self.camX, self.camY, 0.0])
         self.cameraPos = np.array([0.0, 0.0, 1.0])
         self.cameraTarget = np.array([0.0, 0.0, 0.0])
         diff = self.cameraPos - self.cameraTarget
@@ -66,8 +57,6 @@ class LatticeOverviewWidget(QGLWidget):
         self.facility = facility
         self.lattice = self.facility.getLattice()
 
-        # is mouse pressed
-        #self.mousePressed = 0
         self.yRotDeg = 0.0
 
     def loadLattice(self):
@@ -85,19 +74,8 @@ class LatticeOverviewWidget(QGLWidget):
             if line == "L:":
                 nextWillBeL = 1
 
-        #print "self.elements: \n" + str(self.elements) # prints the current lattice
-
-
     def initializeGL(self):
         self.qglClearColor(QtGui.QColor(0, 0,  150))
-        #self.initGeometry()
-
-        self.bluecubeVtxArray, self.bluecubeIdxArray, self.bluecubeClrArray = self.bluecube(self.z)
-        self.redcubeVtxArray, self.redcubeIdxArray, self.redcubeClrArray = self.redcube(self.z)
-
-        greencolor = [0, 1, 0]
-        self.greencubeVtxArray, self.greencubeIdxArray, self.greencubeClrArray = self.createGeomBlock(self.z, greencolor)
-        self.greencube = [self.greencubeVtxArray, self.greencubeIdxArray, self.greencubeClrArray]
 
         self.loadLattice()
 
@@ -201,7 +179,6 @@ class LatticeOverviewWidget(QGLWidget):
         self.zsofar = self.zsofar + elem[3]
         glTranslate(self.cameraPos[0], self.cameraPos[1], self.cameraPos[2])
         glRotate(90, 0.0, 1.0, 0.0)
-        #glRotate(self.yRotDeg, 90.0, 1.0, 0.0)
         elemtype = elem[4]
         if elemtype == "quad":
             glRotate(45, 0.0, 0.0, 1.0)
@@ -217,50 +194,8 @@ class LatticeOverviewWidget(QGLWidget):
             glDrawElementsui(GL_TRIANGLES, elem[1])
         else:
             glDrawElementsui(GL_QUADS, elem[1])
-        
 
-    def bluecube(self, z):
-        bluecubeVtxArray = array(
-                [[0.0, 0.0, 0.0],
-                 [1.0, 0.0, 0.0],
-                 [1.0, 1.0, 0.0],
-                 [0.0, 1.0, 0.0],
-                 [0.0, 0.0, z],
-                 [1.0, 0.0, z],
-                 [1.0, 1.0, z],
-                 [0.0, 1.0, z]])
-        bluecubeIdxArray = [
-                0, 1, 2, 3,
-                3, 2, 6, 7,
-                1, 0, 4, 5,
-                2, 1, 5, 6,
-                0, 3, 7, 4,
-                7, 6, 5, 4 ]
-        bluecubeClrArray = np.zeros((8,3))
-        bluecubeClrArray[:,2] = 1.0
-        return bluecubeVtxArray, bluecubeIdxArray, bluecubeClrArray
-
-    def redcube(self, z):
-        redcubeVtxArray = array(
-                [[0.0, 0.0, 0.0],
-                 [1.0, 0.0, 0.0],
-                 [1.0, 1.0, 0.0],
-                 [0.0, 1.0, 0.0],
-                 [0.0, 0.0, z],
-                 [1.0, 0.0, z],
-                 [1.0, 1.0, z],
-                 [0.0, 1.0, z]])
-        redcubeIdxArray = [
-                0, 1, 2, 3,
-                3, 2, 6, 7,
-                1, 0, 4, 5,
-                2, 1, 5, 6,
-                0, 3, 7, 4,
-                7, 6, 5, 4 ]
-        redcubeClrArray = np.zeros((8,3))
-        redcubeClrArray[:,0] = 1.0
-        return redcubeVtxArray, redcubeIdxArray, redcubeClrArray
-
+    # this will create rectangular blocks
     def createGeomBlock(self, z, color):
         blockVtxArray = array(
                 [[0.0, 0.0, 0.0],
@@ -439,7 +374,6 @@ class LatticeEditor(QWidget):
 
     def __init__(self, parent, facility):
         QGLWidget.__init__(self, parent)
-        #self.setMinimumSize(500, 500)
 
         self.parent = parent
 
@@ -451,31 +385,13 @@ class LatticeEditor(QWidget):
         self.textLatticeEditor = QLabel("Lattice Editor")
         grid.addWidget(self.textLatticeEditor, 0, 0)
 
-        #loadAction = QAction(QtGui.QIcon('icons/open.png'), 'Load', self)
-        #loadAction.setShortcut('Ctrl+O')
-        #loadAction.triggered.connect(self.parent.parent.openFile)
-
         loadButton = QPushButton("Load Lattice")
-        #loadButton.clicked.connect(self.parent.parent.openFile)
         loadButton.clicked.connect(self.loadLattice)
         grid.addWidget(loadButton,1,0)
 
-        #grid.addWidget(loadAction,0,0)
-        #self.toolbar = self.addToolBar('Load')
-        #self.toolbar.addAction(loadAction)
-
-        #saveAction = QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
-        #saveAction.setShortcut('Ctrl+S')
-        #saveAction.triggered.connect(self.parent.parent.saveFile)
-
         saveButton = QPushButton("Save Lattice")
-        #saveButton.clicked.connect(self.parent.parent.saveFile)
         saveButton.clicked.connect(self.saveLattice)
         grid.addWidget(saveButton,1,1)
-
-        #grid.addWidget(saveAction,0,1)
-        #self.toolbar = self.addToolBar('Save')
-        #self.toolbar.addAction(saveAction)
 
         self.selectedElement = "Drift"
 
@@ -503,7 +419,6 @@ class LatticeEditor(QWidget):
         
         self.enterL = QLineEdit()
         grid.addWidget(self.enterL, 4, 1)
-        # make sure that only floats and number can be written. Pass the entered value to createDrift
         valueOfL = self.enterL.text()
 
         self.textK = QLabel("K:")
@@ -513,7 +428,6 @@ class LatticeEditor(QWidget):
         self.enterK = QLineEdit()
         grid.addWidget(self.enterK, 5, 1)
         self.enterK.hide()
-        # make sure that only floats and number can be written. Pass the entered value to createDrift
 
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
@@ -611,51 +525,41 @@ class FormWidget(QWidget):
         glEnable(GL_DEPTH_TEST)
 
         super(FormWidget, self).__init__(parent)
+
+        self.parent = parent
+
+        ## Layout
         self.layout = QHBoxLayout(self)
 
         self.layout.setAlignment(QtCore.Qt.AlignLeft)
         self.layout.addStretch(1)
-        #self.layout.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
-        #zzz#grid = QGridLayout()
-        
-
-        self.parent = parent
-
+        # Lattice overview
         self.latticeoverview = LatticeOverviewWidget(facility, self)
-        #self.latticeoverview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.layout.addWidget(self.latticeoverview) # need to make this expand when increasing horizontal size as well
-        #zzz#grid.addWidget(self.latticeoverview, 0, 0, 3, 2)#, 2, 0)
+        self.layout.addWidget(self.latticeoverview)
 
-        #policy = self.latticeoverview.sizePolicy()
-        #policy.setHorizontalPolicy(QSizePolicy.Maximum)
-        #self.setHorizontalPolicy()
         self.latticeoverview.setFocus() # starts with focus
         self.latticeoverview.mousePressEvent(0) # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
 
-        #editorgrid = QGridLayout() # How can I make this work? (grid within grid) 
+        ## Editor layout
         self.editorlayout = QVBoxLayout() # no need for self as param since layout will later set this as its child
 
+        # Beam editor
         self.beameditor = BeamEditor(self, facility)
-        #self.layout.addWidget(self.beameditor)
         self.editorlayout.addWidget(self.beameditor)
-        #zzz#grid.addWidget(self.beameditor, 0, 1)
 
+        # Lattice editor
         self.latticeeditor = LatticeEditor(self, facility)
-        #self.layout.addWidget(self.latticeeditor)
         self.editorlayout.addWidget(self.latticeeditor)
-        #zzz#grid.addWidget(self.latticeeditor, 1, 1)
 
+        # Evaluate
         self.evalwidget = EvalWidget(self, facility)
-        #self.layout.addWidget(self.evalwidget)
         self.editorlayout.addWidget(self.evalwidget)
-        #zzz#grid.addWidget(self.evalwidget, 2, 1)
 
-        #grid.addWidget(editorgrid,0,1)
+        ## More layout stuff
         self.layout.addLayout(self.editorlayout)
 
         self.setLayout(self.layout)
-        #zzz#self.setLayout(grid)
 
     def resizeEvent(self, event):
         newWidth = max(self.frameGeometry().width()-420,0) # 420 is magic number for getting the correct width
@@ -677,28 +581,6 @@ class DATWidgetInterface(QMainWindow):
 
         self.widget = FormWidget(self, self.facility)
         self.setCentralWidget(self.widget)
-        #self.mainlayout.addWidget(self.widget)
-
-        #self.setLayout(self.mainlayout)
-
-        #exitAction = QAction(QtGui.QIcon('icons/delete.png'), 'Exit', self)
-        #exitAction.setShortcut('Ctrl+Q')
-        #exitAction.triggered.connect(qApp.quit)
-
-        #loadAction = QAction(QtGui.QIcon('icons/open.png'), 'Load', self)
-        #loadAction.setShortcut('Ctrl+O')
-        #loadAction.triggered.connect(self.openFile)
-#
-        #saveAction = QAction(QtGui.QIcon('icons/save.png'), 'Save', self)
-        #saveAction.setShortcut('Ctrl+S')
-        #saveAction.triggered.connect(self.saveFile)
-        
-        #self.toolbar = self.addToolBar('Exit')
-        #self.toolbar.addAction(exitAction)
-        #self.toolbar = self.addToolBar('Load')
-        #self.toolbar.addAction(loadAction)
-        #self.toolbar = self.addToolBar('Save')
-        #self.toolbar.addAction(saveAction)
 
 
 
@@ -706,14 +588,6 @@ class DATWidgetInterface(QMainWindow):
         
         if e.key() == Qt.Key_Escape:
             self.widget.latticeoverview.spin()
-        #if e.key() == "t"
-            #print "t was pressed"
-        #print str(e.key()) + " was pressed, which is the " + chr(e.key()) + " key"
-        #if e.key() == 84:
-            #print "t was pressed"
-        #keyNbr = e.key()
-        #lettera = "a"
-        #letterakey = lettera.key()
 
         # keys: w = 87, a = 65, s = 83, d = 68
         if e.key() not in range(256):
@@ -743,35 +617,6 @@ class DATWidgetInterface(QMainWindow):
             self.widget.latticeoverview.d_pressed = 0
         self.widget.latticeoverview.paintGL()
         self.widget.latticeoverview.updateGL()
-
-    #def openFile(self):
-    #    fname = QFileDialog.getOpenFileName(self, 'Open file', '')
-    #    try:
-    #        spaceChargeOn = 0
-#
-    #        datafilepart = "../data/" + "inpart1000" + ".txt"
-    #        datafiletwiss = "../data/" + "intwiss" + ".txt"
-#
-    #        multipart, twiss = loadSummer2015Formatzasx(datafilepart, datafiletwiss)
-    #        beamdata = getBeamdata()
-    #        nbrOfSplits = 1
-#
-    #        loadedLatticeString = loadLatticeString(fname[0])
-    #        loadedLattice = parseLatticeString(loadedLatticeString, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
-    #        print "lattice loaded"
-    #        self.facility.setLattice(loadedLattice)
-    #        self.widget.latticeoverview.initializeGL()
-    #        self.widget.latticeoverview.paintGL()
-    #    except AttributeError:
-    #        fnameasstring = ''
-#
-    #def saveFile(self):
-    #    fname = QFileDialog.getSaveFileName(self, 'Save file', '')
-    #    try:
-    #        latticeToSave = self.facility.getLattice()
-    #        saveLatticeString(fname[0],latticeToSave) # fname[0] is the path string
-    #    except AttributeError:
-    #        fnameasstring = ''
 
     def resizeEvent(self, event):
         if self.widget is not None:
