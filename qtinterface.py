@@ -605,10 +605,6 @@ class FormWidget(QWidget):
 
         self.parent = parent
 
-        try:
-            self.parent.openFile()
-        except:
-            print "Baaaaaaaad lattice file!"
         self.latticeoverview = LatticeOverviewWidget(facility, self)
         #self.latticeoverview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.layout.addWidget(self.latticeoverview) # need to make this expand when increasing horizontal size as well
