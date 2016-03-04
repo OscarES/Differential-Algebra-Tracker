@@ -76,29 +76,36 @@ def loadEnvelope(filename):
         return 0
 
 #Can't handle LieAlgElements!!!!!!
-def saveLattice(filename, lattice):
-    if not os.path.isfile(filename):
-        os.mknod(filename)
-    pickle.dump(lattice, open(filename, 'wb'))
-    return 1
-
-def loadLattice(filename):
-    try:
-        lattice = pickle.load(open(filename, 'rb'))
-        return lattice
-    except:
-        print 'Bad datafile!'
-        quit()
-        return 0
+#def saveLattice(filename, lattice):
+#    if not os.path.isfile(filename):
+#        os.mknod(filename)
+#    pickle.dump(lattice, open(filename, 'wb'))
+#    return 1
+#
+#def loadLattice(filename):
+#    try:
+#        lattice = pickle.load(open(filename, 'rb'))
+#        return lattice
+#    except:
+#        print 'Bad datafile!'
+#        quit()
+#        return 0
 
 # Can handle sextupole elements!
 # creates a lattice equal to that described by text (which is output from a printLattice call)
-def parseLatticeString(text, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
+def parseLatticeString(text, facility):
+    spaceChargeOn = facility.getSpaceChargeOn()
+    multipart = facility.getMultipart()
+    twiss = facility.getTwiss()
+    beamdata = facility.getBeamdata()
+    nbrOfSplits = facility.getNbrOfSplits()
+
     lattice = Lattice('ParsedLattice')
     for line in iter(text.splitlines()):
         words = line.split()
         typeOfElem = words[0]
         name = words[1]
+        print name
         l = float(words[words.index("L:") + 1]) #what comes after "L:"
         if typeOfElem == "cavity":
             cavityOscillations = float(words[words.index("Oscillations:") + 1])
@@ -132,18 +139,23 @@ def parseLatticeString(text, spaceChargeOn, multipart, twiss, beamdata, nbrOfSpl
         lattice.appendElement(elem)           
     return lattice
 
-def saveLatticeString(filename, lattice):
+def saveLattice(filename, lattice):
     latticeString = lattice.printLattice()
     np.save(filename, latticeString)
     return 1
 
-def loadLatticeString(filename):
+def loadLattice(filename, facility):
     try:
         latticeString = str(np.load(filename))
-        return latticeString
     except:
         print 'Bad datafile!'
-        quit()
+        return 0
+    try:
+        print latticeString
+        lattice = parseLatticeString(latticeString, facility)
+        return lattice
+    except:
+        print 'Error while parsing lattice string!'
         return 0
 
 # Note that this doesn't have z and zp, or envelope or lattice. Just x, xp, y, yp and the twiss

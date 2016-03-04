@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
-from IOHandler import parseLatticeString, saveLatticeString, loadLatticeString, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart # loadLattice, saveLattice
+from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart # loadLattice, saveLattice
 from accelerator import Lattice
 from numpy import array
 import numpy as np
@@ -456,7 +456,8 @@ class LatticeEditor(QWidget):
         #loadAction.triggered.connect(self.parent.parent.openFile)
 
         loadButton = QPushButton("Load Lattice")
-        loadButton.clicked.connect(self.parent.parent.openFile)
+        #loadButton.clicked.connect(self.parent.parent.openFile)
+        loadButton.clicked.connect(self.loadLattice)
         grid.addWidget(loadButton,1,0)
 
         #grid.addWidget(loadAction,0,0)
@@ -468,7 +469,8 @@ class LatticeEditor(QWidget):
         #saveAction.triggered.connect(self.parent.parent.saveFile)
 
         saveButton = QPushButton("Save Lattice")
-        saveButton.clicked.connect(self.parent.parent.saveFile)
+        #saveButton.clicked.connect(self.parent.parent.saveFile)
+        saveButton.clicked.connect(self.saveLattice)
         grid.addWidget(saveButton,1,1)
 
         #grid.addWidget(saveAction,0,1)
@@ -558,7 +560,24 @@ class LatticeEditor(QWidget):
         self.parent.latticeoverview.initializeGL() # update the paint lattice in overview
         self.parent.parent.widget.latticeoverview.s_pressed = 1 # prepare a zoom out
         self.parent.parent.widget.latticeoverview.d_pressed = 1
-        self.parent.latticeoverview.mousePressEvent(0) # repaint by setting focus    
+        self.parent.latticeoverview.mousePressEvent(0) # repaint by setting focus
+
+    def saveLattice(self):
+        fname = QFileDialog.getSaveFileName(self, 'Save Lattice file', '')
+        try:
+            saveLattice(fname[0],self.facility.getLattice()) # fname[0] is the path string
+        except AttributeError:
+            fnameasstring = ''
+
+    def loadLattice(self):
+        fname = QFileDialog.getOpenFileName(self, 'Open Lattice file', '')
+        try:
+            lattice = loadLattice(fname[0], self.facility)
+            self.facility.setLattice(lattice)
+        except:
+            print "Lattice load failed!"
+        self.parent.latticeoverview.initializeGL()
+        self.parent.latticeoverview.paintGL()
     
 class EvalWidget(QWidget):
     def __init__(self, parent, facility):
@@ -725,34 +744,34 @@ class DATWidgetInterface(QMainWindow):
         self.widget.latticeoverview.paintGL()
         self.widget.latticeoverview.updateGL()
 
-    def openFile(self):
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '')
-        try:
-            spaceChargeOn = 0
-
-            datafilepart = "../data/" + "inpart1000" + ".txt"
-            datafiletwiss = "../data/" + "intwiss" + ".txt"
-
-            multipart, twiss = loadSummer2015Formatzasx(datafilepart, datafiletwiss)
-            beamdata = getBeamdata()
-            nbrOfSplits = 1
-
-            loadedLatticeString = loadLatticeString(fname[0])
-            loadedLattice = parseLatticeString(loadedLatticeString, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
-            print "lattice loaded"
-            self.facility.setLattice(loadedLattice)
-            self.widget.latticeoverview.initializeGL()
-            self.widget.latticeoverview.paintGL()
-        except AttributeError:
-            fnameasstring = ''
-
-    def saveFile(self):
-        fname = QFileDialog.getSaveFileName(self, 'Save file', '')
-        try:
-            latticeToSave = self.facility.getLattice()
-            saveLatticeString(fname[0],latticeToSave) # fname[0] is the path string
-        except AttributeError:
-            fnameasstring = ''
+    #def openFile(self):
+    #    fname = QFileDialog.getOpenFileName(self, 'Open file', '')
+    #    try:
+    #        spaceChargeOn = 0
+#
+    #        datafilepart = "../data/" + "inpart1000" + ".txt"
+    #        datafiletwiss = "../data/" + "intwiss" + ".txt"
+#
+    #        multipart, twiss = loadSummer2015Formatzasx(datafilepart, datafiletwiss)
+    #        beamdata = getBeamdata()
+    #        nbrOfSplits = 1
+#
+    #        loadedLatticeString = loadLatticeString(fname[0])
+    #        loadedLattice = parseLatticeString(loadedLatticeString, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+    #        print "lattice loaded"
+    #        self.facility.setLattice(loadedLattice)
+    #        self.widget.latticeoverview.initializeGL()
+    #        self.widget.latticeoverview.paintGL()
+    #    except AttributeError:
+    #        fnameasstring = ''
+#
+    #def saveFile(self):
+    #    fname = QFileDialog.getSaveFileName(self, 'Save file', '')
+    #    try:
+    #        latticeToSave = self.facility.getLattice()
+    #        saveLatticeString(fname[0],latticeToSave) # fname[0] is the path string
+    #    except AttributeError:
+    #        fnameasstring = ''
 
     def resizeEvent(self, event):
         if self.widget is not None:
