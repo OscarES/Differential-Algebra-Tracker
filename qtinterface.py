@@ -634,7 +634,7 @@ class FormWidget(QWidget):
         self.latticeoverview.mousePressEvent(0) # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
 
         #editorgrid = QGridLayout() # How can I make this work? (grid within grid) 
-        self.editorlayout = QVBoxLayout(self)
+        self.editorlayout = QVBoxLayout() # no need for self as param since layout will later set this as its child
 
         self.beameditor = BeamEditor(self, facility)
         #self.layout.addWidget(self.beameditor)

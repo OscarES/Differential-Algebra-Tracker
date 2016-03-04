@@ -105,7 +105,6 @@ def parseLatticeString(text, facility):
         words = line.split()
         typeOfElem = words[0]
         name = words[1]
-        print name
         l = float(words[words.index("L:") + 1]) #what comes after "L:"
         if typeOfElem == "cavity":
             cavityOscillations = float(words[words.index("Oscillations:") + 1])
@@ -151,7 +150,6 @@ def loadLattice(filename, facility):
         print 'Bad datafile!'
         return 0
     try:
-        print latticeString
         lattice = parseLatticeString(latticeString, facility)
         return lattice
     except:
