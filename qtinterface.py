@@ -267,29 +267,152 @@ class BeamEditor(QWidget):
         self.textBeamEditor = QLabel("Beam Editor")
         grid.addWidget(self.textBeamEditor, 0, 0)
 
+        ## Beamdata
+        # beta
+        self.textBeta = QLabel("Relativistic beta:")
+        grid.addWidget(self.textBeta, 1, 0)
+        
+        self.enterBeta = QLineEdit()
+        grid.addWidget(self.enterBeta, 1, 1)
+        valueOfBeta = self.enterBeta.text()
+
+        # rf_lambda
+        self.textLambda = QLabel("RF-Lambda [m]:")
+        grid.addWidget(self.textLambda, 2, 0)
+        
+        self.enterLambda = QLineEdit()
+        grid.addWidget(self.enterLambda, 2, 1)
+        valueOfLambda = self.enterLambda.text()
+
+        # m
+        self.textMass = QLabel("Mass of a particle:")
+        grid.addWidget(self.textMass, 3, 0)
+        
+        self.enterMass = QLineEdit() # should be a ComboBox with m_p, m_e
+        grid.addWidget(self.enterMass, 3, 1)
+        valueOfMass = self.enterMass.text()
+
+        # q
+        self.textCharge = QLabel("Charge of a particle:")
+        grid.addWidget(self.textCharge, 4, 0)
+        
+        self.enterCharge = QLineEdit() # should be a comboBox with e and -e
+        grid.addWidget(self.enterCharge, 4, 1)
+        valueOfCharge = self.enterCharge.text()
+
+        # E
+        self.textEnergy = QLabel("Energy:")
+        grid.addWidget(self.textEnergy, 5, 0)
+        
+        self.enterEnergy = QLineEdit() # should be a QLabel and show the calculated value from beta
+        grid.addWidget(self.enterEnergy, 5, 1)
+        valueOfEnergy = self.enterEnergy.text()
+
+        # nbrOfParticles
+        self.textNbrOfParticles = QLabel("# of particles:")
+        grid.addWidget(self.textNbrOfParticles, 6, 0)
+        
+        self.enterNbrOfParticles = QLineEdit()
+        grid.addWidget(self.enterNbrOfParticles, 6, 1)
+        valueOfNbrOfParticles = self.enterNbrOfParticles.text()
+
         saveBeamdataButton = QPushButton("Save Beamdata")
         saveBeamdataButton.clicked.connect(self.saveBeamdata)
-        grid.addWidget(saveBeamdataButton,1,0)
+        grid.addWidget(saveBeamdataButton,10,1)
+
+        ## Twiss
+        # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
+        # alpha_x
+        self.textAlpha_x = QLabel("Alpha_x:")
+        grid.addWidget(self.textAlpha_x, 1, 4)
+        
+        self.enterAlpha_x = QLineEdit()
+        grid.addWidget(self.enterAlpha_x, 1, 5)
+        valueOfAlpha_x = self.enterAlpha_x.text()
+
+        # beta_x
+        self.textBeta_x = QLabel("Beta_x:")
+        grid.addWidget(self.textBeta_x, 2, 4)
+        
+        self.enterBeta_x = QLineEdit()
+        grid.addWidget(self.enterBeta_x, 2, 5)
+        valueOfBeta_x = self.enterBeta_x.text()
+        
+        # epsilon_rms_x
+        self.textEpsilon_rms_x = QLabel("Epsilon_rms_x:")
+        grid.addWidget(self.textEpsilon_rms_x, 3, 4)
+        
+        self.enterEpsilon_rms_x = QLineEdit()
+        grid.addWidget(self.enterEpsilon_rms_x, 3, 5)
+        valueOfEpsilon_rms_x = self.enterEpsilon_rms_x.text()
+        
+        # alpha_y
+        self.textAlpha_y = QLabel("Alpha_y:")
+        grid.addWidget(self.textAlpha_y, 4, 4)
+        
+        self.enterAlpha_y = QLineEdit()
+        grid.addWidget(self.enterAlpha_y, 4, 5)
+        valueOfAlpha_y = self.enterAlpha_y.text()
+        
+        # beta_y
+        self.textBeta_y = QLabel("Beta_y:")
+        grid.addWidget(self.textBeta_y, 5, 4)
+        
+        self.enterBeta_y = QLineEdit()
+        grid.addWidget(self.enterBeta_y, 5, 5)
+        valueOfBeta_y = self.enterBeta_y.text()
+        
+        # epsilon_rms_y
+        self.textEpsilon_rms_y = QLabel("Epsilon_rms_y:")
+        grid.addWidget(self.textEpsilon_rms_y, 6, 4)
+        
+        self.enterEpsilon_rms_y = QLineEdit()
+        grid.addWidget(self.enterEpsilon_rms_y, 6, 5)
+        valueOfEpsilon_rms_y = self.enterEpsilon_rms_y.text()
+        
+        # alpha_z
+        self.textAlpha_z = QLabel("Alpha_z:")
+        grid.addWidget(self.textAlpha_z, 7, 4)
+        
+        self.enterAlpha_z = QLineEdit()
+        grid.addWidget(self.enterAlpha_z, 7, 5)
+        valueOfAlpha_z = self.enterAlpha_z.text()
+        
+        # beta_z
+        self.textBeta_z = QLabel("Beta_z:")
+        grid.addWidget(self.textBeta_z, 8, 4)
+        
+        self.enterBeta_z = QLineEdit()
+        grid.addWidget(self.enterBeta_z, 8, 5)
+        valueOfBeta_z = self.enterBeta_z.text()
+        
+        # epsilon_rms_z
+        self.textEpsilon_rms_z = QLabel("Epsilon_rms_z:")
+        grid.addWidget(self.textEpsilon_rms_z, 9, 4)
+        
+        self.enterEpsilon_rms_z = QLineEdit()
+        grid.addWidget(self.enterEpsilon_rms_z, 9, 5)
+        valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
 
         saveTwissButton = QPushButton("Save Twiss")
         saveTwissButton.clicked.connect(self.saveTwiss)
-        grid.addWidget(saveTwissButton,1,1)
+        grid.addWidget(saveTwissButton,10,3)
 
         saveMultipartButton = QPushButton("Save Multiparticles")
         saveMultipartButton.clicked.connect(self.saveMultipart)
-        grid.addWidget(saveMultipartButton,1,2)
+        grid.addWidget(saveMultipartButton,10,5)
 
         loadBeamdataButton = QPushButton("Load Beamdata")
         loadBeamdataButton.clicked.connect(self.loadBeamdata)
-        grid.addWidget(loadBeamdataButton,2,0)
+        grid.addWidget(loadBeamdataButton,11,1)
 
         loadTwissButton = QPushButton("Load Twiss")
         loadTwissButton.clicked.connect(self.loadTwiss)
-        grid.addWidget(loadTwissButton,2,1)
+        grid.addWidget(loadTwissButton,11,3)
 
         loadMultipartButton = QPushButton("Load Multiparticles")
         loadMultipartButton.clicked.connect(self.loadMultipart)
-        grid.addWidget(loadMultipartButton,2,2)
+        grid.addWidget(loadMultipartButton,11,5)
 
     def saveBeamdata(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Beamdata file', '')
@@ -642,7 +765,7 @@ class FormWidget(QWidget):
         self.setLayout(self.layout)
 
     def resizeEvent(self, event):
-        newWidth = max(self.frameGeometry().width()-420,0) # 420 is magic number for getting the correct width
+        newWidth = max(self.frameGeometry().width()-720,0) # 720 is magic number for getting the correct width
         self.latticeoverview.setGeometry(4,4,newWidth, self.latticeoverview.height())
         return     
 
