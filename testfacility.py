@@ -5,7 +5,7 @@ from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra
 #from sympy import *
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D, envelopeFromMultipart
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
-from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format, loadSummer2015Formatzasx, parseLatticeString, saveLatticeString, loadLatticeString
+from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format, loadSummer2015Formatzasx, parseLatticeString
 import copy
 from scipy import constants
 from relativity import betaFromE
@@ -181,8 +181,8 @@ print "IOHandling..."
 ### Compare with old code
 print "Compare with old code/ compare space charges..."
 ## Load the same particles (old code comp)
-datafilepart = "../data/" + "inpart1000" + ".txt"
-datafiletwiss = "../data/" + "intwiss" + ".txt"
+datafilepart = "../data/oldformat/" + "inpart1000" + ".txt"
+datafiletwiss = "../data/oldformat/" + "intwiss" + ".txt"
 #multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
 #multipartfromoldcopy = copy.deepcopy(multipartfromold)
 #print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
@@ -216,7 +216,7 @@ envelopeInComp = envelopeFromMultipart(multipartfromold)
 nbrOfSplits = 1
 
 ## the lattice will be a FODSO cell (Focusing Quad, Drift, Defocusing Quad, Sextupole, Drift)
-compLattice = Lattice('compLattice')
+compLattice = Lattice('compLattice', beamdata, twissfromold, multipartfromold)
 
 cavityName = "cavity"
 cavityLength = 2.0
@@ -292,12 +292,12 @@ print compLattice.printLattice()
 #saveLattice("../data/" + "savedlatticestringsextudipolecavity" + ".npy", compLattice)
 
 ## Calculate
-#partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
+partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
 #partresInComp, envresInComp, twissresInComp = parsedLattice.evaluate(multipartfromold,envelopeInComp,twissfromold) # Does eval still change input? yes
 
 #saveSummer2015Format("../data/" + "outpartFODSOspaceChargetesttest" + ".txt","../data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
-#plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
+plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
 
 ### Plotting
 print "Plotting..."

@@ -100,7 +100,7 @@ def parseLatticeString(text, facility):
     beamdata = facility.getBeamdata()
     nbrOfSplits = facility.getNbrOfSplits()
 
-    lattice = Lattice('ParsedLattice')
+    lattice = Lattice('ParsedLattice', beamdata, twiss, multipart)
     for line in iter(text.splitlines()):
         words = line.split()
         typeOfElem = words[0]

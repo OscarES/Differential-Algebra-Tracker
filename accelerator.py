@@ -16,9 +16,14 @@ from particleFactory import envelopeFromMultipart
 from relativity import betaFromE
 
 class Lattice:
-    def __init__(self,name):
+    def __init__(self,name,beamdata,twiss,multipart):
         self.name = name
         self.lattice = list()
+
+        ## Beam properties
+        self.beamdata = beamdata
+        self.twiss = twiss
+        self.multipart = multipart
 
     def appendElement(self, element):
         self.lattice.append(element)
@@ -1117,6 +1122,42 @@ class Cavity(Element):
         return multipart, envelope
 
 
+class FieldMapCavity(Element):
+    def __init__(self, name, L, beamdata, nbrOfSplits):
+        Element.__init__(self, "fieldmap " + name, 1)
+        
+        ## Input
+        self.L = L
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+
+        self.beta_s = beamdata[0]
+        self.gamma_s = 1/sqrt(1-self.beta_s**2)
+        self.m = beamdata[2]
+        self.q = beamdata[3]
+
+        #notdone#self.E_z =
+
+        ## Calculation
+        #dfdx = f.diff(x)
+
+        #notdone#self.dE_xoverdx = 
+        #notdone#self.dE_yoverdy = 
+        #notdone#self.dE_zoverdz = self.E_z.diff(z)
+
+        #notdone#self.dB_yoverdx =
+        #notdone#self.dB_xoverdy = 
+
+        self.prefactor = self.q/(self.gamma_s*self.beta_s**2*self.m*constants.c**2)
+
+        self.Msp = np.array([
+            [1,0,0,0,0,0],
+            [self.Lsp*self.prefactor*(self.dE_xoverdx-self.beta_s*constants.c*self.dB_yoverdx),1-self.Lsp*self.prefactor*self.E_z,0,0,0,0],
+            [0,0,1,0,0,0],
+            [0,0,self.Lsp*self.prefactor*(self.dE_yoverdy+self.beta_s*constants.c*self.dB_xoverdy),1-self.Lsp*self.prefactor*self.E_z,0,0],
+            [0,0,0,0,1,0],
+            [0,0,0,0,self.Lsp*self.prefactor*1/self.gamma_s**2*self.dE_zoverdz,1-self.Lsp*self.prefactor*self.E_z]
+            ])
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition
