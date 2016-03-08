@@ -6,7 +6,6 @@ from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra
 from particleFactory import straight, scanned, randomed, gaussian, gaussianTwiss3D, envelopeFromMultipart
 from plotting import plotEverything, plotEnvelope, plotPhaseSpace
 from IOHandler import saveAll, loadAll, saveMultipart, loadMultipart, saveTwiss, loadTwiss, saveEnvelope, loadEnvelope, saveLattice, loadLattice, saveSummer2015Format, loadSummer2015Format, loadSummer2015Formatzasx, parseLatticeString
-import copy
 from scipy import constants
 from relativity import betaFromE
 import math
@@ -184,18 +183,13 @@ print "Compare with old code/ compare space charges..."
 datafilepart = "../data/oldformat/" + "inpart1000" + ".txt"
 datafiletwiss = "../data/oldformat/" + "intwiss" + ".txt"
 #multipartfromold, twissfromold = loadSummer2015Format(datafilepart, datafiletwiss)
-#multipartfromoldcopy = copy.deepcopy(multipartfromold)
-#print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
 
 # sets z as x from old format
 multipartfromold, twissfromold = loadSummer2015Formatzasx(datafilepart, datafiletwiss)
-multipartfromoldcopy = copy.deepcopy(multipartfromold)
-twissfromoldcopy = copy.deepcopy(twissfromold)
 
 
 #nbrOfParticles = 1000
 #multipartfromold = gaussianTwiss3D(nbrOfParticles, twissfromold)
-#multipartfromoldcopy = copy.deepcopy(multipartfromold)
 #print "multipartfromoldcopy: \n" + str(multipartfromoldcopy)
 
 spaceChargeOnInComp = 0
@@ -314,7 +308,7 @@ partresInComp, envresInComp, twissresInComp = compLattice.evaluate(multipartfrom
 
 #saveSummer2015Format("../data/" + "outpartFODSOspaceChargetesttest" + ".txt","../data/" + "outtwiss" + ".txt",partresInComp, twissfromold)
 
-plotEverything(multipartfromoldcopy, twissfromoldcopy, partresInComp)
+plotEverything(multipartfromold, twissfromold, partresInComp)
 
 ### Plotting
 print "Plotting..."
