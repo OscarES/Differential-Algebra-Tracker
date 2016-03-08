@@ -398,6 +398,10 @@ class BeamEditor(QWidget):
         saveTwissButton.clicked.connect(self.saveTwiss)
         grid.addWidget(saveTwissButton,10,4)
 
+        generateMultipartButton = QPushButton("Generate Multiparticles")
+        #generateMultipartButton.clicked.connect(self.saveMultipart)
+        grid.addWidget(generateMultipartButton,9,5)
+
         saveMultipartButton = QPushButton("Save Multiparticles")
         saveMultipartButton.clicked.connect(self.saveMultipart)
         grid.addWidget(saveMultipartButton,10,5)
