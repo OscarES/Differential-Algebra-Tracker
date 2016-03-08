@@ -98,6 +98,7 @@ class Lattice:
         envelope = copy.deepcopy(envelopein)
         twiss = copy.deepcopy(twissin)
         for elem in self.lattice:
+            print elem.printInfo()
             multipart,envelope, twiss = elem.evaluate(multipart,envelope,twiss)
         return multipart,envelope, twiss
 
@@ -188,7 +189,6 @@ class Drift(LinearElement):
             if self.spaceChargeOn:
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
-                #print "envelope[0]: " + str(envelope[0])
                 twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
                 twiss[4] = envelope[3] / twiss[5]
                 twiss[7] = envelope[6] / twiss[8]
@@ -201,7 +201,6 @@ class Drift(LinearElement):
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
         #envelope = np.dot(self.Tsp, envelope)
-        #print "Envelope from multipart instead!"
         envelope = envelopeFromMultipart(multipart)
         return multipart, envelope
 
@@ -263,7 +262,8 @@ class Dipole(LinearElement):
         return Msp, Tsp
 
     def printInfo(self):
-        return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t K_x: " + str(self.K_x) + "\t K_y: " + str(self.K_y) + "\t beta: " + str(self.beta) + "\t Alpha: " + str(self.alpha) + "\t nparam: " + str(self.nparam)
+        return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t Alpha: " + str(self.alpha) + "\t nparam: " + str(self.nparam)
+        #return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t K_x: " + str(self.K_x) + "\t K_y: " + str(self.K_y) + "\t beta: " + str(self.beta) + "\t Alpha: " + str(self.alpha) + "\t nparam: " + str(self.nparam)
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts

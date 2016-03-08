@@ -391,6 +391,7 @@ class LatticeEditor(QWidget):
         grid.addWidget(self.enterL, 4, 1)
         valueOfL = self.enterL.text()
 
+        ## Quad and sextupole
         self.textK = QLabel("K:")
         grid.addWidget(self.textK, 5, 0)
         self.textK.hide()
@@ -399,30 +400,70 @@ class LatticeEditor(QWidget):
         grid.addWidget(self.enterK, 5, 1)
         self.enterK.hide()
 
+        ## Dipole
+        self.textRho = QLabel("Rho:")
+        grid.addWidget(self.textRho, 4, 0)
+        self.textRho.hide()
+
+        self.enterRho = QLineEdit()
+        grid.addWidget(self.enterRho, 4, 1)
+        self.enterRho.hide()
+
+        self.textAlpha = QLabel("Alpha:")
+        grid.addWidget(self.textAlpha, 5, 0)
+        self.textAlpha.hide()
+
+        self.enterAlpha = QLineEdit()
+        grid.addWidget(self.enterAlpha, 5, 1)
+        self.enterAlpha.hide()
+
+        self.textn = QLabel("n:")
+        grid.addWidget(self.textn, 6, 0)
+        self.textn.hide()
+
+        self.entern = QLineEdit()
+        grid.addWidget(self.entern, 6, 1)
+        self.entern.hide()
+
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
-        grid.addWidget(createElementButton, 6,1)
+        grid.addWidget(createElementButton, 7,1)
 
     def activatedElementSelector(self, text):
         print text
         self.selectedElement = text
-        if text == "Quadrupole":
+        if text == "Quadrupole" or text == "Sextupole":
             self.textK.show()
             self.enterK.show()
+        elif text == "Dipole":
+            self.textK.hide()
+            self.enterK.hide()
+            self.textL.hide()
+            self.enterL.hide()
+
+            self.textRho.show()
+            self.enterRho.show()
+            self.textAlpha.show()
+            self.enterAlpha.show()
+            self.textn.show()
+            self.entern.show()
         else:
             self.textK.hide()
             self.enterK.hide()
+            self.textL.show()
+            self.enterL.show()
 
     def createElement(self):
         ## Take the inputs in fields
         name = self.enterName.text()
 
-        valueOfL = self.enterL.text()
-        try:
-            L = float(valueOfL)
-        except:
-            print "Not a number! L set to 0.0"
-            L = 0.0
+        if not self.enterL.isHidden():
+            valueOfL = self.enterL.text()
+            try:
+                L = float(valueOfL)
+            except:
+                print "Not a number! L set to 0.0"
+                L = 0.0
 
         if not self.enterK.isHidden():
             valueOfK = self.enterK.text()
@@ -432,14 +473,40 @@ class LatticeEditor(QWidget):
                 print "Not a number! K set to 0.0"
                 K = 0.0
 
+        ## Dipole
+        if not self.enterRho.isHidden():
+            valueOfRho = self.enterRho.text()
+            try:
+                Rho = float(valueOfRho)
+            except:
+                print "Not a number! Rho set to 0.0"
+                Rho = 0.0
+
+        if not self.enterAlpha.isHidden():
+            valueOfAlpha = self.enterAlpha.text()
+            try:
+                Alpha = float(valueOfAlpha)
+            except:
+                print "Not a number! Alpha set to 0.0"
+                Alpha = 0.0
+
+        if not self.entern.isHidden():
+            valueOfn = self.entern.text()
+            try:
+                n = float(valueOfn)
+            except:
+                print "Not a number! n set to 0.0"
+                n = 0.0
+
         ## Make new elements
         if self.selectedElement == "Drift":
             self.facility.createDrift(name, L)
+        elif self.selectedElement == "Dipole":
+            self.facility.createDipole(name, Rho, Alpha, n)
         elif self.selectedElement == "Quadrupole":
             self.facility.createQuad(name, K, L)
         else:
             return
-        # Dipole
         # Sextupole
         # Higher order (specify order)
         # Cavity
