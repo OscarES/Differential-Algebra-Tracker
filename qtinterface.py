@@ -425,6 +425,15 @@ class LatticeEditor(QWidget):
         grid.addWidget(self.entern, 6, 1)
         self.entern.hide()
 
+        ## Sextupole
+        self.textOrder = QLabel("Order:")
+        grid.addWidget(self.textOrder, 6, 0)
+        self.textOrder.hide()
+
+        self.enterOrder = QLineEdit()
+        grid.addWidget(self.enterOrder, 6, 1)
+        self.enterOrder.hide()
+
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
         grid.addWidget(createElementButton, 7,1)
@@ -432,26 +441,43 @@ class LatticeEditor(QWidget):
     def activatedElementSelector(self, text):
         print text
         self.selectedElement = text
-        if text == "Quadrupole" or text == "Sextupole":
+
+        # Clear away all boxes
+        self.textK.hide()
+        self.enterK.hide()
+        self.textL.hide()
+        self.enterL.hide()
+        self.textRho.hide()
+        self.enterRho.hide()
+        self.textAlpha.hide()
+        self.enterAlpha.hide()
+        self.textn.hide()
+        self.entern.hide()
+        self.textOrder.hide()
+        self.enterOrder.hide()
+
+        if text == "Drift":
+            self.textL.show()
+            self.enterL.show()
+        elif text == "Quadrupole":
             self.textK.show()
             self.enterK.show()
+            self.textL.show()
+            self.enterL.show()
         elif text == "Dipole":
-            self.textK.hide()
-            self.enterK.hide()
-            self.textL.hide()
-            self.enterL.hide()
-
             self.textRho.show()
             self.enterRho.show()
             self.textAlpha.show()
             self.enterAlpha.show()
             self.textn.show()
             self.entern.show()
-        else:
-            self.textK.hide()
-            self.enterK.hide()
+        elif text == "Sextupole":
+            self.textK.show()
+            self.enterK.show()
             self.textL.show()
             self.enterL.show()
+            self.textOrder.show()
+            self.enterOrder.show()
 
     def createElement(self):
         ## Take the inputs in fields
@@ -498,16 +524,25 @@ class LatticeEditor(QWidget):
                 print "Not a number! n set to 0.0"
                 n = 0.0
 
+        if not self.enterOrder.isHidden():
+            valueOfOrder = self.enterOrder.text()
+            try:
+                Order = int(valueOfOrder)
+            except:
+                print "Not a number! Order set to 5"
+                Order = 5
+
         ## Make new elements
         if self.selectedElement == "Drift":
             self.facility.createDrift(name, L)
         elif self.selectedElement == "Dipole":
             self.facility.createDipole(name, Rho, Alpha, n)
         elif self.selectedElement == "Quadrupole":
-            self.facility.createQuad(name, K, L)
+            self.facility.createQuadrupole(name, K, L)
+        elif self.selectedElement == "Sextupole":
+            self.facility.createSextupole(name, K, L, Order)
         else:
             return
-        # Sextupole
         # Higher order (specify order)
         # Cavity
         

@@ -34,7 +34,7 @@ class Facility():
         self.lattice.createDipole(name, rho, alpha, n)
 
     def createQuadrupole(self, name, K, L):
-        self.lattice.createQuad(name, K, L)
+        self.lattice.createQuadrupole(name, K, L)
         #quad = Quad(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         #self.lattice.appendElement(quad)
 
