@@ -20,6 +20,7 @@ from scipy import *
 from facility import *
 import re
 from particleFactory import envelopeFromMultipart
+from plotting import plotEverything
 
 class LatticeOverviewWidget(QGLWidget):
     '''
@@ -482,6 +483,7 @@ class EvalWidget(QWidget):
         envelope = envelopeFromMultipart(multipart) #self.facility.getEnvelope()
         twiss = self.facility.getTwiss()
         resultmultipart, resultenvelope, resulttwiss = self.facility.evaluate(multipart, envelope, twiss)
+        plotEverything(multipart, twiss, resultmultipart)
         return
 
 # layout manager (aranges the different widgets)
