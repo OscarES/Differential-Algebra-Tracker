@@ -45,8 +45,7 @@ class Facility():
 
     ## Setup
     def getDefaultLatticeElement(self):
-        drift = Drift("Null", 1, 0, 0, 0, 0, 1)
-        self.lattice.appendElement(drift)
+        self.lattice.createDrift("Null", 1)
 
     def getDefaultBeamdata(self):
         E = 2e9*constants.e # 2GeV to joule from ref F.
@@ -113,3 +112,7 @@ class Facility():
 
     def printLattice(self):
         return self.lattice.printLattice()
+
+    def evaluate(self, multipart, envelope, twiss):
+        resultmultipart, resultenvelope, resulttwiss = self.lattice.evaluate(multipart,envelope,twiss)
+        return resultmultipart, resultenvelope, resulttwiss

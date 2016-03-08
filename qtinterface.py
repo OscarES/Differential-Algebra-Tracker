@@ -19,6 +19,7 @@ import numpy as np
 from scipy import *
 from facility import *
 import re
+from particleFactory import envelopeFromMultipart
 
 class LatticeOverviewWidget(QGLWidget):
     '''
@@ -242,7 +243,7 @@ class LatticeOverviewWidget(QGLWidget):
         return blockVtxArray, blockIdxArray, blockClrArray
 
     # If one clicks on the openGL panel it gets the focus, also this will be called if focus on opengl is required
-    def mousePressEvent(self):
+    def mousePressEvent(self, bla):
         self.setFocus()
         self.updateGL()
 
@@ -442,7 +443,7 @@ class LatticeEditor(QWidget):
         self.parent.latticeoverview.initializeGL() # update the paint lattice in overview
         self.parent.parent.widget.latticeoverview.s_pressed = 1 # prepare a zoom out
         self.parent.parent.widget.latticeoverview.d_pressed = 1
-        self.parent.latticeoverview.mousePressEvent() # repaint by setting focus
+        self.parent.latticeoverview.mousePressEvent("bla") # repaint by setting focus
 
     def saveLattice(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Lattice file', '')
@@ -477,8 +478,11 @@ class EvalWidget(QWidget):
         grid.addWidget(EvalButton,0,0)
 
     def evaluate(self):
+        multipart = self.facility.getMultipart()
+        envelope = envelopeFromMultipart(multipart) #self.facility.getEnvelope()
+        twiss = self.facility.getTwiss()
+        resultmultipart, resultenvelope, resulttwiss = self.facility.evaluate(multipart, envelope, twiss)
         return
-        #self.facility.evaluate() # to be implemented
 
 # layout manager (aranges the different widgets)
 class FormWidget(QWidget):
@@ -507,7 +511,7 @@ class FormWidget(QWidget):
         self.layout.addWidget(self.latticeoverview)
 
         self.latticeoverview.setFocus() # starts with focus
-        self.latticeoverview.mousePressEvent() # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
+        self.latticeoverview.mousePressEvent("bla") # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
 
         ## Editor layout
         self.editorlayout = QVBoxLayout() # no need for self as param since layout will later set this as its child

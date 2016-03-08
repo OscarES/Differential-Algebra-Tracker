@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import abc
 from particleFactory import envelopeFromMultipart
 from relativity import betaFromE
+import copy
 
 class Lattice:
     def __init__(self,name,beamdata,twiss,multipart):
@@ -92,10 +93,12 @@ class Lattice:
             text = text + elem.printInfo() + "\n"
         return text
 
-    def evaluate(self, multipart,envelope,twiss):
+    def evaluate(self, multipartin,envelopein,twissin):
+        multipart = copy.deepcopy(multipartin)
+        envelope = copy.deepcopy(envelopein)
+        twiss = copy.deepcopy(twissin)
         for elem in self.lattice:
             multipart,envelope, twiss = elem.evaluate(multipart,envelope,twiss)
-            #print "twiss: " + str(twiss)
         return multipart,envelope, twiss
 
     def relativityAtTheEnd(self, multipart,envelope):
