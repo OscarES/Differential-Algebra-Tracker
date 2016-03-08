@@ -944,7 +944,6 @@ class LieAlgElement(Element):
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
-        #print "hej fran quad"
         for i in range(0,self.n):
             if self.spaceChargeOn:
                 self.sc.updateMatrix(multipart,twiss)
@@ -957,15 +956,12 @@ class LieAlgElement(Element):
 
     def evaluateNumFun(self,multipart,envelope):
         for particle in multipart:
-            #print "hej"
-            #print "particle: " + str(particle)
             x = particle[0][0]
             xp = particle[0][1]
             y = particle[0][2]
             yp = particle[0][3]
             z = particle[0][4]
             zp = particle[0][5]
-            #s = particle[1]
 
             particle[0][0] = self.numFuns[0](x, xp, y, yp, z, zp)
             particle[0][1] = self.numFuns[1](x, xp, y, yp, z, zp)
@@ -975,7 +971,6 @@ class LieAlgElement(Element):
             particle[0][5] = self.numFuns[5](x, xp, y, yp, z, zp)
 
             particle[1] += self.Lsp
-            # Doesn't change envelope at all
         envelope = envelopeFromMultipart(multipart)
         return multipart, envelope
 
