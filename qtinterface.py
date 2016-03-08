@@ -439,6 +439,10 @@ class LatticeEditor(QWidget):
             self.facility.createQuad(name, K, L)
         else:
             return
+        # Dipole
+        # Sextupole
+        # Higher order (specify order)
+        # Cavity
         
 
         self.parent.latticeoverview.initializeGL() # update the paint lattice in overview
