@@ -324,79 +324,79 @@ class BeamEditor(QWidget):
         # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
         # alpha_x
         self.textAlpha_x = QLabel("Alpha_x:")
-        grid.addWidget(self.textAlpha_x, 1, 4)
+        grid.addWidget(self.textAlpha_x, 1, 3)
         
         self.enterAlpha_x = QLineEdit()
-        grid.addWidget(self.enterAlpha_x, 1, 5)
+        grid.addWidget(self.enterAlpha_x, 1, 4)
         valueOfAlpha_x = self.enterAlpha_x.text()
 
         # beta_x
         self.textBeta_x = QLabel("Beta_x:")
-        grid.addWidget(self.textBeta_x, 2, 4)
+        grid.addWidget(self.textBeta_x, 2, 3)
         
         self.enterBeta_x = QLineEdit()
-        grid.addWidget(self.enterBeta_x, 2, 5)
+        grid.addWidget(self.enterBeta_x, 2, 4)
         valueOfBeta_x = self.enterBeta_x.text()
         
         # epsilon_rms_x
         self.textEpsilon_rms_x = QLabel("Epsilon_rms_x:")
-        grid.addWidget(self.textEpsilon_rms_x, 3, 4)
+        grid.addWidget(self.textEpsilon_rms_x, 3, 3)
         
         self.enterEpsilon_rms_x = QLineEdit()
-        grid.addWidget(self.enterEpsilon_rms_x, 3, 5)
+        grid.addWidget(self.enterEpsilon_rms_x, 3, 4)
         valueOfEpsilon_rms_x = self.enterEpsilon_rms_x.text()
         
         # alpha_y
         self.textAlpha_y = QLabel("Alpha_y:")
-        grid.addWidget(self.textAlpha_y, 4, 4)
+        grid.addWidget(self.textAlpha_y, 4, 3)
         
         self.enterAlpha_y = QLineEdit()
-        grid.addWidget(self.enterAlpha_y, 4, 5)
+        grid.addWidget(self.enterAlpha_y, 4, 4)
         valueOfAlpha_y = self.enterAlpha_y.text()
         
         # beta_y
         self.textBeta_y = QLabel("Beta_y:")
-        grid.addWidget(self.textBeta_y, 5, 4)
+        grid.addWidget(self.textBeta_y, 5, 3)
         
         self.enterBeta_y = QLineEdit()
-        grid.addWidget(self.enterBeta_y, 5, 5)
+        grid.addWidget(self.enterBeta_y, 5, 4)
         valueOfBeta_y = self.enterBeta_y.text()
         
         # epsilon_rms_y
         self.textEpsilon_rms_y = QLabel("Epsilon_rms_y:")
-        grid.addWidget(self.textEpsilon_rms_y, 6, 4)
+        grid.addWidget(self.textEpsilon_rms_y, 6, 3)
         
         self.enterEpsilon_rms_y = QLineEdit()
-        grid.addWidget(self.enterEpsilon_rms_y, 6, 5)
+        grid.addWidget(self.enterEpsilon_rms_y, 6, 4)
         valueOfEpsilon_rms_y = self.enterEpsilon_rms_y.text()
         
         # alpha_z
         self.textAlpha_z = QLabel("Alpha_z:")
-        grid.addWidget(self.textAlpha_z, 7, 4)
+        grid.addWidget(self.textAlpha_z, 7, 3)
         
         self.enterAlpha_z = QLineEdit()
-        grid.addWidget(self.enterAlpha_z, 7, 5)
+        grid.addWidget(self.enterAlpha_z, 7, 4)
         valueOfAlpha_z = self.enterAlpha_z.text()
         
         # beta_z
         self.textBeta_z = QLabel("Beta_z:")
-        grid.addWidget(self.textBeta_z, 8, 4)
+        grid.addWidget(self.textBeta_z, 8, 3)
         
         self.enterBeta_z = QLineEdit()
-        grid.addWidget(self.enterBeta_z, 8, 5)
+        grid.addWidget(self.enterBeta_z, 8, 4)
         valueOfBeta_z = self.enterBeta_z.text()
         
         # epsilon_rms_z
         self.textEpsilon_rms_z = QLabel("Epsilon_rms_z:")
-        grid.addWidget(self.textEpsilon_rms_z, 9, 4)
+        grid.addWidget(self.textEpsilon_rms_z, 9, 3)
         
         self.enterEpsilon_rms_z = QLineEdit()
-        grid.addWidget(self.enterEpsilon_rms_z, 9, 5)
+        grid.addWidget(self.enterEpsilon_rms_z, 9, 4)
         valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
 
         saveTwissButton = QPushButton("Save Twiss")
         saveTwissButton.clicked.connect(self.saveTwiss)
-        grid.addWidget(saveTwissButton,10,3)
+        grid.addWidget(saveTwissButton,10,4)
 
         saveMultipartButton = QPushButton("Save Multiparticles")
         saveMultipartButton.clicked.connect(self.saveMultipart)
@@ -408,7 +408,7 @@ class BeamEditor(QWidget):
 
         loadTwissButton = QPushButton("Load Twiss")
         loadTwissButton.clicked.connect(self.loadTwiss)
-        grid.addWidget(loadTwissButton,11,3)
+        grid.addWidget(loadTwissButton,11,4)
 
         loadMultipartButton = QPushButton("Load Multiparticles")
         loadMultipartButton.clicked.connect(self.loadMultipart)
