@@ -25,17 +25,21 @@ class Facility():
         ## Start with just a drift
         self.getDefaultLatticeElement()
 
-        ## space-charge, not sure how these shall be represented in the GUI. spaceChargeOn can be a radio button, nbrOfSplits can be a text field
-        self.spaceChargeOn = 0
-        self.nbrOfSplits = 1
-
     def createDrift(self, name, L):
-        drift = Drift(name, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
-        self.lattice.appendElement(drift)
+        self.lattice.createDrift(name, L)
+        #drift = Drift(name, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        #self.lattice.appendElement(drift)
+
+    def createDipole(self, name, rho, alpha, n):
+        self.lattice.createDipole(name, rho, alpha, n)
 
     def createQuad(self, name, K, L):
-        quad = Quad(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
-        self.lattice.appendElement(quad)
+        self.lattice.createQuad(name, K, L)
+        #quad = Quad(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        #self.lattice.appendElement(quad)
+
+    def createSextupole(self,name, K, L, compOrder):
+        self.lattice.createSextupole(name, K, L, compOrder)
 
 
 
@@ -63,35 +67,49 @@ class Facility():
 
     ## Passing of varibles to and fro
     def getLattice(self):
-        return self.lattice
+        return self.lattice.getLattice()
+        #return self.lattice
 
     def getBeamdata(self):
-        return self.beamdata
+        return self.lattice.getBeamdata()
+        #return self.beamdata
 
     def getTwiss(self):
-        return self.twiss
+        return self.lattice.getTwiss()
+        #return self.twiss
 
     def getMultipart(self):
-        return self.multipart
+        return self.lattice.getMultipart()
+        #return self.multipart
 
     def getSpaceChargeOn(self):
-        return self.spaceChargeOn
+        return self.lattice.getSpaceChargeOn()
+        #return self.spaceChargeOn
 
     def getNbrOfSplits(self):
-        return self.nbrOfSplits
+        return self.lattice.getNbrOfSplits()
+        #return self.nbrOfSplits
 
-    def setLattice(self,lattice):
+    def setLattice(self,lattice): # changes the entire lattice object!
+        #self.lattice.setLattice(lattice)
         self.lattice = lattice
 
     def setBeamdata(self,beamdata):
-        self.beamdata = beamdata
+        self.lattice.setBeamdata(beamdata)
+        #self.beamdata = beamdata
 
     def setTwiss(self,twiss):
-        self.twiss = twiss
+        self.lattice.setTwiss(twiss)
+        #self.twiss = twiss
 
     def setMultipart(self,multipart):
-        self.multipart = multipart
+        self.lattice.setMultipart(multipart)
+        #self.multipart = multipart
 
     def setSpaceChargeOn(self, spaceChargeOn):
-        self.spaceChargeOn = spaceChargeOn
+        self.lattice.setSpaceChargeOn(spaceChargeOn)
+        #self.spaceChargeOn = spaceChargeOn
     ## End Passing
+
+    def printLattice(self):
+        return self.lattice.printLattice()

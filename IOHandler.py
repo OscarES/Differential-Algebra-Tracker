@@ -99,7 +99,6 @@ def parseLatticeString(text, facility):
     twiss = facility.getTwiss()
     beamdata = facility.getBeamdata()
     nbrOfSplits = facility.getNbrOfSplits()
-
     lattice = Lattice('ParsedLattice', beamdata, twiss, multipart)
     for line in iter(text.splitlines()):
         words = line.split()
@@ -116,6 +115,8 @@ def parseLatticeString(text, facility):
 
             cavityEzofs = [cavityOscillations, cavityAmplitudeA, cavityAmplitudeB, cavityE_0, cavitySigma, cavityP]
             elem = Cavity(name, l, cavityEzofs, beamdata, nbrOfSplits)
+            lattice.appendElement(elem)
+            continue
         if typeOfElem == "dipole":
             rho = float(words[words.index("rho:") + 1]) #what comes after "rho:"
             #k_x = what comes after "K_x: "
@@ -123,19 +124,26 @@ def parseLatticeString(text, facility):
             beta = beamdata[0]
             nparam = float(words[words.index("nparam:") + 1]) #what comes after "nparam:"
             alpha = float(words[words.index("Alpha:") + 1]) #what comes after "Alpha:"
-            elem = Dipole(name, rho, alpha, nparam, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            #elem = Dipole(name, rho, alpha, nparam, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            lattice.createDipole(name, rho, alpha, nparam)
+            continue
         elif typeOfElem != "drift" and typeOfElem != "cavity":
             k = float(words[words.index("K:") + 1]) #what comes after "K:"
         if typeOfElem == "liealgelem":
             hamToUse = words[words.index("HamUsed:") + 1] #what comes after "HamUsed:" and before next whitespace
             order = int(words[words.index("Order:") + 1]) #what comes after "Order:"
-            elem = LieAlgElement(name, hamToUse, k, l, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            #elem = LieAlgElement(name, hamToUse, k, l, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            lattice.createSextupole(name, k, l, order)
+            continue
         
         if typeOfElem == "quad":
-            elem = Quad(name, k, l, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            #elem = Quad(name, k, l, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            lattice.createQuadrupole(name, k, l)
+            continue
         if typeOfElem == "drift":
-            elem = Drift(name, l, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
-        lattice.appendElement(elem)           
+            #elem = Drift(name, l, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits)
+            lattice.createDrift(name, l)
+            continue           
     return lattice
 
 def saveLattice(filename, lattice):

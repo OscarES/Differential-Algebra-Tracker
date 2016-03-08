@@ -52,8 +52,9 @@ class LatticeOverviewWidget(QGLWidget):
         self.lattice = self.facility.getLattice()
 
     def loadLattice(self):
-        self.lattice = self.facility.getLattice()
-        lattticeString = self.lattice.printLattice()
+        #self.lattice = self.facility.getLattice()
+        #lattticeString = self.lattice.printLattice()
+        lattticeString = self.facility.printLattice()
         self.elements = []
         nextWillBeL = 0
         for line in lattticeString.split():

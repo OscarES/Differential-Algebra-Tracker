@@ -25,9 +25,66 @@ class Lattice:
         self.twiss = twiss
         self.multipart = multipart
 
+        ## space-charge, not sure how these shall be represented in the GUI. spaceChargeOn can be a radio button, nbrOfSplits can be a text field
+        self.spaceChargeOn = 0
+        self.nbrOfSplits = 1
+
+    def createDrift(self, name, L):
+        drift = Drift(name, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(drift)
+
+    def createDipole(self, name, rho, alpha, n):
+        dipole = Dipole(name, rho, alpha, n, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(dipole)
+
+    def createQuadrupole(self, name, K, L):
+        quad = Quad(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(quad)
+
+    def createSextupole(self,name, K, L, compOrder):
+        hamToUse = "sextupoleham"
+        sextu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(sextu)
+
+    # TODO
+    #def createCavity():
+    #    return
+
     def appendElement(self, element):
         self.lattice.append(element)
         return 1
+
+    ## Passing of varibles to and fro
+    def getLattice(self):
+        return self.lattice
+
+    def getBeamdata(self):
+        return self.beamdata
+
+    def getTwiss(self):
+        return self.twiss
+
+    def getMultipart(self):
+        return self.multipart
+
+    def getSpaceChargeOn(self):
+        return self.spaceChargeOn
+
+    def getNbrOfSplits(self):
+        return self.nbrOfSplits
+
+    def setBeamdata(self,beamdata):
+        self.beamdata = beamdata
+
+    def setTwiss(self,twiss):
+        self.twiss = twiss
+
+    def setMultipart(self,multipart):
+        self.multipart = multipart
+
+    def setSpaceChargeOn(self, spaceChargeOn):
+        self.spaceChargeOn = spaceChargeOn
+    ## End Passing
 
     def printLattice(self):
         text = ""
