@@ -86,6 +86,8 @@ class LatticeOverviewWidget(QGLWidget):
 
             if elem[0] == "liealgelem":
                 VtxArray, IdxArray, ClrArray = self.createHexaBlock(length, color)
+            elif elem[0] == "cavity":
+                VtxArray, IdxArray, ClrArray = self.createCylinder(length, color)
             else:
                 VtxArray, IdxArray, ClrArray = self.createGeomBlock(length, color)
             block = [VtxArray, IdxArray, ClrArray, length, elem[0]]
@@ -154,7 +156,7 @@ class LatticeOverviewWidget(QGLWidget):
         elemtype = elem[4]
         if elemtype == "quad":
             glRotate(45, 0.0, 0.0, 1.0)
-        elif elemtype == "liealgelem":
+        elif elemtype == "liealgelem" or elemtype == "cavity":
             glTranslate(0.5, 0.5, 0.0)
         glTranslate(-0.5, -0.5, -0.5)
 
@@ -162,7 +164,7 @@ class LatticeOverviewWidget(QGLWidget):
         glEnableClientState(GL_COLOR_ARRAY)
         glVertexPointerf(elem[0])
         glColorPointerf(elem[2])
-        if elemtype == "liealgelem":
+        if elemtype == "liealgelem" or elemtype == "cavity":
             glDrawElementsui(GL_TRIANGLES, elem[1])
         else:
             glDrawElementsui(GL_QUADS, elem[1])
@@ -193,6 +195,54 @@ class LatticeOverviewWidget(QGLWidget):
 
     # this will create the sextupole blocks
     def createHexaBlock(self, z, color):
+        blockVtxArray = array(
+                [[0.866025, 0.5, 0.0],      # 0
+                 [0.0, 1.0, 0.0],           # 1
+                 [-0.866025, 0.5, 0.0],     # 2
+                 [-0.866025, -0.5, 0.0],    # 3
+                 [0.0,-1.0,0.0],            # 4
+                 [0.866025, -0.5,0.0],      # 5
+                 [0.0,0.0,0.0],             # 6
+                 [0.866025, 0.5, z],        # 7
+                 [0.0, 1.0, z],             # 8
+                 [-0.866025, 0.5, z],       # 9
+                 [-0.866025, -0.5, z],      # 10
+                 [0.0,-1.0,z],              # 11
+                 [0.866025, -0.5,z],        # 12
+                 [0.0,0.0,z]])              # 13
+        blockIdxArray = [
+                1, 0, 6,
+                2, 1, 6,
+                3, 2, 6,
+                4, 3, 6,
+                5, 4, 6,
+                0, 5, 6,
+                0, 1, 7,
+                1, 2, 8,
+                2, 3, 9,
+                3, 4, 10,
+                4, 5, 11,
+                5, 0, 12,
+                1, 8, 7,
+                2, 9, 8,
+                3, 10, 9,
+                4, 11, 10,
+                5, 12, 11,
+                0, 7, 12,
+                7, 8, 13,
+                8, 9, 13,
+                9, 10, 13,
+                10, 11, 13,
+                11, 12, 13,
+                12, 7, 13]
+        blockClrArray = np.zeros((14,3))
+        blockClrArray[:,0] = color[0]
+        blockClrArray[:,1] = color[1]
+        blockClrArray[:,2] = color[2]
+        return blockVtxArray, blockIdxArray, blockClrArray
+
+    # this will create the cavity cylinder
+    def createCylinder(self, z, color):
         blockVtxArray = array(
                 [[0.866025, 0.5, 0.0],      # 0
                  [0.0, 1.0, 0.0],           # 1
@@ -566,7 +616,7 @@ class LatticeEditor(QWidget):
         self.elementSelector.addItem("Dipole")
         self.elementSelector.addItem("Quadrupole")
         self.elementSelector.addItem("Sextupole")
-        self.elementSelector.addItem("RF-cavity")
+        self.elementSelector.addItem("RF-Cavity")
         self.elementSelector.addItem("Higher order element")
         grid.addWidget(self.elementSelector, 2, 0)
 
@@ -674,6 +724,9 @@ class LatticeEditor(QWidget):
             self.enterL.show()
             self.textOrder.show()
             self.enterOrder.show()
+        elif text == "RF-Cavity":
+            self.textL.show()
+            self.enterL.show()
 
     def createElement(self):
         ## Take the inputs in fields
@@ -737,6 +790,15 @@ class LatticeEditor(QWidget):
             self.facility.createQuadrupole(name, K, L)
         elif self.selectedElement == "Sextupole":
             self.facility.createSextupole(name, K, L, Order)
+        elif self.selectedElement == "RF-Cavity":
+            Oscillations = 2
+            AmplitudeA = 0
+            AmplitudeB = 30 # 30 MeV / m
+            E_0 = AmplitudeB
+            Sigma = 1
+            P = 3
+            Ezofs = [Oscillations, AmplitudeA, AmplitudeB, E_0, Sigma, P]
+            self.facility.createCavity(name, L, Ezofs)
         else:
             return
         # Higher order (specify order)

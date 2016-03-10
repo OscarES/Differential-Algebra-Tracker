@@ -49,9 +49,10 @@ class Lattice:
         sextu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(sextu)
 
-    # TODO
-    #def createCavity():
-    #    return
+    def createCavity(self, name, L, Ezofs):
+        cavity = Cavity(name, L, Ezofs, self.beamdata, self.nbrOfSplits)
+        self.appendElement(cavity)
+        self.beamdata[4] = cavity.getNewE() # Update energy
 
     def appendElement(self, element):
         self.lattice.append(element)

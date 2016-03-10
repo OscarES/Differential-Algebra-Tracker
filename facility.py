@@ -41,6 +41,9 @@ class Facility():
     def createSextupole(self,name, K, L, compOrder):
         self.lattice.createSextupole(name, K, L, compOrder)
 
+    def createCavity(self, name, L, Ezofs):
+        self.lattice.createCavity(name, L, Ezofs)
+
 
 
     ## Setup
