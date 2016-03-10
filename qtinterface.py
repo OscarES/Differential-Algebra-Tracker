@@ -13,7 +13,6 @@ from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
 from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart # loadLattice, saveLattice
-from accelerator import Lattice
 from numpy import array
 import numpy as np
 from scipy import *
@@ -51,11 +50,8 @@ class LatticeOverviewWidget(QGLWidget):
 
         # extract from lattice
         self.facility = facility
-        self.lattice = self.facility.getLattice()
 
     def loadLattice(self):
-        #self.lattice = self.facility.getLattice()
-        #lattticeString = self.lattice.printLattice()
         lattticeString = self.facility.printLattice()
         self.elements = []
         nextWillBeL = 0
