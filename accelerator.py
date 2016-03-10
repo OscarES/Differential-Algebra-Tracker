@@ -1178,7 +1178,7 @@ class Cavity(Element):
         envelope = envelopeFromMultipart(multipart)
         return multipart, envelope
 
-
+# Comes from ref E.
 class FieldMapCavity(Element):
     def __init__(self, name, L, beamdata, nbrOfSplits):
         Element.__init__(self, "fieldmap " + name, 1)
