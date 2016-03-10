@@ -314,7 +314,7 @@ class BeamEditor(QWidget):
         
         self.enterNbrOfParticles = QLineEdit()
         grid.addWidget(self.enterNbrOfParticles, 6, 1)
-        valueOfNbrOfParticles = self.enterNbrOfParticles.text()
+        self.valueOfNbrOfParticles = self.enterNbrOfParticles.text()
 
         saveBeamdataButton = QPushButton("Save Beamdata")
         saveBeamdataButton.clicked.connect(self.saveBeamdata)
@@ -328,7 +328,7 @@ class BeamEditor(QWidget):
         
         self.enterAlpha_x = QLineEdit()
         grid.addWidget(self.enterAlpha_x, 1, 4)
-        valueOfAlpha_x = self.enterAlpha_x.text()
+        self.valueOfAlpha_x = self.enterAlpha_x.text()
 
         # beta_x
         self.textBeta_x = QLabel("Beta_x:")
@@ -336,7 +336,7 @@ class BeamEditor(QWidget):
         
         self.enterBeta_x = QLineEdit()
         grid.addWidget(self.enterBeta_x, 2, 4)
-        valueOfBeta_x = self.enterBeta_x.text()
+        self.valueOfBeta_x = self.enterBeta_x.text()
         
         # epsilon_rms_x
         self.textEpsilon_rms_x = QLabel("Epsilon_rms_x:")
@@ -344,7 +344,7 @@ class BeamEditor(QWidget):
         
         self.enterEpsilon_rms_x = QLineEdit()
         grid.addWidget(self.enterEpsilon_rms_x, 3, 4)
-        valueOfEpsilon_rms_x = self.enterEpsilon_rms_x.text()
+        self.valueOfEpsilon_rms_x = self.enterEpsilon_rms_x.text()
         
         # alpha_y
         self.textAlpha_y = QLabel("Alpha_y:")
@@ -352,7 +352,7 @@ class BeamEditor(QWidget):
         
         self.enterAlpha_y = QLineEdit()
         grid.addWidget(self.enterAlpha_y, 4, 4)
-        valueOfAlpha_y = self.enterAlpha_y.text()
+        self.valueOfAlpha_y = self.enterAlpha_y.text()
         
         # beta_y
         self.textBeta_y = QLabel("Beta_y:")
@@ -360,7 +360,7 @@ class BeamEditor(QWidget):
         
         self.enterBeta_y = QLineEdit()
         grid.addWidget(self.enterBeta_y, 5, 4)
-        valueOfBeta_y = self.enterBeta_y.text()
+        self.valueOfBeta_y = self.enterBeta_y.text()
         
         # epsilon_rms_y
         self.textEpsilon_rms_y = QLabel("Epsilon_rms_y:")
@@ -368,7 +368,7 @@ class BeamEditor(QWidget):
         
         self.enterEpsilon_rms_y = QLineEdit()
         grid.addWidget(self.enterEpsilon_rms_y, 6, 4)
-        valueOfEpsilon_rms_y = self.enterEpsilon_rms_y.text()
+        self.valueOfEpsilon_rms_y = self.enterEpsilon_rms_y.text()
         
         # alpha_z
         self.textAlpha_z = QLabel("Alpha_z:")
@@ -376,7 +376,7 @@ class BeamEditor(QWidget):
         
         self.enterAlpha_z = QLineEdit()
         grid.addWidget(self.enterAlpha_z, 7, 4)
-        valueOfAlpha_z = self.enterAlpha_z.text()
+        self.valueOfAlpha_z = self.enterAlpha_z.text()
         
         # beta_z
         self.textBeta_z = QLabel("Beta_z:")
@@ -384,7 +384,7 @@ class BeamEditor(QWidget):
         
         self.enterBeta_z = QLineEdit()
         grid.addWidget(self.enterBeta_z, 8, 4)
-        valueOfBeta_z = self.enterBeta_z.text()
+        self.valueOfBeta_z = self.enterBeta_z.text()
         
         # epsilon_rms_z
         self.textEpsilon_rms_z = QLabel("Epsilon_rms_z:")
@@ -392,14 +392,14 @@ class BeamEditor(QWidget):
         
         self.enterEpsilon_rms_z = QLineEdit()
         grid.addWidget(self.enterEpsilon_rms_z, 9, 4)
-        valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
+        self.valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
 
         saveTwissButton = QPushButton("Save Twiss")
         saveTwissButton.clicked.connect(self.saveTwiss)
         grid.addWidget(saveTwissButton,10,4)
 
         generateMultipartButton = QPushButton("Generate Multiparticles")
-        #generateMultipartButton.clicked.connect(self.saveMultipart)
+        generateMultipartButton.clicked.connect(self.generateMultipart)
         grid.addWidget(generateMultipartButton,9,5)
 
         saveMultipartButton = QPushButton("Save Multiparticles")
@@ -447,6 +447,79 @@ class BeamEditor(QWidget):
             self.facility.setTwiss(twiss)
         except:
             print "Bad twiss file!"
+
+    def generateMultipart(self):
+        nbrOfParticles = self.getNbrOfParticles()
+        twiss = self.getTwissFromInput()
+        self.facility.generateMultipart(nbrOfParticles, twiss)
+        return
+
+    def getNbrOfParticles(self):
+        self.valueOfNbrOfParticles = self.enterNbrOfParticles.text()
+        try:
+            nbrOfParticles = int(self.valueOfNbrOfParticles)
+        except:
+            print "nbrOfParticles not integer, set to 10 instead"
+            nbrOfParticles = 10
+        return nbrOfParticles
+
+    def getTwissFromInput(self):
+        self.valueOfAlpha_x = self.enterAlpha_x.text()
+        self.valueOfBeta_x = self.enterBeta_x.text()
+        self.valueOfEpsilon_rms_x = self.enterEpsilon_rms_x.text()
+        self.valueOfAlpha_y = self.enterAlpha_y.text()
+        self.valueOfBeta_y = self.enterBeta_y.text()
+        self.valueOfEpsilon_rms_y = self.enterEpsilon_rms_y.text()
+        self.valueOfAlpha_z = self.enterAlpha_z.text()
+        self.valueOfBeta_z = self.enterBeta_z.text()
+        self.valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
+        try:
+            Alpha_x = float(self.valueOfAlpha_x)
+        except:
+            print "Alpha_x not a number, set to 0.0 instead"
+            Alpha_x = 0.0
+        try:
+            Beta_x = float(self.valueOfBeta_x)
+        except:
+            print "Beta_x not a number, set to 0.0 instead"
+            Beta_x = 0.0
+        try:
+            Epsilon_rms_x = float(self.valueOfEpsilon_rms_x)
+        except:
+            print "Epsilon_rms_x not a number, set to 0.0 instead"
+            Epsilon_rms_x = 0.0
+        try:
+            Alpha_y = float(self.valueOfAlpha_y)
+        except:
+            print "Alpha_y not a number, set to 0.0 instead"
+            Alpha_y = 0.0
+        try:
+            Beta_y = float(self.valueOfBeta_y)
+        except:
+            print "Beta_y not a number, set to 0.0 instead"
+            Beta_y = 0.0
+        try:
+            Epsilon_rms_y = float(self.valueOfEpsilon_rms_y)
+        except:
+            print "Epsilon_rms_y not a number, set to 0.0 instead"
+            Epsilon_rms_y = 0.0
+        try:
+            Alpha_z = float(self.valueOfAlpha_z)
+        except:
+            print "Alpha_z not a number, set to 0.0 instead"
+            Alpha_z = 0.0
+        try:
+            Beta_z = float(self.valueOfBeta_z)
+        except:
+            print "Beta_z not a number, set to 0.0 instead"
+            Beta_z = 0.0
+        try:
+            Epsilon_rms_z = float(self.valueOfEpsilon_rms_z)
+        except:
+            print "Epsilon_rms_z not a number, set to 0.0 instead"
+            Epsilon_rms_z = 0.0
+        twiss = [Alpha_x, Beta_x, Epsilon_rms_x, Alpha_y, Beta_y, Epsilon_rms_y, Alpha_z, Beta_z, Epsilon_rms_z]
+        return twiss
 
     def saveMultipart(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Multipart file', '')

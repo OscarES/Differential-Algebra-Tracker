@@ -101,6 +101,10 @@ class Facility():
         self.lattice.setTwiss(twiss)
         #self.twiss = twiss
 
+    def generateMultipart(self, nbrOfParticles, twiss):
+        multipart = gaussianTwiss3D(nbrOfParticles, twiss)
+        self.setMultipart(multipart)
+
     def setMultipart(self,multipart):
         self.lattice.setMultipart(multipart)
         #self.multipart = multipart
