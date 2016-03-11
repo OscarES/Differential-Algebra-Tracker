@@ -5,16 +5,10 @@ from particleFactory import gaussianTwiss3D
 import numpy as np
 
 
-
-
 # code that will be the middle man between accelerator and qtinterface
 
 class Facility():
     def __init__(self):
-        
-
-        
-
         ## Beam properties
         self.beamdata = self.getDefaultBeamdata()
         self.twiss = self.getDefaultTwiss()
@@ -23,27 +17,20 @@ class Facility():
         # empty lattice
         self.lattice = Lattice("Facility", self.beamdata, self.twiss, self.multipart)
 
-
     def createDrift(self, name, L):
         self.lattice.createDrift(name, L)
-        #drift = Drift(name, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
-        #self.lattice.appendElement(drift)
 
     def createDipole(self, name, rho, alpha, n):
         self.lattice.createDipole(name, rho, alpha, n)
 
     def createQuadrupole(self, name, K, L):
         self.lattice.createQuadrupole(name, K, L)
-        #quad = Quad(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
-        #self.lattice.appendElement(quad)
 
     def createSextupole(self,name, K, L, compOrder):
         self.lattice.createSextupole(name, K, L, compOrder)
 
     def createCavity(self, name, L, Ezofs):
         self.lattice.createCavity(name, L, Ezofs)
-
-
 
     ## Setup
     def getDefaultBeamdata(self):
@@ -66,39 +53,30 @@ class Facility():
     ## Passing of varibles to and fro
     def getLattice(self):
         return self.lattice.getLattice()
-        #return self.lattice
 
     def getBeamdata(self):
         return self.lattice.getBeamdata()
-        #return self.beamdata
 
     def getTwiss(self):
         return self.lattice.getTwiss()
-        #return self.twiss
 
     def getMultipart(self):
         return self.lattice.getMultipart()
-        #return self.multipart
 
     def getSpaceChargeOn(self):
         return self.lattice.getSpaceChargeOn()
-        #return self.spaceChargeOn
 
     def getNbrOfSplits(self):
         return self.lattice.getNbrOfSplits()
-        #return self.nbrOfSplits
 
     def setLattice(self,lattice): # changes the entire lattice object!
-        #self.lattice.setLattice(lattice)
         self.lattice = lattice
 
     def setBeamdata(self,beamdata):
         self.lattice.setBeamdata(beamdata)
-        #self.beamdata = beamdata
 
     def setTwiss(self,twiss):
         self.lattice.setTwiss(twiss)
-        #self.twiss = twiss
 
     def generateMultipart(self, nbrOfParticles, twiss):
         multipart = gaussianTwiss3D(nbrOfParticles, twiss)
@@ -106,11 +84,9 @@ class Facility():
 
     def setMultipart(self,multipart):
         self.lattice.setMultipart(multipart)
-        #self.multipart = multipart
 
     def setSpaceChargeOn(self, spaceChargeOn):
         self.lattice.setSpaceChargeOn(spaceChargeOn)
-        #self.spaceChargeOn = spaceChargeOn
     ## End Passing
 
     def printLattice(self):
