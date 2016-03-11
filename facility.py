@@ -74,9 +74,11 @@ class Facility():
 
     def setBeamdata(self,beamdata):
         self.lattice.setBeamdata(beamdata)
+        self.beamdata = self.lattice.getBeamdata()
 
     def setTwiss(self,twiss):
         self.lattice.setTwiss(twiss)
+        self.twiss = self.lattice.getTwiss()
 
     def generateMultipart(self, nbrOfParticles, twiss):
         multipart = gaussianTwiss3D(nbrOfParticles, twiss)
@@ -84,6 +86,7 @@ class Facility():
 
     def setMultipart(self,multipart):
         self.lattice.setMultipart(multipart)
+        self.multipart = self.lattice.getMultipart()
 
     def setSpaceChargeOn(self, spaceChargeOn):
         self.lattice.setSpaceChargeOn(spaceChargeOn)
