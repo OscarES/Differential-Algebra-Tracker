@@ -20,10 +20,9 @@ class Facility():
         self.twiss = self.getDefaultTwiss()
         self.multipart = gaussianTwiss3D(self.beamdata[5], self.twiss)
 
+        # empty lattice
         self.lattice = Lattice("Facility", self.beamdata, self.twiss, self.multipart)
 
-        ## Start with just a drift
-        self.getDefaultLatticeElement()
 
     def createDrift(self, name, L):
         self.lattice.createDrift(name, L)
@@ -47,9 +46,6 @@ class Facility():
 
 
     ## Setup
-    def getDefaultLatticeElement(self):
-        self.lattice.createDrift("Null", 1)
-
     def getDefaultBeamdata(self):
         E = 2e9*constants.e # 2GeV to joule from ref F.
         freq = 704.42e6 # (Hz) from ref. F

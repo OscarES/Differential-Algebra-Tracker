@@ -146,6 +146,15 @@ class LatticeOverviewWidget(QGLWidget):
         for block in self.array_of_blocks:
             self.elemPaint(block)
 
+        # draw when there are no elements
+        if self.array_of_blocks == []:
+            glLoadIdentity()
+            glEnableClientState(GL_VERTEX_ARRAY)
+            glEnableClientState(GL_COLOR_ARRAY)
+            glVertexPointerf([0,0,0])
+            glColorPointerf([0,0,0])
+            glDrawElementsui(GL_TRIANGLES, [0,0,0])
+
         
     def elemPaint(self, elem):
         glLoadIdentity()
@@ -963,7 +972,7 @@ class FormWidget(QWidget):
         self.setLayout(self.layout)
 
     def resizeEvent(self, event):
-        newWidth = max(self.frameGeometry().width()-720,0) # 720 is magic number for getting the correct width
+        newWidth = max(self.frameGeometry().width()-820,0) # 820 is magic number for getting the correct width
         self.latticeoverview.setGeometry(4,4,newWidth, self.latticeoverview.height())
         return     
 
