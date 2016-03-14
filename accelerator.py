@@ -192,9 +192,9 @@ class Drift(LinearElement):
             if self.spaceChargeOn:
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
-                twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
-                twiss[4] = envelope[3] / twiss[5]
-                twiss[7] = envelope[6] / twiss[8]
+                #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+                #twiss[4] = envelope[3] / twiss[5]
+                #twiss[7] = envelope[6] / twiss[8]
             multipart, envelope = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
             
         return multipart, envelope, twiss
