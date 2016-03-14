@@ -96,5 +96,5 @@ class Facility():
         return self.lattice.printLattice()
 
     def evaluate(self, multipart, envelope, twiss):
-        resultmultipart, resultenvelope, resulttwiss = self.lattice.evaluate(multipart,envelope,twiss)
-        return resultmultipart, resultenvelope, resulttwiss
+        resultmultipart, resultenvelope, resulttwiss, resultenvlist = self.lattice.evaluate(multipart,envelope,twiss)
+        return resultmultipart, resultenvelope, resulttwiss, resultenvlist

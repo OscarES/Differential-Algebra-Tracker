@@ -42,6 +42,8 @@ class LatticeOverviewWidget(QGLWidget):
         self.cameraTarget = np.array([0.0, 0.0, 0.0])
         diff = self.cameraPos - self.cameraTarget
         self.cameraDirection = diff/np.linalg.norm(diff)
+        self.cameraSpeed = 0.5
+        self.cameraSpeed_s = 0.5
 
         self.up = np.array([0.0, 1.0, 0.0])
         tempCross = np.cross(self.up, self.cameraDirection)
@@ -58,6 +60,7 @@ class LatticeOverviewWidget(QGLWidget):
         for line in lattticeString.split():
             if nextWillBeL:
                 self.elements.append([tempword, float(line)])
+                self.cameraSpeed_s = float(line)
                 nextWillBeL = 0
             if line == "drift" or line == "dipole" or line == "quad" or line == "liealgelem" or line == "cavity":  
                 tempword = line
@@ -124,22 +127,21 @@ class LatticeOverviewWidget(QGLWidget):
     def paintGL(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        cameraSpeed = 0.5
         if self.w_pressed:
-            self.cameraPos += self.cameraDirection*cameraSpeed
+            self.cameraPos += self.cameraDirection*self.cameraSpeed
             self.w_pressed = 0
         if self.s_pressed:
-            self.cameraPos -= self.cameraDirection*cameraSpeed
+            self.cameraPos -= self.cameraDirection*self.cameraSpeed_s
             self.s_pressed = 0
         if self.a_pressed:
             tempCross = np.cross(self.cameraDirection, self.up)
             normTempCross = tempCross/np.linalg.norm(tempCross)
-            self.cameraPos -= normTempCross*cameraSpeed
+            self.cameraPos -= normTempCross*self.cameraSpeed
             self.a_pressed = 0
         if self.d_pressed:
             tempCross = np.cross(self.cameraDirection, self.up)
             normTempCross = tempCross/np.linalg.norm(tempCross)
-            self.cameraPos += normTempCross*cameraSpeed
+            self.cameraPos += normTempCross*self.cameraSpeed_s
             self.d_pressed = 0
 
         self.zsofar = 0
@@ -878,8 +880,8 @@ class LatticeEditor(QWidget):
         
 
         self.parent.latticeoverview.initializeGL() # update the paint lattice in overview
-        self.parent.parent.widget.latticeoverview.s_pressed = 1 # prepare a zoom out
-        self.parent.parent.widget.latticeoverview.d_pressed = 1
+        self.parent.parent.widget.latticeoverview.s_pressed = 1 # zoom out
+        self.parent.parent.widget.latticeoverview.d_pressed = 1 # move with lattice
         self.parent.latticeoverview.mousePressEvent("bla") # repaint by setting focus
 
     def saveLattice(self):
