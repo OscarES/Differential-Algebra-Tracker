@@ -433,9 +433,7 @@ class BeamEditor(QWidget):
         grid.addWidget(self.enterNbrOfParticles, 6, 1)
         self.valueOfNbrOfParticles = self.enterNbrOfParticles.text()
 
-        saveBeamdataButton = QPushButton("Save Beamdata")
-        saveBeamdataButton.clicked.connect(self.saveBeamdata)
-        grid.addWidget(saveBeamdataButton,10,1)
+        
 
         ## Twiss
         # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
@@ -511,29 +509,41 @@ class BeamEditor(QWidget):
         grid.addWidget(self.enterEpsilon_rms_z, 9, 4)
         self.valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
 
-        saveTwissButton = QPushButton("Save Twiss")
-        saveTwissButton.clicked.connect(self.saveTwiss)
-        grid.addWidget(saveTwissButton,10,4)
+        useBeamdataButton = QPushButton("Use Beamdata")
+        useBeamdataButton.clicked.connect(self.useBeamdataInput)
+        grid.addWidget(useBeamdataButton,10,1)
+
+        useTwissButton = QPushButton("Use Twiss")
+        useTwissButton.clicked.connect(self.useTwissInput)
+        grid.addWidget(useTwissButton,10,4)
 
         generateMultipartButton = QPushButton("Generate Multiparticles")
         generateMultipartButton.clicked.connect(self.generateMultipart)
-        grid.addWidget(generateMultipartButton,9,5)
+        grid.addWidget(generateMultipartButton,10,5)
+
+        saveBeamdataButton = QPushButton("Save Beamdata")
+        saveBeamdataButton.clicked.connect(self.saveBeamdata)
+        grid.addWidget(saveBeamdataButton,11,1)
+
+        saveTwissButton = QPushButton("Save Twiss")
+        saveTwissButton.clicked.connect(self.saveTwiss)
+        grid.addWidget(saveTwissButton,11,4)
 
         saveMultipartButton = QPushButton("Save Multiparticles")
         saveMultipartButton.clicked.connect(self.saveMultipart)
-        grid.addWidget(saveMultipartButton,10,5)
+        grid.addWidget(saveMultipartButton,11,5)
 
         loadBeamdataButton = QPushButton("Load Beamdata")
         loadBeamdataButton.clicked.connect(self.loadBeamdata)
-        grid.addWidget(loadBeamdataButton,11,1)
+        grid.addWidget(loadBeamdataButton,12,1)
 
         loadTwissButton = QPushButton("Load Twiss")
         loadTwissButton.clicked.connect(self.loadTwiss)
-        grid.addWidget(loadTwissButton,11,4)
+        grid.addWidget(loadTwissButton,12,4)
 
         loadMultipartButton = QPushButton("Load Multiparticles")
         loadMultipartButton.clicked.connect(self.loadMultipart)
-        grid.addWidget(loadMultipartButton,11,5)
+        grid.addWidget(loadMultipartButton,12,5)
 
     def saveBeamdata(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Beamdata file', '')
@@ -579,6 +589,52 @@ class BeamEditor(QWidget):
             print "nbrOfParticles not integer, set to 10 instead"
             nbrOfParticles = 10
         return nbrOfParticles
+
+    # [beta, rf_lambda, m, q, E, nbrOfParticles]
+    def getBeamdataFromInput(self):
+        self.valueOfBeta = self.enterBeta.text()
+        self.valueOfLambda = self.enterLambda.text()
+        self.valueOfMass = self.enterMass.text()
+        self.valueOfCharge = self.enterCharge.text()
+        self.valueOfEnergy = self.enterEnergy.text()
+        self.valueOfNbrOfParticles = self.enterNbrOfParticles.text()
+
+        try:
+            beta = float(self.valueOfBeta)
+        except:
+            print "Beta not a number, set to 0.0 instead"
+            beta = 0.0
+        try:
+            rf_lambda = float(self.valueOfLambda)
+        except:
+            print "Rf_lamda not a number, set to 0.0 instead"
+            rf_lambda = 0.0
+        try:
+            m = float(self.valueOfMass)
+        except:
+            print "Mass not a number, set to 0.0 instead"
+            m = 0.0
+        try:
+            q = float(self.valueOfCharge)
+        except:
+            print "Charge not a number, set to 0.0 instead"
+            q = 0.0
+        try:
+            E = float(self.valueOfEnergy)
+        except:
+            print "Energy not a number, set to 0.0 instead"
+            E = 0.0
+        try:
+            nbrOfParticles = int(self.valueOfEpsilon_rms_y)
+        except:
+            print "NbrOfParticles not a number, set to 1 instead"
+            nbrOfParticles = 1
+        beamdata = [beta, rf_lambda, m, q, E, nbrOfParticles]
+        return beamdata
+
+    def useBeamdataInput(self):
+        beamdata = self.getBeamdataFromInput()
+        self.facility.setBeamdata(beamdata)
 
     def getTwissFromInput(self):
         self.valueOfAlpha_x = self.enterAlpha_x.text()
@@ -637,6 +693,10 @@ class BeamEditor(QWidget):
             Epsilon_rms_z = 0.0
         twiss = [Alpha_x, Beta_x, Epsilon_rms_x, Alpha_y, Beta_y, Epsilon_rms_y, Alpha_z, Beta_z, Epsilon_rms_z]
         return twiss
+
+    def useTwissInput(self):
+        twiss = self.getTwissFromInput()
+        self.facility.setTwiss(twiss)
 
     def saveMultipart(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Multipart file', '')
