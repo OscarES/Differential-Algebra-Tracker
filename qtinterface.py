@@ -128,12 +128,12 @@ class LatticeOverviewWidget(QGLWidget):
             self.cameraPos += self.cameraDirection*self.cameraSpeed
             self.w_pressed = 0
         if self.s_pressed:
-            self.cameraPos -= self.cameraDirection*self.cameraSpeed_s
+            self.cameraPos -= self.cameraDirection*self.cameraSpeed
             self.s_pressed = 0
         if self.a_pressed:
             tempCross = np.cross(self.cameraDirection, self.up)
             normTempCross = tempCross/np.linalg.norm(tempCross)
-            self.cameraPos -= normTempCross*self.cameraSpeed
+            self.cameraPos -= normTempCross*self.cameraSpeed_s
             self.a_pressed = 0
         if self.d_pressed:
             tempCross = np.cross(self.cameraDirection, self.up)
