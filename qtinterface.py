@@ -433,7 +433,8 @@ class BeamEditor(QWidget):
         grid.addWidget(self.enterNbrOfParticles, 6, 1)
         self.valueOfNbrOfParticles = self.enterNbrOfParticles.text()
 
-        
+        # Set the fields to the default parameters
+        self.writeInBeamdataFields()
 
         ## Twiss
         # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
@@ -509,6 +510,10 @@ class BeamEditor(QWidget):
         grid.addWidget(self.enterEpsilon_rms_z, 9, 4)
         self.valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
 
+        # Set the fields to the default parameters
+        self.writeInTwissFields()
+
+        # buttons
         useBeamdataButton = QPushButton("Use Beamdata")
         useBeamdataButton.clicked.connect(self.useBeamdataInput)
         grid.addWidget(useBeamdataButton,10,1)
@@ -625,7 +630,7 @@ class BeamEditor(QWidget):
             print "Energy not a number, set to 0.0 instead"
             E = 0.0
         try:
-            nbrOfParticles = int(self.valueOfEpsilon_rms_y)
+            nbrOfParticles = int(self.valueOfNbrOfParticles)
         except:
             print "NbrOfParticles not a number, set to 1 instead"
             nbrOfParticles = 1
@@ -635,6 +640,15 @@ class BeamEditor(QWidget):
     def useBeamdataInput(self):
         beamdata = self.getBeamdataFromInput()
         self.facility.setBeamdata(beamdata)
+
+    def writeInBeamdataFields(self):
+        beamdata = self.facility.getBeamdata()
+        self.enterBeta.setText(str(beamdata[0]))
+        self.enterLambda.setText(str(beamdata[1]))
+        self.enterMass.setText(str(beamdata[2]))
+        self.enterCharge.setText(str(beamdata[3]))
+        self.enterEnergy.setText(str(beamdata[4]))
+        self.enterNbrOfParticles.setText(str(beamdata[5]))
 
     def getTwissFromInput(self):
         self.valueOfAlpha_x = self.enterAlpha_x.text()
@@ -697,6 +711,18 @@ class BeamEditor(QWidget):
     def useTwissInput(self):
         twiss = self.getTwissFromInput()
         self.facility.setTwiss(twiss)
+
+    def writeInTwissFields(self):
+        twiss = self.facility.getTwiss()
+        self.enterAlpha_x.setText(str(twiss[0]))
+        self.enterBeta_x.setText(str(twiss[1]))
+        self.enterEpsilon_rms_x.setText(str(twiss[2]))
+        self.enterAlpha_y.setText(str(twiss[3]))
+        self.enterBeta_y.setText(str(twiss[4]))
+        self.enterEpsilon_rms_y.setText(str(twiss[5]))
+        self.enterAlpha_z.setText(str(twiss[6]))
+        self.enterBeta_z.setText(str(twiss[7]))
+        self.enterEpsilon_rms_z.setText(str(twiss[8]))
 
     def saveMultipart(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Multipart file', '')
