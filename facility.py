@@ -1,8 +1,9 @@
 from accelerator import *
 from scipy import constants
 from relativity import betaFromE
-from particleFactory import gaussianTwiss3D
+from particleFactory import gaussianTwiss3D, envelopeFromMultipart
 import numpy as np
+from plotting import plotEverything
 
 
 # code that will be the middle man between accelerator and qtinterface
@@ -13,6 +14,7 @@ class Facility():
         self.beamdata = self.getDefaultBeamdata()
         self.twiss = self.getDefaultTwiss()
         self.multipart = gaussianTwiss3D(self.beamdata[5], self.twiss)
+        self.envelope = envelopeFromMultipart(self.multipart)
 
         # empty lattice
         self.lattice = Lattice("Facility", self.beamdata, self.twiss, self.multipart)
@@ -95,6 +97,9 @@ class Facility():
     def printLattice(self):
         return self.lattice.printLattice()
 
-    def evaluate(self, multipart, envelope, twiss):
-        resultmultipart, resultenvelope, resulttwiss, resultenvlist = self.lattice.evaluate(multipart,envelope,twiss)
-        return resultmultipart, resultenvelope, resulttwiss, resultenvlist
+    def evaluate(self):
+        self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist = self.lattice.evaluate(self.multipart,self.envelope,self.twiss)
+        #return self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist
+
+    def plotAfterEval(self):
+        plotEverything(self.multipart, self.twiss, self.resultmultipart, self.resultenvlist)

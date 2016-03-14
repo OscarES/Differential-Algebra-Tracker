@@ -13,13 +13,10 @@ from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
 from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart # loadLattice, saveLattice
-from numpy import array
 import numpy as np
 from scipy import *
 from facility import *
 import re
-from particleFactory import envelopeFromMultipart
-from plotting import plotEverything
 
 class LatticeOverviewWidget(QGLWidget):
     '''
@@ -917,11 +914,16 @@ class EvalWidget(QWidget):
         grid.addWidget(EvalButton,0,0)
 
     def evaluate(self):
-        multipart = self.facility.getMultipart()
-        envelope = envelopeFromMultipart(multipart) #self.facility.getEnvelope()
-        twiss = self.facility.getTwiss()
-        resultmultipart, resultenvelope, resulttwiss, resultenvlist = self.facility.evaluate(multipart, envelope, twiss)
-        plotEverything(multipart, twiss, resultmultipart, resultenvlist)
+        # The stuff below should be moved to facility.py because these low level stuff shouldn't be this far up
+        #multipart = self.facility.getMultipart()
+        #envelope = envelopeFromMultipart(multipart) #self.facility.getEnvelope()
+        #twiss = self.facility.getTwiss()
+        #resultmultipart, resultenvelope, resulttwiss, resultenvlist = self.facility.evaluate(multipart, envelope, twiss)
+        #plotEverything(multipart, twiss, resultmultipart, resultenvlist)
+
+        # Cleaner way
+        self.facility.evaluate()
+        self.facility.plotAfterEval()
         return
 
 # layout manager (aranges the different widgets)
