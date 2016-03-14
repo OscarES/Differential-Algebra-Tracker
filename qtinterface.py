@@ -918,8 +918,8 @@ class EvalWidget(QWidget):
         multipart = self.facility.getMultipart()
         envelope = envelopeFromMultipart(multipart) #self.facility.getEnvelope()
         twiss = self.facility.getTwiss()
-        resultmultipart, resultenvelope, resulttwiss = self.facility.evaluate(multipart, envelope, twiss)
-        plotEverything(multipart, twiss, resultmultipart)
+        resultmultipart, resultenvelope, resulttwiss, resultenvlist = self.facility.evaluate(multipart, envelope, twiss)
+        plotEverything(multipart, twiss, resultmultipart, resultenvlist)
         return
 
 # layout manager (aranges the different widgets)

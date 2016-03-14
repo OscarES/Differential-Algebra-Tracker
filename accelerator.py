@@ -100,10 +100,14 @@ class Lattice:
         multipart = copy.deepcopy(multipartin)
         envelope = copy.deepcopy(envelopein)
         twiss = copy.deepcopy(twissin)
+        envlist = list()
+        envlist.append(np.array([envelope, 0]))
         for elem in self.lattice:
             print elem.printInfo()
-            multipart,envelope, twiss = elem.evaluate(multipart,envelope,twiss)
-        return multipart,envelope, twiss
+            multipart,envelope, twiss, env_with_s = elem.evaluate(multipart,envelope,twiss)
+            env_with_s[1] = env_with_s[1] + envlist[-1][1]
+            envlist.append(env_with_s)
+        return multipart,envelope, twiss, envlist
 
     def relativityAtTheEnd(self, multipart,envelope):
         return multipart,envelope
@@ -195,9 +199,9 @@ class Drift(LinearElement):
                 #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
                 #twiss[4] = envelope[3] / twiss[5]
                 #twiss[7] = envelope[6] / twiss[8]
-            multipart, envelope = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope, env_with_s = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
             
-        return multipart, envelope, twiss
+        return multipart, envelope, twiss, env_with_s
 
     def evaluateMT(self,multipart,envelope):
         # should just go through a disunited part
@@ -205,7 +209,8 @@ class Drift(LinearElement):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
-        return multipart, envelope
+        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        return multipart, envelope, env_with_s
 
 ### DIPOLE
 class Dipole(LinearElement):
@@ -275,13 +280,13 @@ class Dipole(LinearElement):
             if self.spaceChargeOn:
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
-            multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
             #twiss[7] = envelope[6] / twiss[8]
             #print "twiss[7] after: " + str(twiss[7])
-        return multipart, envelope, twiss
+        return multipart, envelope, twiss, env_with_s
 
     def evaluateM(self,multipart,envelope):
         # should just go through a disunited part
@@ -290,7 +295,8 @@ class Dipole(LinearElement):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
-        return multipart, envelope
+        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        return multipart, envelope, env_with_s
 
 ### QUAD
 class Quad(LinearElement):
@@ -373,13 +379,13 @@ class Quad(LinearElement):
             if self.spaceChargeOn:
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
-            multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
             #twiss[7] = envelope[6] / twiss[8]
             #print "twiss[7] after: " + str(twiss[7])
-        return multipart, envelope, twiss
+        return multipart, envelope, twiss, env_with_s
 
     def evaluateM(self,multipart,envelope):
         # should just go through a disunited part
@@ -388,7 +394,8 @@ class Quad(LinearElement):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
-        return multipart, envelope
+        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        return multipart, envelope, env_with_s
 
 ### SPACE CHARGE!!!!! C. Allen's approach
 class SpaceCharge(LinearElement):
@@ -533,7 +540,8 @@ class SpaceCharge(LinearElement):
             reducedphasespace = extendedphasespace[0:6] # throws away the dispersion 1 term
             multipart[j] = np.array([reducedphasespace, multipart[j][1]]) # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
         envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
-        return multipart,envelope
+        #env_with_s = np.array([copy.deepcopy(envelope), self.Lsp]) # there is only an angle kick so the deviation envelope wont change
+        return multipart, envelope, env_with_s
 
 
 
@@ -951,11 +959,11 @@ class LieAlgElement(Element):
             if self.spaceChargeOn:
                 self.sc.updateMatrix(multipart,twiss)
                 multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
-            multipart, envelope = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #twiss[7] = envelope[6] / twiss[8]
-        return multipart, envelope, twiss
+        return multipart, envelope, twiss, env_with_s
 
     def evaluateNumFun(self,multipart,envelope):
         for particle in multipart:
@@ -975,7 +983,8 @@ class LieAlgElement(Element):
 
             particle[1] += self.Lsp
         envelope = envelopeFromMultipart(multipart)
-        return multipart, envelope
+        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        return multipart, envelope, env_with_s
 
 
 
@@ -1043,6 +1052,8 @@ class Cavity(Element):
         self.k = 2*constants.pi/self.beta_i/self.rf_lambda
         self.phi_s = self.findPhi_s(self.beta_i)
         print "self.phi_s: " + str(self.phi_s)
+
+        self.Lsp = self.L/self.n
 
         ## Calculations
         T_of_beta = self.timeTransitFactor(self.beta_i)
@@ -1162,13 +1173,13 @@ class Cavity(Element):
             #if self.spaceChargeOn:
                 #self.sc.updateMatrix(multipart,twiss)
                 #multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
-            multipart, envelope = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
             #twiss[7] = envelope[6] / twiss[8]
             #print "twiss[7] after: " + str(twiss[7])
-        return multipart, envelope, twiss
+        return multipart, envelope, twiss, env_with_s
 
     def evaluateM(self,multipart,envelope):
         # should just go through a disunited part
@@ -1177,7 +1188,8 @@ class Cavity(Element):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
-        return multipart, envelope
+        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        return multipart, envelope, env_with_s
 
 # Comes from ref E.
 class FieldMapCavity(Element):

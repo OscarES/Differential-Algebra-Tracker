@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-def plotEverything(multipartin,twiss,multipartout):#,envx,envy):
+def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     xin = [multipartin[i][0][0] for i in xrange(len(multipartin))]
     xpin = [multipartin[i][0][1] for i in xrange(len(multipartin))]
     yin = [multipartin[i][0][2] for i in xrange(len(multipartin))]
@@ -17,6 +17,10 @@ def plotEverything(multipartin,twiss,multipartout):#,envx,envy):
     alpha_z = twiss[6]
     beta_z = twiss[7]
     epsilon_rms_z = twiss[8]
+
+    envx = [envlist[i][0][0] for i in xrange(len(envlist))]
+    envy = [envlist[i][0][3] for i in xrange(len(envlist))]
+    s = [envlist[i][1] for i in xrange(len(envlist))]
 
     xo = [multipartout[i][0][0] for i in xrange(len(multipartout))]
     xpo = [multipartout[i][0][1] for i in xrange(len(multipartout))]
@@ -42,15 +46,15 @@ def plotEverything(multipartin,twiss,multipartout):#,envx,envy):
     plt.xlabel('x')
     plt.ylabel('y')
     ax4 = plt.subplot2grid((4,3), (1, 0), colspan=3)
-    #plt.plot(envx[:,0],envx[:,1],'ro')
-   #plt.title('Envelope in x by z')
-   #plt.xlabel('z')
-   #plt.ylabel('Envelope in x')
+    plt.plot(s,envx,'ro')
+    plt.title('Envelope in sigma_x^2 by s')
+    plt.xlabel('s')
+    plt.ylabel('Envelope in sigma_x^2')
     ax5 = plt.subplot2grid((4,3), (2, 0), colspan=3)
-   #plt.plot(envy[:,0],envy[:,1],'bo')
-   #plt.title('Envelope in y by z')
-   #plt.xlabel('z')
-   #plt.ylabel('Envelope in y')
+    plt.plot(s,envy,'bo')
+    plt.title('Envelope in sigma_y^2 by s')
+    plt.xlabel('s')
+    plt.ylabel('Envelope in sigma_y^2')
     ax6 = plt.subplot2grid((4,3), (3, 0))
     plt.plot(xo,xpo,'ro')
     plt.title('Values after FODO in x')
