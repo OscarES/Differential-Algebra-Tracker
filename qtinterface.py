@@ -366,7 +366,7 @@ class LatticeOverviewWidget(QGLWidget):
         self.updateGL()
 
 
-class BeamEditor(QWidget):
+class BeamEditor(QGroupBox):
     '''
     Widget for editing the input beam
     '''
@@ -375,62 +375,60 @@ class BeamEditor(QWidget):
         QGLWidget.__init__(self, parent)
 
         self.parent = parent
+        self.setTitle("Beam Editor")
 
         self.facility = facility
 
         grid = QGridLayout()
         self.setLayout(grid)
 
-        self.textBeamEditor = QLabel("Beam Editor")
-        grid.addWidget(self.textBeamEditor, 0, 0)
-
         ## Beamdata
         # beta
         self.textBeta = QLabel("Relativistic beta:")
-        grid.addWidget(self.textBeta, 1, 0)
+        grid.addWidget(self.textBeta, 0, 0)
         
         self.enterBeta = QLineEdit()
-        grid.addWidget(self.enterBeta, 1, 1)
+        grid.addWidget(self.enterBeta, 0, 1)
         valueOfBeta = self.enterBeta.text()
 
         # rf_lambda
         self.textLambda = QLabel("RF-Lambda [m]:")
-        grid.addWidget(self.textLambda, 2, 0)
+        grid.addWidget(self.textLambda, 1, 0)
         
         self.enterLambda = QLineEdit()
-        grid.addWidget(self.enterLambda, 2, 1)
+        grid.addWidget(self.enterLambda, 1, 1)
         valueOfLambda = self.enterLambda.text()
 
         # m
         self.textMass = QLabel("Mass of a particle:")
-        grid.addWidget(self.textMass, 3, 0)
+        grid.addWidget(self.textMass, 2, 0)
         
         self.enterMass = QLineEdit() # should be a ComboBox with m_p, m_e
-        grid.addWidget(self.enterMass, 3, 1)
+        grid.addWidget(self.enterMass, 2, 1)
         valueOfMass = self.enterMass.text()
 
         # q
         self.textCharge = QLabel("Charge of a particle:")
-        grid.addWidget(self.textCharge, 4, 0)
+        grid.addWidget(self.textCharge, 3, 0)
         
         self.enterCharge = QLineEdit() # should be a comboBox with e and -e
-        grid.addWidget(self.enterCharge, 4, 1)
+        grid.addWidget(self.enterCharge, 3, 1)
         valueOfCharge = self.enterCharge.text()
 
         # E
         self.textEnergy = QLabel("Energy:")
-        grid.addWidget(self.textEnergy, 5, 0)
+        grid.addWidget(self.textEnergy, 4, 0)
         
         self.enterEnergy = QLineEdit() # should be a QLabel and show the calculated value from beta
-        grid.addWidget(self.enterEnergy, 5, 1)
+        grid.addWidget(self.enterEnergy, 4, 1)
         valueOfEnergy = self.enterEnergy.text()
 
         # nbrOfParticles
         self.textNbrOfParticles = QLabel("# of particles:")
-        grid.addWidget(self.textNbrOfParticles, 6, 0)
+        grid.addWidget(self.textNbrOfParticles, 5, 0)
         
         self.enterNbrOfParticles = QLineEdit()
-        grid.addWidget(self.enterNbrOfParticles, 6, 1)
+        grid.addWidget(self.enterNbrOfParticles, 5, 1)
         self.valueOfNbrOfParticles = self.enterNbrOfParticles.text()
 
         # Set the fields to the default parameters
@@ -440,74 +438,74 @@ class BeamEditor(QWidget):
         # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
         # alpha_x
         self.textAlpha_x = QLabel("Alpha_x:")
-        grid.addWidget(self.textAlpha_x, 1, 3)
+        grid.addWidget(self.textAlpha_x, 0, 3)
         
         self.enterAlpha_x = QLineEdit()
-        grid.addWidget(self.enterAlpha_x, 1, 4)
+        grid.addWidget(self.enterAlpha_x, 0, 4)
         self.valueOfAlpha_x = self.enterAlpha_x.text()
 
         # beta_x
         self.textBeta_x = QLabel("Beta_x:")
-        grid.addWidget(self.textBeta_x, 2, 3)
+        grid.addWidget(self.textBeta_x, 1, 3)
         
         self.enterBeta_x = QLineEdit()
-        grid.addWidget(self.enterBeta_x, 2, 4)
+        grid.addWidget(self.enterBeta_x, 1, 4)
         self.valueOfBeta_x = self.enterBeta_x.text()
         
         # epsilon_rms_x
         self.textEpsilon_rms_x = QLabel("Epsilon_rms_x:")
-        grid.addWidget(self.textEpsilon_rms_x, 3, 3)
+        grid.addWidget(self.textEpsilon_rms_x, 2, 3)
         
         self.enterEpsilon_rms_x = QLineEdit()
-        grid.addWidget(self.enterEpsilon_rms_x, 3, 4)
+        grid.addWidget(self.enterEpsilon_rms_x, 2, 4)
         self.valueOfEpsilon_rms_x = self.enterEpsilon_rms_x.text()
         
         # alpha_y
         self.textAlpha_y = QLabel("Alpha_y:")
-        grid.addWidget(self.textAlpha_y, 4, 3)
+        grid.addWidget(self.textAlpha_y, 3, 3)
         
         self.enterAlpha_y = QLineEdit()
-        grid.addWidget(self.enterAlpha_y, 4, 4)
+        grid.addWidget(self.enterAlpha_y, 3, 4)
         self.valueOfAlpha_y = self.enterAlpha_y.text()
         
         # beta_y
         self.textBeta_y = QLabel("Beta_y:")
-        grid.addWidget(self.textBeta_y, 5, 3)
+        grid.addWidget(self.textBeta_y, 4, 3)
         
         self.enterBeta_y = QLineEdit()
-        grid.addWidget(self.enterBeta_y, 5, 4)
+        grid.addWidget(self.enterBeta_y, 4, 4)
         self.valueOfBeta_y = self.enterBeta_y.text()
         
         # epsilon_rms_y
         self.textEpsilon_rms_y = QLabel("Epsilon_rms_y:")
-        grid.addWidget(self.textEpsilon_rms_y, 6, 3)
+        grid.addWidget(self.textEpsilon_rms_y, 5, 3)
         
         self.enterEpsilon_rms_y = QLineEdit()
-        grid.addWidget(self.enterEpsilon_rms_y, 6, 4)
+        grid.addWidget(self.enterEpsilon_rms_y, 5, 4)
         self.valueOfEpsilon_rms_y = self.enterEpsilon_rms_y.text()
         
         # alpha_z
         self.textAlpha_z = QLabel("Alpha_z:")
-        grid.addWidget(self.textAlpha_z, 7, 3)
+        grid.addWidget(self.textAlpha_z, 6, 3)
         
         self.enterAlpha_z = QLineEdit()
-        grid.addWidget(self.enterAlpha_z, 7, 4)
+        grid.addWidget(self.enterAlpha_z, 6, 4)
         self.valueOfAlpha_z = self.enterAlpha_z.text()
         
         # beta_z
         self.textBeta_z = QLabel("Beta_z:")
-        grid.addWidget(self.textBeta_z, 8, 3)
+        grid.addWidget(self.textBeta_z, 7, 3)
         
         self.enterBeta_z = QLineEdit()
-        grid.addWidget(self.enterBeta_z, 8, 4)
+        grid.addWidget(self.enterBeta_z, 7, 4)
         self.valueOfBeta_z = self.enterBeta_z.text()
         
         # epsilon_rms_z
         self.textEpsilon_rms_z = QLabel("Epsilon_rms_z:")
-        grid.addWidget(self.textEpsilon_rms_z, 9, 3)
+        grid.addWidget(self.textEpsilon_rms_z, 8, 3)
         
         self.enterEpsilon_rms_z = QLineEdit()
-        grid.addWidget(self.enterEpsilon_rms_z, 9, 4)
+        grid.addWidget(self.enterEpsilon_rms_z, 8, 4)
         self.valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
 
         # Set the fields to the default parameters
@@ -516,39 +514,39 @@ class BeamEditor(QWidget):
         # buttons
         useBeamdataButton = QPushButton("Use Beamdata")
         useBeamdataButton.clicked.connect(self.useBeamdataInput)
-        grid.addWidget(useBeamdataButton,10,1)
+        grid.addWidget(useBeamdataButton,9,1)
 
         useTwissButton = QPushButton("Use Twiss")
         useTwissButton.clicked.connect(self.useTwissInput)
-        grid.addWidget(useTwissButton,10,4)
+        grid.addWidget(useTwissButton,9,4)
 
         generateMultipartButton = QPushButton("Generate Multiparticles")
         generateMultipartButton.clicked.connect(self.generateMultipart)
-        grid.addWidget(generateMultipartButton,10,5)
+        grid.addWidget(generateMultipartButton,9,5)
 
         saveBeamdataButton = QPushButton("Save Beamdata")
         saveBeamdataButton.clicked.connect(self.saveBeamdata)
-        grid.addWidget(saveBeamdataButton,11,1)
+        grid.addWidget(saveBeamdataButton,10,1)
 
         saveTwissButton = QPushButton("Save Twiss")
         saveTwissButton.clicked.connect(self.saveTwiss)
-        grid.addWidget(saveTwissButton,11,4)
+        grid.addWidget(saveTwissButton,10,4)
 
         saveMultipartButton = QPushButton("Save Multiparticles")
         saveMultipartButton.clicked.connect(self.saveMultipart)
-        grid.addWidget(saveMultipartButton,11,5)
+        grid.addWidget(saveMultipartButton,10,5)
 
         loadBeamdataButton = QPushButton("Load Beamdata")
         loadBeamdataButton.clicked.connect(self.loadBeamdata)
-        grid.addWidget(loadBeamdataButton,12,1)
+        grid.addWidget(loadBeamdataButton,11,1)
 
         loadTwissButton = QPushButton("Load Twiss")
         loadTwissButton.clicked.connect(self.loadTwiss)
-        grid.addWidget(loadTwissButton,12,4)
+        grid.addWidget(loadTwissButton,11,4)
 
         loadMultipartButton = QPushButton("Load Multiparticles")
         loadMultipartButton.clicked.connect(self.loadMultipart)
-        grid.addWidget(loadMultipartButton,12,5)
+        grid.addWidget(loadMultipartButton,11,5)
 
     def saveBeamdata(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Beamdata file', '')
@@ -740,7 +738,7 @@ class BeamEditor(QWidget):
             print "Bad multipart file!"
     
 
-class LatticeEditor(QWidget):
+class LatticeEditor(QGroupBox):
     '''
     Widget for editing the lattice
     '''
@@ -749,22 +747,20 @@ class LatticeEditor(QWidget):
         QGLWidget.__init__(self, parent)
 
         self.parent = parent
+        self.setTitle("Lattice Editor")
 
         self.facility = facility
 
         grid = QGridLayout()
         self.setLayout(grid)
 
-        self.textLatticeEditor = QLabel("Lattice Editor")
-        grid.addWidget(self.textLatticeEditor, 0, 0)
-
         loadButton = QPushButton("Load Lattice")
         loadButton.clicked.connect(self.loadLattice)
-        grid.addWidget(loadButton,1,0)
+        grid.addWidget(loadButton,0,0)
 
         saveButton = QPushButton("Save Lattice")
         saveButton.clicked.connect(self.saveLattice)
-        grid.addWidget(saveButton,1,1)
+        grid.addWidget(saveButton,0,1)
 
         self.selectedElement = "Drift"
 
@@ -775,71 +771,71 @@ class LatticeEditor(QWidget):
         self.elementSelector.addItem("Sextupole")
         self.elementSelector.addItem("RF-Cavity")
         self.elementSelector.addItem("Higher order element")
-        grid.addWidget(self.elementSelector, 2, 0)
+        grid.addWidget(self.elementSelector, 1, 0)
 
         self.elementSelector.activated[str].connect(self.activatedElementSelector)
         self.selectedElement = "Drift"
         
         self.textName = QLabel("Name:")
-        grid.addWidget(self.textName, 3, 0)
+        grid.addWidget(self.textName, 2, 0)
 
         self.enterName = QLineEdit()
-        grid.addWidget(self.enterName, 3, 1)
+        grid.addWidget(self.enterName, 2, 1)
         name = self.enterName.text()
 
         self.textL = QLabel("L:")
-        grid.addWidget(self.textL, 4, 0)
+        grid.addWidget(self.textL, 3, 0)
         
         self.enterL = QLineEdit()
-        grid.addWidget(self.enterL, 4, 1)
+        grid.addWidget(self.enterL, 3, 1)
         valueOfL = self.enterL.text()
 
         ## Quad and sextupole
         self.textK = QLabel("K:")
-        grid.addWidget(self.textK, 5, 0)
+        grid.addWidget(self.textK, 4, 0)
         self.textK.hide()
 
         self.enterK = QLineEdit()
-        grid.addWidget(self.enterK, 5, 1)
+        grid.addWidget(self.enterK, 4, 1)
         self.enterK.hide()
 
         ## Dipole
         self.textRho = QLabel("Rho:")
-        grid.addWidget(self.textRho, 4, 0)
+        grid.addWidget(self.textRho, 3, 0)
         self.textRho.hide()
 
         self.enterRho = QLineEdit()
-        grid.addWidget(self.enterRho, 4, 1)
+        grid.addWidget(self.enterRho, 3, 1)
         self.enterRho.hide()
 
         self.textAlpha = QLabel("Alpha:")
-        grid.addWidget(self.textAlpha, 5, 0)
+        grid.addWidget(self.textAlpha, 4, 0)
         self.textAlpha.hide()
 
         self.enterAlpha = QLineEdit()
-        grid.addWidget(self.enterAlpha, 5, 1)
+        grid.addWidget(self.enterAlpha, 4, 1)
         self.enterAlpha.hide()
 
         self.textn = QLabel("n:")
-        grid.addWidget(self.textn, 6, 0)
+        grid.addWidget(self.textn, 5, 0)
         self.textn.hide()
 
         self.entern = QLineEdit()
-        grid.addWidget(self.entern, 6, 1)
+        grid.addWidget(self.entern, 5, 1)
         self.entern.hide()
 
         ## Sextupole
         self.textOrder = QLabel("Order:")
-        grid.addWidget(self.textOrder, 6, 0)
+        grid.addWidget(self.textOrder, 5, 0)
         self.textOrder.hide()
 
         self.enterOrder = QLineEdit()
-        grid.addWidget(self.enterOrder, 6, 1)
+        grid.addWidget(self.enterOrder, 5, 1)
         self.enterOrder.hide()
 
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
-        grid.addWidget(createElementButton, 7,1)
+        grid.addWidget(createElementButton, 6,1)
 
     def activatedElementSelector(self, text):
         print text
