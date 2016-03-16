@@ -264,9 +264,9 @@ class Dipole(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
-            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, multipart, twiss, beamdata)
 
     """ taken from lie code where K = sqrt(k)"""
     def createMatrixM(self, rho, L, K_x, K_y, beta, gamma):
@@ -373,7 +373,7 @@ class Quad(LinearElement):
         if self.spaceChargeOn == 1:
             self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, multipart, twiss, beamdata)
 
     """ taken from lie code where K = sqrt(k)"""
     def createMatrixM(self,K,L):
@@ -1027,9 +1027,9 @@ class LieAlgElement(Element):
 
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
-            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceCharge('liealg_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('liealg_sc', self.Lsp, multipart, twiss, beamdata)
 
     def printInfo(self):
         return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K) + "\t HamUsed: " +  str(self.hamUsed) + "\t Order: " +  str(self.order)
