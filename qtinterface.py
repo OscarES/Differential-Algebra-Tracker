@@ -389,7 +389,6 @@ class BeamEditor(QGroupBox):
         
         self.enterBeta = QLineEdit()
         grid.addWidget(self.enterBeta, 0, 1)
-        valueOfBeta = self.enterBeta.text()
 
         # rf_lambda
         self.textLambda = QLabel("RF-Lambda [m]:")
@@ -397,7 +396,6 @@ class BeamEditor(QGroupBox):
         
         self.enterLambda = QLineEdit()
         grid.addWidget(self.enterLambda, 1, 1)
-        valueOfLambda = self.enterLambda.text()
 
         # m
         self.textMass = QLabel("Mass of a particle:")
@@ -405,7 +403,6 @@ class BeamEditor(QGroupBox):
         
         self.enterMass = QLineEdit() # should be a ComboBox with m_p, m_e
         grid.addWidget(self.enterMass, 2, 1)
-        valueOfMass = self.enterMass.text()
 
         # q
         self.textCharge = QLabel("Charge of a particle:")
@@ -413,7 +410,6 @@ class BeamEditor(QGroupBox):
         
         self.enterCharge = QLineEdit() # should be a comboBox with e and -e
         grid.addWidget(self.enterCharge, 3, 1)
-        valueOfCharge = self.enterCharge.text()
 
         # E
         self.textEnergy = QLabel("Energy:")
@@ -421,7 +417,6 @@ class BeamEditor(QGroupBox):
         
         self.enterEnergy = QLineEdit() # should be a QLabel and show the calculated value from beta
         grid.addWidget(self.enterEnergy, 4, 1)
-        valueOfEnergy = self.enterEnergy.text()
 
         # nbrOfParticles
         self.textNbrOfParticles = QLabel("# of particles:")
@@ -429,7 +424,6 @@ class BeamEditor(QGroupBox):
         
         self.enterNbrOfParticles = QLineEdit()
         grid.addWidget(self.enterNbrOfParticles, 5, 1)
-        self.valueOfNbrOfParticles = self.enterNbrOfParticles.text()
 
         # Set the fields to the default parameters
         self.writeInBeamdataFields()
@@ -442,7 +436,6 @@ class BeamEditor(QGroupBox):
         
         self.enterAlpha_x = QLineEdit()
         grid.addWidget(self.enterAlpha_x, 0, 4)
-        self.valueOfAlpha_x = self.enterAlpha_x.text()
 
         # beta_x
         self.textBeta_x = QLabel("Beta_x:")
@@ -450,7 +443,6 @@ class BeamEditor(QGroupBox):
         
         self.enterBeta_x = QLineEdit()
         grid.addWidget(self.enterBeta_x, 1, 4)
-        self.valueOfBeta_x = self.enterBeta_x.text()
         
         # epsilon_rms_x
         self.textEpsilon_rms_x = QLabel("Epsilon_rms_x:")
@@ -458,7 +450,6 @@ class BeamEditor(QGroupBox):
         
         self.enterEpsilon_rms_x = QLineEdit()
         grid.addWidget(self.enterEpsilon_rms_x, 2, 4)
-        self.valueOfEpsilon_rms_x = self.enterEpsilon_rms_x.text()
         
         # alpha_y
         self.textAlpha_y = QLabel("Alpha_y:")
@@ -466,7 +457,6 @@ class BeamEditor(QGroupBox):
         
         self.enterAlpha_y = QLineEdit()
         grid.addWidget(self.enterAlpha_y, 3, 4)
-        self.valueOfAlpha_y = self.enterAlpha_y.text()
         
         # beta_y
         self.textBeta_y = QLabel("Beta_y:")
@@ -474,7 +464,6 @@ class BeamEditor(QGroupBox):
         
         self.enterBeta_y = QLineEdit()
         grid.addWidget(self.enterBeta_y, 4, 4)
-        self.valueOfBeta_y = self.enterBeta_y.text()
         
         # epsilon_rms_y
         self.textEpsilon_rms_y = QLabel("Epsilon_rms_y:")
@@ -482,7 +471,6 @@ class BeamEditor(QGroupBox):
         
         self.enterEpsilon_rms_y = QLineEdit()
         grid.addWidget(self.enterEpsilon_rms_y, 5, 4)
-        self.valueOfEpsilon_rms_y = self.enterEpsilon_rms_y.text()
         
         # alpha_z
         self.textAlpha_z = QLabel("Alpha_z:")
@@ -490,7 +478,6 @@ class BeamEditor(QGroupBox):
         
         self.enterAlpha_z = QLineEdit()
         grid.addWidget(self.enterAlpha_z, 6, 4)
-        self.valueOfAlpha_z = self.enterAlpha_z.text()
         
         # beta_z
         self.textBeta_z = QLabel("Beta_z:")
@@ -498,7 +485,6 @@ class BeamEditor(QGroupBox):
         
         self.enterBeta_z = QLineEdit()
         grid.addWidget(self.enterBeta_z, 7, 4)
-        self.valueOfBeta_z = self.enterBeta_z.text()
         
         # epsilon_rms_z
         self.textEpsilon_rms_z = QLabel("Epsilon_rms_z:")
@@ -506,7 +492,6 @@ class BeamEditor(QGroupBox):
         
         self.enterEpsilon_rms_z = QLineEdit()
         grid.addWidget(self.enterEpsilon_rms_z, 8, 4)
-        self.valueOfEpsilon_rms_z = self.enterEpsilon_rms_z.text()
 
         # Set the fields to the default parameters
         self.writeInTwissFields()
