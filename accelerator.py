@@ -102,11 +102,18 @@ class Lattice:
         twiss = copy.deepcopy(twissin)
         envlist = list()
         envlist.append(np.array([envelope, 0]))
-        for elem in self.lattice:
-            print elem.printInfo()
-            multipart,envelope, twiss, env_with_s = elem.evaluate(multipart,envelope,twiss)
-            env_with_s[1] = env_with_s[1] + envlist[-1][1]
-            envlist.append(env_with_s)
+        if self.spaceChargeOn:
+            for elem in self.lattice:
+                print elem.printInfo()
+                multipart,envelope, twiss, env_with_s = elem.evaluateWithSC(multipart,envelope,twiss)
+                env_with_s[1] = env_with_s[1] + envlist[-1][1]
+                envlist.append(env_with_s)
+        else:
+            for elem in self.lattice:
+                print elem.printInfo()
+                multipart,envelope, twiss, env_with_s = elem.evaluateWithoutSC(multipart,envelope,twiss)
+                env_with_s[1] = env_with_s[1] + envlist[-1][1]
+                envlist.append(env_with_s)
         return multipart,envelope, twiss, envlist
 
     def relativityAtTheEnd(self, multipart,envelope):
@@ -199,6 +206,28 @@ class Drift(LinearElement):
                 #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
                 #twiss[4] = envelope[3] / twiss[5]
                 #twiss[7] = envelope[6] / twiss[8]
+            multipart, envelope, env_with_s = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
+            
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluateWithSC(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        for i in range(0,self.n):
+            self.sc.updateMatrix(multipart,twiss)
+            multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #twiss[7] = envelope[6] / twiss[8]
+            multipart, envelope, env_with_s = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
+            
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluateWithoutSC(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        for i in range(0,self.n):
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #twiss[7] = envelope[6] / twiss[8]
             multipart, envelope, env_with_s = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
             
         return multipart, envelope, twiss, env_with_s
