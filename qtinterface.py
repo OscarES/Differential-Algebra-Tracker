@@ -754,13 +754,49 @@ class LatticeEditor(QGroupBox):
         grid = QGridLayout()
         self.setLayout(grid)
 
+        # SC and splits
+        self.textNbrOfSplits = QLabel("# of Splits:")
+        grid.addWidget(self.textNbrOfSplits, 0, 4)
+        self.textNbrOfSplits.hide()
+        
+        self.enterNbrOfSplits = QLineEdit()
+        grid.addWidget(self.enterNbrOfSplits, 0, 5)
+        self.enterNbrOfSplits.hide()
+
+        # SC radio buttons (they come after since they change the split buttons)
+        self.textSC = QLabel("Space Charge:")
+        grid.addWidget(self.textSC, 0, 0)
+        
+        self.radioGroup = QButtonGroup(self)
+
+        self.radioNoSC = QRadioButton("None")
+        self.radioGroup.addButton(self.radioNoSC)
+        self.radioNoSC.toggled.connect(self.radioNoSC_clicked)
+        grid.addWidget(self.radioNoSC, 0, 1)
+        self.radioNoSC.toggle()
+
+        self.radioSC1 = QRadioButton("Allen's SC")
+        self.radioGroup.addButton(self.radioSC1)
+        self.radioSC1.toggled.connect(self.radioSC1_clicked)
+        grid.addWidget(self.radioSC1, 0, 2)
+
+        self.radioSC2 = QRadioButton("Elliptic integral")
+        self.radioGroup.addButton(self.radioSC2)
+        self.radioSC2.toggled.connect(self.radioSC2_clicked)
+        grid.addWidget(self.radioSC2, 0, 3)
+
+        redoLatticeButton = QPushButton("Redo Lattice")
+        redoLatticeButton.clicked.connect(self.redoLattice)
+        grid.addWidget(redoLatticeButton,0,6)
+
+        # load and save
         loadButton = QPushButton("Load Lattice")
         loadButton.clicked.connect(self.loadLattice)
-        grid.addWidget(loadButton,0,0)
+        grid.addWidget(loadButton,1,0)
 
         saveButton = QPushButton("Save Lattice")
         saveButton.clicked.connect(self.saveLattice)
-        grid.addWidget(saveButton,0,1)
+        grid.addWidget(saveButton,1,1)
 
         self.selectedElement = "Drift"
 
@@ -771,71 +807,99 @@ class LatticeEditor(QGroupBox):
         self.elementSelector.addItem("Sextupole")
         self.elementSelector.addItem("RF-Cavity")
         self.elementSelector.addItem("Higher order element")
-        grid.addWidget(self.elementSelector, 1, 0)
+        grid.addWidget(self.elementSelector, 2, 0)
 
         self.elementSelector.activated[str].connect(self.activatedElementSelector)
         self.selectedElement = "Drift"
         
         self.textName = QLabel("Name:")
-        grid.addWidget(self.textName, 2, 0)
+        grid.addWidget(self.textName, 3, 0)
 
         self.enterName = QLineEdit()
-        grid.addWidget(self.enterName, 2, 1)
+        grid.addWidget(self.enterName, 3, 1)
         name = self.enterName.text()
 
         self.textL = QLabel("L:")
-        grid.addWidget(self.textL, 3, 0)
+        grid.addWidget(self.textL, 4, 0)
         
         self.enterL = QLineEdit()
-        grid.addWidget(self.enterL, 3, 1)
+        grid.addWidget(self.enterL, 4, 1)
         valueOfL = self.enterL.text()
 
         ## Quad and sextupole
         self.textK = QLabel("K:")
-        grid.addWidget(self.textK, 4, 0)
+        grid.addWidget(self.textK, 5, 0)
         self.textK.hide()
 
         self.enterK = QLineEdit()
-        grid.addWidget(self.enterK, 4, 1)
+        grid.addWidget(self.enterK, 5, 1)
         self.enterK.hide()
 
         ## Dipole
         self.textRho = QLabel("Rho:")
-        grid.addWidget(self.textRho, 3, 0)
+        grid.addWidget(self.textRho, 4, 0)
         self.textRho.hide()
 
         self.enterRho = QLineEdit()
-        grid.addWidget(self.enterRho, 3, 1)
+        grid.addWidget(self.enterRho, 4, 1)
         self.enterRho.hide()
 
         self.textAlpha = QLabel("Alpha:")
-        grid.addWidget(self.textAlpha, 4, 0)
+        grid.addWidget(self.textAlpha, 5, 0)
         self.textAlpha.hide()
 
         self.enterAlpha = QLineEdit()
-        grid.addWidget(self.enterAlpha, 4, 1)
+        grid.addWidget(self.enterAlpha, 5, 1)
         self.enterAlpha.hide()
 
         self.textn = QLabel("n:")
-        grid.addWidget(self.textn, 5, 0)
+        grid.addWidget(self.textn, 6, 0)
         self.textn.hide()
 
         self.entern = QLineEdit()
-        grid.addWidget(self.entern, 5, 1)
+        grid.addWidget(self.entern, 6, 1)
         self.entern.hide()
 
         ## Sextupole
         self.textOrder = QLabel("Order:")
-        grid.addWidget(self.textOrder, 5, 0)
+        grid.addWidget(self.textOrder, 6, 0)
         self.textOrder.hide()
 
         self.enterOrder = QLineEdit()
-        grid.addWidget(self.enterOrder, 5, 1)
+        grid.addWidget(self.enterOrder, 6, 1)
         self.enterOrder.hide()
 
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
-        grid.addWidget(createElementButton, 6,1)
+        grid.addWidget(createElementButton, 7,1)
+
+    def radioNoSC_clicked(self, enabled):
+        if enabled:
+            self.spaceCharge = 0
+            self.textNbrOfSplits.hide()
+            self.enterNbrOfSplits.hide()
+
+    def radioSC1_clicked(self, enabled):
+        if enabled:
+            self.spaceCharge = 1
+            self.textNbrOfSplits.show()
+            self.enterNbrOfSplits.show()
+
+    def radioSC2_clicked(self, enabled):
+        if enabled:
+            self.spaceCharge = 2
+            self.textNbrOfSplits.show()
+            self.enterNbrOfSplits.show()
+
+    def redoLattice(self):
+        # send self.spaceCharge to facility which will send it to accelerator
+        self.valueOfNbrOfSplits = self.enterNbrOfSplits.text()
+        try:
+            self.nbrOfSplits = int(self.valueOfNbrOfSplits)
+        except:
+            print "# of Splits not a number, set to 1 instead!"
+            self.nbrOfSplits = 1
+        self.facility.setSpaceChargeOnAndSplits(self.spaceCharge, self.nbrOfSplits)
 
     def activatedElementSelector(self, text):
         print text

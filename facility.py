@@ -90,8 +90,8 @@ class Facility():
         self.lattice.setMultipart(multipart)
         self.multipart = self.lattice.getMultipart()
 
-    def setSpaceChargeOn(self, spaceChargeOn):
-        self.lattice.setSpaceChargeOn(spaceChargeOn)
+    def setSpaceChargeOnAndSplits(self, spaceChargeOn, nbrOfSplits):
+        self.lattice.setSpaceChargeOnAndSplits(spaceChargeOn, nbrOfSplits)
     ## End Passing
 
     def printLattice(self):

@@ -86,8 +86,10 @@ class Lattice:
     def setMultipart(self,multipart):
         self.multipart = multipart
 
-    def setSpaceChargeOn(self, spaceChargeOn):
+    def setSpaceChargeOnAndSplits(self, spaceChargeOn, nbrOfSplits):
         self.spaceChargeOn = spaceChargeOn
+        self.nbrOfSplits = nbrOfSplits
+        # Now the lattice shall remake each element with the new spaceChargeOn and nbrOfSplits
     ## End Passing
 
     def printLattice(self):
