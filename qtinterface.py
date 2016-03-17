@@ -878,12 +878,15 @@ class LatticeEditor(QGroupBox):
 
     def redoLattice(self):
         # send self.spaceCharge to facility which will send it to accelerator
-        self.valueOfNbrOfSplits = self.enterNbrOfSplits.text()
-        try:
-            self.nbrOfSplits = int(self.valueOfNbrOfSplits)
-        except:
-            print "# of Splits not a number, set to 1 instead!"
+        if self.spaceCharge == 0:
             self.nbrOfSplits = 1
+        else:
+            self.valueOfNbrOfSplits = self.enterNbrOfSplits.text()
+            try:
+                self.nbrOfSplits = int(self.valueOfNbrOfSplits)
+            except:
+                print "# of Splits not a number, set to 1 instead!"
+                self.nbrOfSplits = 1
         self.facility.setSpaceChargeOnAndSplits(self.spaceCharge, self.nbrOfSplits)
 
     def activatedElementSelector(self, text):
