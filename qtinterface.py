@@ -1043,6 +1043,7 @@ class EvalWidget(QWidget):
         self.setLayout(grid)
 
         EvalButton = QPushButton("Evaluate!")
+        EvalButton.setMinimumSize(300,100)
         EvalButton.setStyleSheet("background-color:green")
         EvalButton.clicked.connect(self.evaluate)
         grid.addWidget(EvalButton,0,0)
@@ -1077,42 +1078,32 @@ class FormWidget(QWidget):
         self.parent = parent
 
         ## Layout
-        self.layout = QHBoxLayout(self)
-
-        self.layout.setAlignment(QtCore.Qt.AlignLeft)
-        self.layout.addStretch(1)
+        self.layout = QGridLayout()
 
         # Lattice overview
         self.latticeoverview = LatticeOverviewWidget(facility, self)
-        self.layout.addWidget(self.latticeoverview)
+        self.latticeoverview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.layout.addWidget(self.latticeoverview, 0, 0, 3, 1)
 
         self.latticeoverview.setFocus() # starts with focus
         self.latticeoverview.mousePressEvent("bla") # for some reason I need a parameter in this overloaded function (set it to bla sends 0 as bla)
 
-        ## Editor layout
-        self.editorlayout = QVBoxLayout() # no need for self as param since layout will later set this as its child
-
         # Beam editor
         self.beameditor = BeamEditor(self, facility)
-        self.editorlayout.addWidget(self.beameditor)
+        self.beameditor.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.layout.addWidget(self.beameditor, 0, 1)
 
         # Lattice editor
         self.latticeeditor = LatticeEditor(self, facility)
-        self.editorlayout.addWidget(self.latticeeditor)
+        self.latticeeditor.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.layout.addWidget(self.latticeeditor, 1, 1)
 
         # Evaluate
         self.evalwidget = EvalWidget(self, facility)
-        self.editorlayout.addWidget(self.evalwidget)
+        self.evalwidget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.layout.addWidget(self.evalwidget, 2, 1)
 
-        ## More layout stuff
-        self.layout.addLayout(self.editorlayout)
-
-        self.setLayout(self.layout)
-
-    def resizeEvent(self, event):
-        newWidth = max(self.frameGeometry().width()-820,0) # 820 is magic number for getting the correct width
-        self.latticeoverview.setGeometry(4,4,newWidth, self.latticeoverview.height())
-        return     
+        self.setLayout(self.layout) 
 
 class DATWidgetInterface(QMainWindow):
     ''' Example class for using SpiralWidget'''
