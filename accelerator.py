@@ -210,19 +210,6 @@ class Drift(LinearElement):
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
 
-    def evaluate(self,multipart,envelope,twiss):
-        # some for loop that goes through all of the disunited parts
-        for i in range(0,self.n):
-            if self.spaceChargeOn:
-                self.sc.updateMatrix(multipart,twiss)
-                multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
-                #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
-                #twiss[4] = envelope[3] / twiss[5]
-                #twiss[7] = envelope[6] / twiss[8]
-            multipart, envelope, env_with_s = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
-            
-        return multipart, envelope, twiss, env_with_s
-
     def evaluateWithSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
         for i in range(0,self.n):
@@ -325,21 +312,6 @@ class Dipole(LinearElement):
             self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, multipart, twiss, beamdata)
-
-    def evaluate(self,multipart,envelope,twiss):
-        # some for loop that goes through all of the disunited parts
-        #print "hej fran quad"
-        for i in range(0,self.n):
-            if self.spaceChargeOn:
-                self.sc.updateMatrix(multipart,twiss)
-                multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
-            multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
-            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
-            #twiss[4] = envelope[3] / twiss[5]
-            #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
-            #twiss[7] = envelope[6] / twiss[8]
-            #print "twiss[7] after: " + str(twiss[7])
-        return multipart, envelope, twiss, env_with_s
 
     def evaluateWithSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
@@ -460,21 +432,6 @@ class Quad(LinearElement):
             self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, multipart, twiss, beamdata)
-
-    def evaluate(self,multipart,envelope,twiss):
-        # some for loop that goes through all of the disunited parts
-        #print "hej fran quad"
-        for i in range(0,self.n):
-            if self.spaceChargeOn:
-                self.sc.updateMatrix(multipart,twiss)
-                multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
-            multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
-            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
-            #twiss[4] = envelope[3] / twiss[5]
-            #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
-            #twiss[7] = envelope[6] / twiss[8]
-            #print "twiss[7] after: " + str(twiss[7])
-        return multipart, envelope, twiss, env_with_s
 
     def evaluateWithSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
@@ -1089,18 +1046,6 @@ class LieAlgElement(Element):
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('liealg_sc', self.Lsp, multipart, twiss, beamdata)
 
-    def evaluate(self,multipart,envelope,twiss):
-        # some for loop that goes through all of the disunited parts
-        for i in range(0,self.n):
-            if self.spaceChargeOn:
-                self.sc.updateMatrix(multipart,twiss)
-                multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
-            multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
-            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
-            #twiss[4] = envelope[3] / twiss[5]
-            #twiss[7] = envelope[6] / twiss[8]
-        return multipart, envelope, twiss, env_with_s
-
     def evaluateWithSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
         for i in range(0,self.n):
@@ -1331,7 +1276,7 @@ class Cavity(Element):
     def printInfo(self):
         return self.name + "\t L: " + str(self.L) + "\t Oscillations: " + str(self.oscillations) + "\t AmplitudeA: " + str(self.amplitudeA) + "\t AmplitudeB: " + str(self.amplitudeB) + "\t E_0: " + str(self.E_0) + "\t sigma: " + str(self.sigma) + "\t p: " + str(self.p)
 
-    def evaluate(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
         #print "hej fran quad"
         for i in range(0,self.n):
