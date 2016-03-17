@@ -447,6 +447,20 @@ class Quad(LinearElement):
     def printInfo(self):
         return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K)
 
+    def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+        
+        self.Msp = self.createMatrixM(self.K, self.Lsp)
+        self.Tsp = self.createMatrixT(self.Msp)
+
+        # space charge class
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, multipart, twiss, beamdata)
+
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
         #print "hej fran quad"
