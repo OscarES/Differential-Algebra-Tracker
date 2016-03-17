@@ -1021,6 +1021,7 @@ class LieAlgElement(Element):
         Element.__init__(self, "liealgelem " + name, 0)
 
         self.hamUsed = hamToUse
+        self.hamToUse = hamToUse
         self.L = L
         self.K = K
         self.order = order
@@ -1086,6 +1087,15 @@ class LieAlgElement(Element):
         for i in range(0,self.n):
             self.sc.updateMatrix(multipart,twiss)
             multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
+            multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #twiss[7] = envelope[6] / twiss[8]
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluateWithoutSC(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        for i in range(0,self.n):
             multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
