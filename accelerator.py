@@ -50,7 +50,7 @@ class Lattice:
         self.appendElement(sextu)
 
     def createCavity(self, name, L, Ezofs):
-        cavity = Cavity(name, L, Ezofs, self.beamdata, self.nbrOfSplits)
+        cavity = Cavity(name, L, Ezofs, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(cavity)
         self.beamdata[4] = cavity.getNewE() # Update energy
 
@@ -1132,7 +1132,7 @@ def leapfrog(x_0, v_0, F, h, n):
 
 # Comes from ref E.
 class Cavity(Element):
-    def __init__(self, name, L, Ezofs, beamdata, nbrOfSplits):#, K, M):
+    def __init__(self, name, L, Ezofs, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):#, K, M):
         Element.__init__(self, "cavity " + name, 0) # linear set to zero
         #self.name = name
         #self.K = K
@@ -1143,6 +1143,7 @@ class Cavity(Element):
         ## Input
         self.L = L
         self.n = nbrOfSplits
+        self.spaceChargeOn = spaceChargeOn
         # E-field
         self.oscillations = Ezofs[0]
         self.halfnbrofoscillations = self.oscillations/2
@@ -1217,6 +1218,12 @@ class Cavity(Element):
         self.Msp = self.M # splitting doesn't do anything
         self.Lsp = self.L
 
+        # Space Charge!
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('cavity_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('cavity_sc', self.Lsp, multipart, twiss, beamdata)
+
     # with E_z0 from ref C.
     def timeTransitFactor(self, beta):
         # E_z0_of_s
@@ -1276,13 +1283,35 @@ class Cavity(Element):
     def printInfo(self):
         return self.name + "\t L: " + str(self.L) + "\t Oscillations: " + str(self.oscillations) + "\t AmplitudeA: " + str(self.amplitudeA) + "\t AmplitudeB: " + str(self.amplitudeB) + "\t E_0: " + str(self.E_0) + "\t sigma: " + str(self.sigma) + "\t p: " + str(self.p)
 
+    def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+
+        # WARNING THE ELEMENT IS NEVER SPLIT
+        
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+
+    def evaluateWithSC(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        for i in range(0,self.n):
+            self.sc.updateMatrix(multipart,twiss)
+            multipart, envelope = self.sc.evaluateSC(multipart,envelope)
+            multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
+            #twiss[7] = envelope[6] / twiss[8]
+            #print "twiss[7] after: " + str(twiss[7])
+        return multipart, envelope, twiss, env_with_s
+
     def evaluateWithoutSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
-        #print "hej fran quad"
+        # WARNING THE ELEMENT IS NEVER SPLIT SO THAT IT WILL BE n NORMAL SIZED ELEMENT IN THE PLACE OF THE WHOLE ELEMENT
         for i in range(0,self.n):
-            #if self.spaceChargeOn:
-                #self.sc.updateMatrix(multipart,twiss)
-                #multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
             multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
