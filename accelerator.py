@@ -1059,8 +1059,6 @@ class LieAlgElement(Element):
         elif self.hamToUse == "octupoleham":
             self.numFuns = self.LA.hamToNumFuns(self.octupoleham, self.K, self.Lsp, self.order)
 
-        
-
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
             self.sc = SpaceCharge('liealg_sc', self.Lsp, multipart, twiss, beamdata)
@@ -1069,6 +1067,27 @@ class LieAlgElement(Element):
 
     def printInfo(self):
         return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K) + "\t HamUsed: " +  str(self.hamUsed) + "\t Order: " +  str(self.order)
+
+    def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+        
+        if self.hamToUse == "drift":
+            self.numFuns = self.LA.hamToNumFuns(self.driftham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "quad":
+            self.numFuns = self.LA.hamToNumFuns(self.quadham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "quaddefocusham":
+            self.numFuns = self.LA.hamToNumFuns(self.quaddefocusham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "sextupoleham":
+            self.numFuns = self.LA.hamToNumFuns(self.sextupoleham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "octupoleham":
+            self.numFuns = self.LA.hamToNumFuns(self.octupoleham, self.K, self.Lsp, self.order)
+
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('liealg_sc', self.Lsp, multipart, twiss, beamdata)
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
