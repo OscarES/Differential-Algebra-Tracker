@@ -272,7 +272,9 @@ class Dipole(LinearElement):
         # disunite matrices
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
-        self.Msp, self.Tsp = self.disunite(self.M,self.T,self.n)
+
+        self.Msp = self.createMatrixM(self.rho, self.Lsp, self.K_x, self.K_y, self.beta, self.gamma)
+        self.Tsp = self.createMatrixT(self.Msp)
 
         # space charge class
         self.spaceChargeOn = spaceChargeOn
@@ -306,14 +308,23 @@ class Dipole(LinearElement):
                 [0, 0, 0, 0, 0, 0, M[5,4]**2, 2*M[5,4]*M[5,5], M[5,5]**2]
                 ])
 
-    def disunite(self,M,T,n):
-        Msp = self.createMatrixM(self.rho, self.Lsp, self.K_x, self.K_y, self.beta, self.gamma)
-        Tsp = self.createMatrixT(Msp)
-        return Msp, Tsp
-
     def printInfo(self):
         return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t Alpha: " + str(self.alpha) + "\t nparam: " + str(self.nparam)
         #return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t K_x: " + str(self.K_x) + "\t K_y: " + str(self.K_y) + "\t beta: " + str(self.beta) + "\t Alpha: " + str(self.alpha) + "\t nparam: " + str(self.nparam)
+
+    def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+        
+        self.Msp = self.createMatrixM(self.rho, self.Lsp, self.K_x, self.K_y, self.beta, self.gamma)
+        self.Tsp = self.createMatrixT(self.Msp)
+
+        # space charge class
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, multipart, twiss, beamdata)
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
