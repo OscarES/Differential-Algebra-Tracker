@@ -90,6 +90,8 @@ class Lattice:
         self.spaceChargeOn = spaceChargeOn
         self.nbrOfSplits = nbrOfSplits
         # Now the lattice shall remake each element with the new spaceChargeOn and nbrOfSplits
+        for elem in self.lattice:
+            elem.updateSC(self.spaceChargeOn, self.nbrOfSplits, self.multipart, self.twiss, self.beamdata)
     ## End Passing
 
     def printLattice(self):
@@ -159,7 +161,7 @@ class Drift(LinearElement):
         self.Lsp = self.L/self.n
         
         self.Msp = self.createMatrixM(self.Lsp)
-        self.Tsp = self.createMatrixT(Msp)
+        self.Tsp = self.createMatrixT(self.Msp)
 
         # space charge class
         self.spaceChargeOn = spaceChargeOn
@@ -193,6 +195,20 @@ class Drift(LinearElement):
                 [0, 0, 0, 0, 0, 0, M[4,4]*M[5,4], M[4,4]*M[5,5]+M[4,5]*M[5,4], M[4,5]*M[5,5]],
                 [0, 0, 0, 0, 0, 0, M[5,4]**2, 2*M[5,4]*M[5,5], M[5,5]**2]
                 ])
+
+    def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+        
+        self.Msp = self.createMatrixM(self.Lsp)
+        self.Tsp = self.createMatrixT(self.Msp)
+
+        # space charge class
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
@@ -619,7 +635,7 @@ class SpaceCharge(LinearElement):
             multipart[j] = np.array([reducedphasespace, multipart[j][1]]) # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
         envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
         #env_with_s = np.array([copy.deepcopy(envelope), self.Lsp]) # there is only an angle kick so the deviation envelope wont change
-        return multipart, envelope, env_with_s
+        return multipart, envelope
 
 
 
