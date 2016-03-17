@@ -155,11 +155,11 @@ class Drift(LinearElement):
         self.M = self.createMatrixM(L) # M should be a 6x6 matrix
         self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
 
-        # disunite the matrices, CLEAN UP THIS CODE!!!!!! (should disunite be removed or kept?)
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
-        self.Msp, self.Tsp = self.disunite(self.M,self.T,self.n)
-        #print "self.Tsp: \n" + str(self.Tsp)
+        
+        self.Msp = self.createMatrixM(self.Lsp)
+        self.Tsp = self.createMatrixT(Msp)
 
         # space charge class
         self.spaceChargeOn = spaceChargeOn
@@ -193,11 +193,6 @@ class Drift(LinearElement):
                 [0, 0, 0, 0, 0, 0, M[4,4]*M[5,4], M[4,4]*M[5,5]+M[4,5]*M[5,4], M[4,5]*M[5,5]],
                 [0, 0, 0, 0, 0, 0, M[5,4]**2, 2*M[5,4]*M[5,5], M[5,5]**2]
                 ])
-
-    def disunite(self,M,T,n):
-        Msp = self.createMatrixM(self.Lsp)
-        Tsp = self.createMatrixT(Msp)
-        return Msp, Tsp
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
