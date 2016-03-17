@@ -390,7 +390,8 @@ class Quad(LinearElement):
         # disunite matrices
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
-        self.Msp, self.Tsp = self.disunite(self.M,self.T,self.n)
+        self.Msp = self.createMatrixM(self.K, self.Lsp)
+        self.Tsp = self.createMatrixT(self.Msp)
 
         # space charge class
         self.spaceChargeOn = spaceChargeOn
@@ -442,11 +443,6 @@ class Quad(LinearElement):
                 [0, 0, 0, 0, 0, 0, M[4,4]*M[5,4], M[4,4]*M[5,5]+M[4,5]*M[5,4], M[4,5]*M[5,5]],
                 [0, 0, 0, 0, 0, 0, M[5,4]**2, 2*M[5,4]*M[5,5], M[5,5]**2]
                 ])
-
-    def disunite(self,M,T,n):
-        Msp = self.createMatrixM(self.K, self.Lsp)
-        Tsp = self.createMatrixT(Msp)
-        return Msp, Tsp
 
     def printInfo(self):
         return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K)
