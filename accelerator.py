@@ -1020,8 +1020,10 @@ class LieAlgElement(Element):
     def __init__(self, name, hamToUse, K, L, order, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
         Element.__init__(self, "liealgelem " + name, 0)
 
+        self.hamUsed = hamToUse
         self.L = L
         self.K = K
+        self.order = order
         self.n = nbrOfSplits # matches matrix approach well
         #self.n = 5 # matches matrix approach not as well but is needed for split
         self.Lsp = L/self.n
@@ -1045,19 +1047,18 @@ class LieAlgElement(Element):
         self.sextupoleham = -self.l/2*(2/3*self.k**2*(self.qx**3-3*self.qx*self.qy**2)+(self.px**2+self.py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
         self.octupoleham = -self.l/2*(2/4*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+(self.px**2+self.py**2)) # same decision as above
 
-        if hamToUse == "drift":
-            self.numFuns = self.LA.hamToNumFuns(self.driftham, K, self.Lsp, order)
-        elif hamToUse == "quad":
-            self.numFuns = self.LA.hamToNumFuns(self.quadham, K, self.Lsp, order)
-        elif hamToUse == "quaddefocusham":
-            self.numFuns = self.LA.hamToNumFuns(self.quaddefocusham, K, self.Lsp, order)
-        elif hamToUse == "sextupoleham":
-            self.numFuns = self.LA.hamToNumFuns(self.sextupoleham, K, self.Lsp, order)
-        elif hamToUse == "octupoleham":
-            self.numFuns = self.LA.hamToNumFuns(self.octupoleham, K, self.Lsp, order)
+        if self.hamToUse == "drift":
+            self.numFuns = self.LA.hamToNumFuns(self.driftham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "quad":
+            self.numFuns = self.LA.hamToNumFuns(self.quadham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "quaddefocusham":
+            self.numFuns = self.LA.hamToNumFuns(self.quaddefocusham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "sextupoleham":
+            self.numFuns = self.LA.hamToNumFuns(self.sextupoleham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "octupoleham":
+            self.numFuns = self.LA.hamToNumFuns(self.octupoleham, self.K, self.Lsp, self.order)
 
-        self.hamUsed = hamToUse
-        self.order = order
+        
 
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
