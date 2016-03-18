@@ -17,6 +17,7 @@ from relativity import betaFromE
 import copy
 
 # beamdata comes as [beta, rf_lambda, m, q, E, nbrOfParticles]
+# the units for beamdata: beta is unitless, rf_lambda is in m, m is in kg, q is in C, E is in J (should be in Mev later), nbrOfParticles is unitless
 # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
 # the units for twiss: alpha is unitless, beta is in m, epsilon is in m*rad
 class Lattice:
