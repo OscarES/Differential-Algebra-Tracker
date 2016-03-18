@@ -36,7 +36,7 @@ class Facility():
 
     ## Setup
     def getDefaultBeamdata(self):
-        E = 2e9*constants.e # 2GeV to joule from ref F.
+        E = 2e9*constants.e # 2GeV to joule from ref F. # Why show this in Joules?
         freq = 704.42e6 # (Hz) from ref. F
         
         rf_lambda = float(constants.c)/freq  # beam data needed
