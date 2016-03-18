@@ -268,3 +268,9 @@ def loadSummer2015Formatzasx(datafilepart, datafiletwiss):
         print 'Bad datafile!'
         quit()
         return 0
+
+def saveLatticeFormat_dat(datafile):
+    return 0
+
+def loadLatticeFormat_dat(datafile):
+    return 0
