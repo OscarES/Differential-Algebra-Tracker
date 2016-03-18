@@ -854,9 +854,15 @@ class LatticeEditor(QGroupBox):
         grid.addWidget(self.enterOrder, 6, 1)
         self.enterOrder.hide()
 
+        ## Create Element
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
         grid.addWidget(createElementButton, 7,1)
+
+        ## Print Matrices
+        printMatricesButton = QPushButton("Print Matrices")
+        printMatricesButton.clicked.connect(self.printMatrices)
+        grid.addWidget(printMatricesButton, 7,2)
 
     def radioNoSC_clicked(self, enabled):
         if enabled:
@@ -1033,6 +1039,9 @@ class LatticeEditor(QGroupBox):
             print "Lattice load failed!" + str(sys.exc_info()[-1].tb_lineno)
         self.parent.latticeoverview.initializeGL()
         self.parent.latticeoverview.paintGL()
+
+    def printMatrices(self):
+        print self.facility.printMatrices()
     
 class EvalWidget(QWidget):
     def __init__(self, parent, facility):

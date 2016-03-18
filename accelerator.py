@@ -100,6 +100,16 @@ class Lattice:
             text = text + elem.printInfo() + "\n"
         return text
 
+    def printMatrices(self):
+        text = ""
+        for elem in self.lattice:
+            text = text + elem.name + ":\n"
+            hasFun = getattr(elem, "printMatrix", None)
+            if not callable(hasFun):
+                continue
+            text = text + elem.printMatrix() + "\n"
+        return text
+
     def evaluate(self, multipartin,envelopein,twissin):
         multipart = copy.deepcopy(multipartin)
         envelope = copy.deepcopy(envelopein)
@@ -172,6 +182,10 @@ class Drift(LinearElement):
 
     def printInfo(self):
         return self.name + "\t L: " + str(self.L)
+
+    def printMatrix(self):
+        MspAsMatrix = np.asmatrix(self.Msp)
+        return str(MspAsMatrix**self.n)
 
     def createMatrixM(self,L):
         return np.array([
@@ -299,6 +313,10 @@ class Dipole(LinearElement):
         return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t Alpha: " + str(self.alpha) + "\t nparam: " + str(self.nparam)
         #return self.name + "\t rho: " + str(self.rho) + "\t L: " + str(self.L) + "\t K_x: " + str(self.K_x) + "\t K_y: " + str(self.K_y) + "\t beta: " + str(self.beta) + "\t Alpha: " + str(self.alpha) + "\t nparam: " + str(self.nparam)
 
+    def printMatrix(self):
+        MspAsMatrix = np.asmatrix(self.Msp)
+        return str(MspAsMatrix**self.n)        
+
     def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
@@ -418,6 +436,10 @@ class Quad(LinearElement):
 
     def printInfo(self):
         return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K)
+
+    def printMatrix(self):
+        MspAsMatrix = np.asmatrix(self.Msp)
+        return str(MspAsMatrix**self.n)
 
     def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
         self.n = nbrOfSplits

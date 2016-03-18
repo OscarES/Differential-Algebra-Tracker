@@ -100,6 +100,9 @@ class Facility():
     def printLattice(self):
         return self.lattice.printLattice()
 
+    def printMatrices(self):
+        return self.lattice.printMatrices()
+
     def evaluate(self):
         self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist = self.lattice.evaluate(self.multipart,self.envelope,self.twiss)
         #return self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist
