@@ -1026,6 +1026,8 @@ class LatticeEditor(QGroupBox):
         fname = QFileDialog.getOpenFileName(self, 'Open Lattice file', '')
         try:
             lattice = loadLattice(fname[0], self.facility)
+            if lattice == 0:
+                raise ValueError("loadLattice returned only 0")
             self.facility.setLattice(lattice)
         except:
             print "Lattice load failed!"

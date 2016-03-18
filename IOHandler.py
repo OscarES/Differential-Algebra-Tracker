@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 import os
 import copy
-from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole, Cavity
+from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole, Cavity # I should clean the code so that this entire import can be removed
 
 def saveAll(filename, multipart, twiss, envelope, lattice):
     saveMultipart(filename + "multipart", multipart)
@@ -152,17 +152,25 @@ def saveLattice(filename, lattice):
     return 1
 
 def loadLattice(filename, facility):
-    try:
-        latticeString = str(np.load(filename))
-    except:
-        print 'Bad datafile!'
-        return 0
-    try:
-        lattice = parseLatticeString(latticeString, facility)
-        return lattice
-    except:
-        print 'Error while parsing lattice string!'
-        return 0
+    if filename.endswith(".dat"):
+        try:
+            lattice = loadLatticeFormat_dat(filename, facility.getLatticeObj())
+            return lattice
+        except:
+            print "loadLatticeFormat_dat failed"
+            return 0
+    else:
+        try:
+            latticeString = str(np.load(filename))
+        except:
+            print 'Bad datafile!'
+            return 0
+        try:
+            lattice = parseLatticeString(latticeString, facility)
+            return lattice
+        except:
+            print 'Error while parsing lattice string!'
+            return 0
 
 # Note that this doesn't have z and zp, or envelope or lattice. Just x, xp, y, yp and the twiss
 def saveSummer2015Format(filenamepart, filenametwiss, multipart, twiss):
@@ -269,8 +277,47 @@ def loadSummer2015Formatzasx(datafilepart, datafiletwiss):
         quit()
         return 0
 
-def saveLatticeFormat_dat(datafile):
+def saveLatticeFormat_dat(filename):
     return 0
 
-def loadLatticeFormat_dat(datafile):
-    return 0
+def loadLatticeFormat_dat(filename, lattice):
+    try:
+        f = open(filename, 'r')
+        latticeString = f.read()
+    except:
+        print 'Bad datafile! From loadLatticeFormat_dat...'
+        return 0
+
+    for line in iter(latticeString.splitlines()):
+        words = line.split()
+        typeOfElem = words[0]
+
+        if typeOfElem == "DRIFT":
+           # Useful params
+           L = float(words[1])/1000 # /1000 is for converting mm to m
+           # Useless params
+           R = float(words[2])
+           Ry = float(words[3])
+           # Params not stated that I need to construct the element
+           name = "d"
+           # Create the element
+           lattice.createDrift(name, L)
+        elif typeOfElem == "QUAD":
+            # Useful params
+            L = float(words[1])/1000
+            G = float(words[2]) # They say G I say K, what is the difference?
+            # Useless params
+            R = float(words[2])
+            # Params not stated that I need construct the element
+            name = "q"
+            # Create the element
+            lattice.createQuadrupole(name, G, L)
+        elif typeOfElem == "END":
+            continue
+
+        #if typeOfElem == "":
+            # Useful params
+            # Useless params
+            # Params not stated that I need construct the element
+            # Create the element         
+    return lattice

@@ -56,6 +56,9 @@ class Facility():
     def getLattice(self):
         return self.lattice.getLattice()
 
+    def getLatticeObj(self):
+        return self.lattice
+
     def getBeamdata(self):
         return self.lattice.getBeamdata()
 
