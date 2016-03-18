@@ -384,7 +384,7 @@ class BeamEditor(QGroupBox):
 
         ## Beamdata
         # beta
-        self.textBeta = QLabel("Relativistic beta:")
+        self.textBeta = QLabel("Relativistic beta []:")
         grid.addWidget(self.textBeta, 0, 0)
         
         self.enterBeta = QLineEdit()
@@ -398,28 +398,28 @@ class BeamEditor(QGroupBox):
         grid.addWidget(self.enterLambda, 1, 1)
 
         # m
-        self.textMass = QLabel("Mass of a particle:")
+        self.textMass = QLabel("Mass of a particle [kg]:")
         grid.addWidget(self.textMass, 2, 0)
         
         self.enterMass = QLineEdit() # should be a ComboBox with m_p, m_e
         grid.addWidget(self.enterMass, 2, 1)
 
         # q
-        self.textCharge = QLabel("Charge of a particle:")
+        self.textCharge = QLabel("Charge of a particle [C]:")
         grid.addWidget(self.textCharge, 3, 0)
         
         self.enterCharge = QLineEdit() # should be a comboBox with e and -e
         grid.addWidget(self.enterCharge, 3, 1)
 
         # E
-        self.textEnergy = QLabel("Energy:")
+        self.textEnergy = QLabel("Energy [J]:")
         grid.addWidget(self.textEnergy, 4, 0)
         
         self.enterEnergy = QLineEdit() # should be a QLabel and show the calculated value from beta
         grid.addWidget(self.enterEnergy, 4, 1)
 
         # nbrOfParticles
-        self.textNbrOfParticles = QLabel("# of particles:")
+        self.textNbrOfParticles = QLabel("# of particles []:")
         grid.addWidget(self.textNbrOfParticles, 5, 0)
         
         self.enterNbrOfParticles = QLineEdit()
@@ -431,63 +431,63 @@ class BeamEditor(QGroupBox):
         ## Twiss
         # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
         # alpha_x
-        self.textAlpha_x = QLabel("Alpha_x:")
+        self.textAlpha_x = QLabel("Alpha_x []:")
         grid.addWidget(self.textAlpha_x, 0, 3)
         
         self.enterAlpha_x = QLineEdit()
         grid.addWidget(self.enterAlpha_x, 0, 4)
 
         # beta_x
-        self.textBeta_x = QLabel("Beta_x:")
+        self.textBeta_x = QLabel("Beta_x [m]:")
         grid.addWidget(self.textBeta_x, 1, 3)
         
         self.enterBeta_x = QLineEdit()
         grid.addWidget(self.enterBeta_x, 1, 4)
         
         # epsilon_rms_x
-        self.textEpsilon_rms_x = QLabel("Epsilon_rms_x:")
+        self.textEpsilon_rms_x = QLabel("Epsilon_rms_x [m*rad]:")
         grid.addWidget(self.textEpsilon_rms_x, 2, 3)
         
         self.enterEpsilon_rms_x = QLineEdit()
         grid.addWidget(self.enterEpsilon_rms_x, 2, 4)
         
         # alpha_y
-        self.textAlpha_y = QLabel("Alpha_y:")
+        self.textAlpha_y = QLabel("Alpha_y []:")
         grid.addWidget(self.textAlpha_y, 3, 3)
         
         self.enterAlpha_y = QLineEdit()
         grid.addWidget(self.enterAlpha_y, 3, 4)
         
         # beta_y
-        self.textBeta_y = QLabel("Beta_y:")
+        self.textBeta_y = QLabel("Beta_y [m]:")
         grid.addWidget(self.textBeta_y, 4, 3)
         
         self.enterBeta_y = QLineEdit()
         grid.addWidget(self.enterBeta_y, 4, 4)
         
         # epsilon_rms_y
-        self.textEpsilon_rms_y = QLabel("Epsilon_rms_y:")
+        self.textEpsilon_rms_y = QLabel("Epsilon_rms_y [m*rad]:")
         grid.addWidget(self.textEpsilon_rms_y, 5, 3)
         
         self.enterEpsilon_rms_y = QLineEdit()
         grid.addWidget(self.enterEpsilon_rms_y, 5, 4)
         
         # alpha_z
-        self.textAlpha_z = QLabel("Alpha_z:")
+        self.textAlpha_z = QLabel("Alpha_z []:")
         grid.addWidget(self.textAlpha_z, 6, 3)
         
         self.enterAlpha_z = QLineEdit()
         grid.addWidget(self.enterAlpha_z, 6, 4)
         
         # beta_z
-        self.textBeta_z = QLabel("Beta_z:")
+        self.textBeta_z = QLabel("Beta_z [m]:")
         grid.addWidget(self.textBeta_z, 7, 3)
         
         self.enterBeta_z = QLineEdit()
         grid.addWidget(self.enterBeta_z, 7, 4)
         
         # epsilon_rms_z
-        self.textEpsilon_rms_z = QLabel("Epsilon_rms_z:")
+        self.textEpsilon_rms_z = QLabel("Epsilon_rms_z [m*rad]:")
         grid.addWidget(self.textEpsilon_rms_z, 8, 3)
         
         self.enterEpsilon_rms_z = QLineEdit()
@@ -804,7 +804,7 @@ class LatticeEditor(QGroupBox):
         grid.addWidget(self.enterName, 3, 1)
         name = self.enterName.text()
 
-        self.textL = QLabel("L:")
+        self.textL = QLabel("L [m]:")
         grid.addWidget(self.textL, 4, 0)
         
         self.enterL = QLineEdit()
@@ -812,7 +812,7 @@ class LatticeEditor(QGroupBox):
         valueOfL = self.enterL.text()
 
         ## Quad and sextupole
-        self.textK = QLabel("K:")
+        self.textK = QLabel("K [sqrt(T*C*s/kg) (quad at least)]:") # see calculations 2016-03-18 and TraceWin man s 102
         grid.addWidget(self.textK, 5, 0)
         self.textK.hide()
 
@@ -821,7 +821,7 @@ class LatticeEditor(QGroupBox):
         self.enterK.hide()
 
         ## Dipole
-        self.textRho = QLabel("Rho:")
+        self.textRho = QLabel("Rho [m]:")
         grid.addWidget(self.textRho, 4, 0)
         self.textRho.hide()
 
@@ -829,7 +829,7 @@ class LatticeEditor(QGroupBox):
         grid.addWidget(self.enterRho, 4, 1)
         self.enterRho.hide()
 
-        self.textAlpha = QLabel("Alpha:")
+        self.textAlpha = QLabel("Alpha [unitless angle]:")
         grid.addWidget(self.textAlpha, 5, 0)
         self.textAlpha.hide()
 
@@ -837,7 +837,7 @@ class LatticeEditor(QGroupBox):
         grid.addWidget(self.enterAlpha, 5, 1)
         self.enterAlpha.hide()
 
-        self.textn = QLabel("n:")
+        self.textn = QLabel("n []:")
         grid.addWidget(self.textn, 6, 0)
         self.textn.hide()
 
@@ -846,7 +846,7 @@ class LatticeEditor(QGroupBox):
         self.entern.hide()
 
         ## Sextupole
-        self.textOrder = QLabel("Order:")
+        self.textOrder = QLabel("Order []:")
         grid.addWidget(self.textOrder, 6, 0)
         self.textOrder.hide()
 
