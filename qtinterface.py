@@ -1030,7 +1030,7 @@ class LatticeEditor(QGroupBox):
                 raise ValueError("loadLattice returned only 0")
             self.facility.setLattice(lattice)
         except:
-            print "Lattice load failed!"
+            print "Lattice load failed!" + str(sys.exc_info()[-1].tb_lineno)
         self.parent.latticeoverview.initializeGL()
         self.parent.latticeoverview.paintGL()
     

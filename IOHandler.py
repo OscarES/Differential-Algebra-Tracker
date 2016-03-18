@@ -1,7 +1,10 @@
 import numpy as np
 import pickle
 import os
+import sys
 import copy
+from scipy import constants
+from relativity import gammaFromBeta
 from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole, Cavity # I should clean the code so that this entire import can be removed
 
 def saveAll(filename, multipart, twiss, envelope, lattice):
@@ -157,7 +160,7 @@ def loadLattice(filename, facility):
             lattice = loadLatticeFormat_dat(filename, facility.getLatticeObj())
             return lattice
         except:
-            print "loadLatticeFormat_dat failed"
+            print "loadLatticeFormat_dat failed" + str(sys.exc_info()[-1].tb_lineno)
             return 0
     else:
         try:
@@ -288,36 +291,56 @@ def loadLatticeFormat_dat(filename, lattice):
         print 'Bad datafile! From loadLatticeFormat_dat...'
         return 0
 
-    for line in iter(latticeString.splitlines()):
-        words = line.split()
-        typeOfElem = words[0]
+    # Useful parameters from lattice
+    beamdata = lattice.getBeamdata()
+    m_0 = beamdata[2]
+    beta = beamdata[0]
+    gamma = gammaFromBeta(beta)
+    q = beamdata[3]
 
-        if typeOfElem == "DRIFT":
-           # Useful params
-           L = float(words[1])/1000 # /1000 is for converting mm to m
-           # Useless params
-           R = float(words[2])
-           Ry = float(words[3])
-           # Params not stated that I need to construct the element
-           name = "d"
-           # Create the element
-           lattice.createDrift(name, L)
-        elif typeOfElem == "QUAD":
-            # Useful params
-            L = float(words[1])/1000
-            G = float(words[2]) # They say G I say K, what is the difference?
-            # Useless params
-            R = float(words[2])
-            # Params not stated that I need construct the element
-            name = "q"
-            # Create the element
-            lattice.createQuadrupole(name, G, L)
-        elif typeOfElem == "END":
-            continue
-
-        #if typeOfElem == "":
-            # Useful params
-            # Useless params
-            # Params not stated that I need construct the element
-            # Create the element         
-    return lattice
+    try:
+        # Parsing
+        for line in iter(latticeString.splitlines()):
+            words = line.split()
+            typeOfElem = words[0]
+    
+            if typeOfElem == "DRIFT":
+               # Useful params
+               L = float(words[1])/1000 # /1000 is for converting mm to m
+               # Useless params
+               R = float(words[2])
+               Ry = float(words[3])
+               # Params not stated that I need to construct the element
+               name = "d"
+               # Create the element
+               lattice.createDrift(name, L)
+            elif typeOfElem == "QUAD":
+                # Useful params
+                L = float(words[1])/1000
+                G = float(words[2]) # They say G I say K, what is the difference? Ans: See TraceWin manual page 102 my K is their -k
+    
+                # Indirect params
+                Brho = m_0*constants.c*beta*gamma/q
+                k = np.sqrt(float(abs(G/Brho))) # For some reason abs(...) is a sympy float and np.sqrt just can't handle that
+                if q*G > 0:
+                    K = -k # focus in horiz (x)
+                else:
+                    K = k # defocus in horiz (x)
+                # Useless params
+                R = float(words[2])
+                # Params not stated that I need construct the element
+                name = "q"
+                # Create the element
+                lattice.createQuadrupole(name, K, L)
+            elif typeOfElem == "END":
+                continue
+    
+            #if typeOfElem == "":
+                # Useful params
+                # Useless params
+                # Params not stated that I need construct the element
+                # Create the element         
+        return lattice
+    except:
+        print "Parsing failed" + str(sys.exc_info()[-1].tb_lineno)
+        return 0
