@@ -16,6 +16,7 @@ from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBe
 import numpy as np
 from scipy import *
 from facility import *
+from relativity import *
 import re
 
 class LatticeOverviewWidget(QGLWidget):
@@ -428,6 +429,10 @@ class BeamEditor(QGroupBox):
         # Set the fields to the default parameters
         self.writeInBeamdataFields()
 
+        # Connect beta and energy fields (must come after beamdata's default parameters has been set)
+        self.enterBeta.textChanged.connect(self.setEnergyFromBeta)
+        self.enterEnergy.textChanged.connect(self.setBetaFromEnergy)
+
         ## Twiss
         # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
         # alpha_x
@@ -533,6 +538,41 @@ class BeamEditor(QGroupBox):
         loadMultipartButton.clicked.connect(self.loadMultipart)
         grid.addWidget(loadMultipartButton,11,5)
 
+    def setEnergyFromBeta(self):
+        if self.enterEnergy.hasFocus():
+            return # Don't change value if enterEnergy field has focus
+        self.valueOfBeta = self.enterBeta.text()
+        try:
+            beta = float(self.valueOfBeta)
+        except:
+            return # Only run the setBeta when the value is a valid float
+
+        self.valueOfMass = self.enterMass.text()
+        try:
+            m_0 = float(self.valueOfMass)
+        except:
+            return # Only run the setBeta when the value is a valid float
+        gamma = gammaFromBeta(beta)
+        E = EFromBeta(m_0, beta)
+        self.enterEnergy.setText(str(E))
+
+    def setBetaFromEnergy(self):
+        if self.enterBeta.hasFocus():
+            return # Don't change value if enterBeta field has focus
+        self.valueOfEnergy = self.enterEnergy.text()
+        try:
+            E = float(self.valueOfEnergy)
+        except:
+            return # Only run the setBeta when the value is a valid float
+
+        self.valueOfMass = self.enterMass.text()
+        try:
+            m_0 = float(self.valueOfMass)
+        except:
+            return # Only run the setBeta when the value is a valid float
+        beta = betaFromE(m_0, E)
+        self.enterBeta.setText(str(beta))
+
     def saveBeamdata(self):
         fname = QFileDialog.getSaveFileName(self, 'Save Beamdata file', '')
         try:
@@ -600,8 +640,8 @@ class BeamEditor(QGroupBox):
         try:
             m = float(self.valueOfMass)
         except:
-            print "Mass not a number, set to 0.0 instead"
-            m = 0.0
+            print "Mass not a number, set to 1.0 instead"
+            m = 1.0
         try:
             q = float(self.valueOfCharge)
         except:
