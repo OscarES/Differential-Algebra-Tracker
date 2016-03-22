@@ -450,7 +450,7 @@ class BeamEditor(QGroupBox):
         grid.addWidget(self.enterBeta_x, 1, 4)
         
         # epsilon_rms_x
-        self.textEpsilon_rms_x = QLabel("Epsilon_rms_x [m*rad]:")
+        self.textEpsilon_rms_x = QLabel("Epsilon_rms_x [m]:")
         grid.addWidget(self.textEpsilon_rms_x, 2, 3)
         
         self.enterEpsilon_rms_x = QLineEdit()
@@ -471,7 +471,7 @@ class BeamEditor(QGroupBox):
         grid.addWidget(self.enterBeta_y, 4, 4)
         
         # epsilon_rms_y
-        self.textEpsilon_rms_y = QLabel("Epsilon_rms_y [m*rad]:")
+        self.textEpsilon_rms_y = QLabel("Epsilon_rms_y [m]:")
         grid.addWidget(self.textEpsilon_rms_y, 5, 3)
         
         self.enterEpsilon_rms_y = QLineEdit()
@@ -492,7 +492,7 @@ class BeamEditor(QGroupBox):
         grid.addWidget(self.enterBeta_z, 7, 4)
         
         # epsilon_rms_z
-        self.textEpsilon_rms_z = QLabel("Epsilon_rms_z [m*rad]:")
+        self.textEpsilon_rms_z = QLabel("Epsilon_rms_z [m]:")
         grid.addWidget(self.textEpsilon_rms_z, 8, 3)
         
         self.enterEpsilon_rms_z = QLineEdit()
