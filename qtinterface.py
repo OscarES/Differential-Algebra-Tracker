@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
-from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart # loadLattice, saveLattice
+from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart, saveEnvelope # loadLattice, saveLattice
 import numpy as np
 from scipy import *
 from facility import *
@@ -1099,6 +1099,11 @@ class EvalWidget(QWidget):
         EvalButton.clicked.connect(self.evaluate)
         grid.addWidget(EvalButton,0,0)
 
+        self.SaveResultButton = QPushButton("Save Results")
+        self.SaveResultButton.clicked.connect(self.saveResults)
+        grid.addWidget(self.SaveResultButton,0,1)
+        self.SaveResultButton.hide()
+
     def evaluate(self):
         # The stuff below should be moved to facility.py because these low level stuff shouldn't be this far up
         #multipart = self.facility.getMultipart()
@@ -1110,6 +1115,36 @@ class EvalWidget(QWidget):
         # Cleaner way
         self.facility.evaluate()
         self.facility.plotAfterEval()
+        self.SaveResultButton.show()
+        return
+
+    def saveResults(self):
+        resultmultipart, resultenvelope, resulttwiss, resultenvlist = self.facility.getResults()
+
+        fnamemul = QFileDialog.getSaveFileName(self, 'Save Multipart file', '')
+        try:
+            saveMultipart(fnamemul[0],resultmultipart) # fname[0] is the path string
+        except AttributeError:
+            print "Could not save multipart results!"
+
+        fnameenvelope = QFileDialog.getSaveFileName(self, 'Save Envelope file', '')
+        try:
+            saveEnvelope(fnameenvelope[0],resultenvelope) # fname[0] is the path string
+        except AttributeError:
+            print "Could not save envelope results!"
+        
+        fnametwiss = QFileDialog.getSaveFileName(self, 'Save Twiss file', '')
+        try:
+            saveTwiss(fnametwiss[0],resulttwiss) # fname[0] is the path string
+        except AttributeError:
+            print "Could not save twiss results!"
+
+        fnameenvelopelist = QFileDialog.getSaveFileName(self, 'Save Envelopelist file', '')
+        try:
+            saveEnvelope(fnameenvelopelist[0],resultenvlist) # fname[0] is the path string
+        except AttributeError:
+            print "Could not save envelopelist results!"
+
         return
 
 # layout manager (aranges the different widgets)

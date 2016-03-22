@@ -105,7 +105,13 @@ class Facility():
 
     def evaluate(self):
         self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist = self.lattice.evaluate(self.multipart,self.envelope,self.twiss)
-        #return self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist
+
+    def getResults(self):
+        #if 'self.resultmultipart' in locals():
+        if hasattr(self,'resultmultipart'):
+            return self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist
+        else:
+            return
 
     def plotAfterEval(self):
         plotEverything(self.multipart, self.twiss, self.resultmultipart, self.resultenvlist)
