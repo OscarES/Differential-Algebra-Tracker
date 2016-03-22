@@ -1,4 +1,8 @@
+from __future__ import division # needed for 1/2 = 0.5
 import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+import numpy as np
+from scipy import constants
 
 def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     xin = [multipartin[i][0][0] for i in xrange(len(multipartin))]
@@ -16,11 +20,45 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     epsilon_rms_y = twiss[5]
     alpha_z = twiss[6]
     beta_z = twiss[7]
-    epsilon_rms_z = twiss[8]
+    epsilon_rms_z = twiss[8]    
 
     envx = [envlist[i][0][0] for i in xrange(len(envlist))]
     envy = [envlist[i][0][3] for i in xrange(len(envlist))]
     s = [envlist[i][1] for i in xrange(len(envlist))]
+
+    # begin ellipse, see appendix C in Wille
+    gamma_x = (1+alpha_x**2)/beta_x
+    
+    #sigma_xp = np.sqrt(epsilon_rms_x*gamma_x)# b, from fig 3.23
+    #sigma_x = np.sqrt(epsilon_rms_x*beta_x) # a
+    sigma_xp = np.sqrt(envlist[0][0][2]) # sqrt since env has sigma**2. 3*sigma will cover 99.7%. 
+    sigma_x = np.sqrt(envx[0])
+    three_sigma_x = 3*sigma_x
+    three_sigma_xp = 3*sigma_xp
+    angle_x =  1/2*np.arcsin(2*alpha_x/(sigma_x/sigma_xp - sigma_xp/sigma_x))# recalc eqn (C.4), is in radians
+    ellipse_x = Ellipse((0,0), 2*three_sigma_x, 2*three_sigma_xp, angle_x*180/constants.pi) # 2* is because matplotlibs height is from bottom to top and not center to top...
+    ellipse_x.set_facecolor('none')
+    ellipse_x.set_edgecolor((0,0,0))
+
+
+    gamma_y = (1+alpha_y**2)/beta_y
+    #sigma_yp = np.sqrt(epsilon_rms_y*gamma_y)# b, from fig 3.23
+    #sigma_y = np.sqrt(epsilon_rms_y*beta_y) # a
+    sigma_yp = np.sqrt(envlist[0][0][5]) # sqrt since env has sigma**2. 3*sigma will cover 99.7%. 
+    sigma_y = np.sqrt(envy[0])
+    three_sigma_y = 3*sigma_y
+    three_sigma_yp = 3*sigma_yp
+    angle_y =  1/2*np.arcsin(2*alpha_y/(sigma_y/sigma_yp - sigma_yp/sigma_y))# recalc eqn (C.4), is in radians
+    ellipse_y = Ellipse((0,0), 2*three_sigma_y, 2*three_sigma_yp, angle_y*180/constants.pi) # 2* is because matplotlibs height is from bottom to top and not center to top...
+    ellipse_y.set_facecolor('none')
+    ellipse_y.set_edgecolor((0,0,0))
+
+    ellipse_xy = Ellipse((0,0), 2*three_sigma_x, 2*three_sigma_y, 0)
+    ellipse_xy.set_facecolor('none')
+    ellipse_xy.set_edgecolor((0,0,0))
+
+    gamma_z = (1+alpha_z**2)/beta_z
+    # end ellipse
 
     xo = [multipartout[i][0][0] for i in xrange(len(multipartout))]
     xpo = [multipartout[i][0][1] for i in xrange(len(multipartout))]
@@ -31,42 +69,58 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
 
     plt.figure(0)
     ax1 = plt.subplot2grid((4,3), (0,0))
-    plt.plot(xin,xpin,'ro')
+    ax1.add_artist(ellipse_x)
+    ax1.plot(xin,xpin,'ro', zorder=1)
+    ax1.set_xlim(-5*sigma_x, 5*sigma_x)
+    ax1.set_ylim(-5*sigma_xp, 5*sigma_xp)
     plt.title('Initial values in x')
     plt.xlabel('x [m]')
     plt.ylabel('xp []')
+
     ax2 = plt.subplot2grid((4,3), (0,1))
-    plt.plot(yin,ypin,'bo')
+    ax2.add_artist(ellipse_y)
+    ax2.plot(yin,ypin,'bo', zorder=1)
+    ax2.set_xlim(-5*sigma_y, 5*sigma_y)
+    ax2.set_ylim(-5*sigma_yp, 5*sigma_yp)
     plt.title('Initial values in y')
     plt.xlabel('y [m]')
     plt.ylabel('yp []')
+
     ax3 = plt.subplot2grid((4,3), (0,2))
-    plt.plot(xin,yin,'go')
+    ax3.add_artist(ellipse_xy)
+    ax3.plot(xin,yin,'go', zorder=1)
+    ax3.set_xlim(-5*sigma_x, 5*sigma_x)
+    ax3.set_ylim(-5*sigma_y, 5*sigma_y)
     plt.title('Initial values x and y')
     plt.xlabel('x [m]')
     plt.ylabel('y [m]')
+
     ax4 = plt.subplot2grid((4,3), (1, 0), colspan=3)
-    plt.plot(s,envx,'ro')
+    ax4.plot(s,envx,'ro')
     plt.title('Envelope in sigma_x^2 by s')
     plt.xlabel('s [m]')
     plt.ylabel('Envelope in sigma_x^2')
+
     ax5 = plt.subplot2grid((4,3), (2, 0), colspan=3)
-    plt.plot(s,envy,'bo')
+    ax5.plot(s,envy,'bo')
     plt.title('Envelope in sigma_y^2 by s')
     plt.xlabel('s [m]')
     plt.ylabel('Envelope in sigma_y^2')
+
     ax6 = plt.subplot2grid((4,3), (3, 0))
-    plt.plot(xo,xpo,'ro')
+    ax6.plot(xo,xpo,'ro')
     plt.title('Values after FODO in x')
     plt.xlabel('x [m]')
     plt.ylabel('xp []')
+
     ax7 = plt.subplot2grid((4,3), (3, 1))
-    plt.plot(yo,ypo,'bo')
+    ax7.plot(yo,ypo,'bo')
     plt.title('Values after FODO in y')
     plt.xlabel('y [m]')
     plt.ylabel('yp []')
+
     ax8 = plt.subplot2grid((4,3), (3, 2))
-    plt.plot(xo,yo,'go')
+    ax8.plot(xo,yo,'go')
     plt.title('Values after FODO in y and x')
     plt.xlabel('x [m]')
     plt.ylabel('y [m]')
