@@ -1105,14 +1105,6 @@ class EvalWidget(QWidget):
         self.SaveResultButton.hide()
 
     def evaluate(self):
-        # The stuff below should be moved to facility.py because these low level stuff shouldn't be this far up
-        #multipart = self.facility.getMultipart()
-        #envelope = envelopeFromMultipart(multipart) #self.facility.getEnvelope()
-        #twiss = self.facility.getTwiss()
-        #resultmultipart, resultenvelope, resulttwiss, resultenvlist = self.facility.evaluate(multipart, envelope, twiss)
-        #plotEverything(multipart, twiss, resultmultipart, resultenvlist)
-
-        # Cleaner way
         self.facility.evaluate()
         self.facility.plotAfterEval()
         self.SaveResultButton.show()
