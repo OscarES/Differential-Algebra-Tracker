@@ -130,19 +130,27 @@ def envelopeFromMultipart(multipart):
     z = [multipart[i][0][4] for i in xrange(len(multipart))]
     zp = [multipart[i][0][5] for i in xrange(len(multipart))]
 
-    sigma_x = np.mean(x) # sigma isn't std! It is mean instead!
-    sigma_xp = np.mean(xp)
-    sigma_y = np.mean(y)
-    sigma_yp = np.mean(yp)
-    sigma_z = np.mean(z)
-    sigma_zp = np.mean(zp)
+    #sigma_x = np.mean(x) # sigma isn't std! It is mean instead!
+    #sigma_xp = np.mean(xp)
+    #sigma_y = np.mean(y)
+    #sigma_yp = np.mean(yp)
+    #sigma_z = np.mean(z)
+    #sigma_zp = np.mean(zp)
 
-    #sigma_x = np.std(x) # sigma isn't std! It is mean instead!
-    #sigma_xp = np.std(xp)
-    #sigma_y = np.std(y)
-    #sigma_yp = np.std(yp)
-    #sigma_z = np.std(z)
-    #sigma_zp = np.std(zp)
+    #sigma_x = np.mean(map(abs, x)) # sigma isn't std! It is abs mean perhaps!
+    #sigma_xp = np.mean(map(abs, xp))
+    #sigma_y = np.mean(map(abs, y))
+    #sigma_yp = np.mean(map(abs, yp))
+    #sigma_z = np.mean(map(abs, z))
+    #sigma_zp = np.mean(map(abs, zp))
+
+
+    sigma_x = np.std(x) # sigma is std
+    sigma_xp = np.std(xp)
+    sigma_y = np.std(y)
+    sigma_yp = np.std(yp)
+    sigma_z = np.std(z)
+    sigma_zp = np.std(zp)
 
     envelope = [sigma_x**2, sigma_x*sigma_xp, sigma_xp**2, sigma_y**2, sigma_y*sigma_yp, sigma_yp**2, sigma_z**2, sigma_z*sigma_zp, sigma_zp**2]
     return envelope
