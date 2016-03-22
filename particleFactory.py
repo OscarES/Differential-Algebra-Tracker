@@ -145,6 +145,22 @@ def envelopeFromMultipart(multipart):
     #sigma_zp = np.mean(map(abs, zp))
 
 
+
+    # Convert to float so that std won't complain
+    x = np.array(x)
+    xp = np.array(xp)
+    y = np.array(y)
+    yp = np.array(yp)
+    z = np.array(z)
+    zp = np.array(zp)
+
+    x = x.astype('float')
+    xp = xp.astype('float')
+    y = y.astype('float')
+    yp = yp.astype('float')
+    z = z.astype('float')
+    zp = zp.astype('float')
+
     sigma_x = np.std(x) # sigma is std
     sigma_xp = np.std(xp)
     sigma_y = np.std(y)
