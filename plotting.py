@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 import numpy as np
 from scipy import constants
+from particleFactory import envelopeFromMultipart
 
 def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     xin = [multipartin[i][0][0] for i in xrange(len(multipartin))]
@@ -26,7 +27,8 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     envy = [envlist[i][0][3] for i in xrange(len(envlist))]
     s = [envlist[i][1] for i in xrange(len(envlist))]
 
-    # begin ellipse, see appendix C in Wille
+    ## begin ellipse, see appendix C in Wille
+    # initial
     gamma_x = (1+alpha_x**2)/beta_x
     
     #sigma_xp = np.sqrt(epsilon_rms_x*gamma_x)# b, from fig 3.23
@@ -35,7 +37,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     sigma_x = np.sqrt(envx[0])
     three_sigma_x = 3*sigma_x
     three_sigma_xp = 3*sigma_xp
-    angle_x =  1/2*np.arcsin(2*alpha_x/(sigma_x/sigma_xp - sigma_xp/sigma_x))# recalc eqn (C.4), is in radians
+    angle_x = angleFrom_i_and_ip(xin, xpin) # in radians
     ellipse_x = Ellipse((0,0), 2*three_sigma_x, 2*three_sigma_xp, angle_x*180/constants.pi) # 2* is because matplotlibs height is from bottom to top and not center to top...
     ellipse_x.set_facecolor('none')
     ellipse_x.set_edgecolor((0,0,0))
@@ -48,7 +50,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     sigma_y = np.sqrt(envy[0])
     three_sigma_y = 3*sigma_y
     three_sigma_yp = 3*sigma_yp
-    angle_y =  1/2*np.arcsin(2*alpha_y/(sigma_y/sigma_yp - sigma_yp/sigma_y))# recalc eqn (C.4), is in radians
+    angle_y = angleFrom_i_and_ip(yin, ypin)
     ellipse_y = Ellipse((0,0), 2*three_sigma_y, 2*three_sigma_yp, angle_y*180/constants.pi) # 2* is because matplotlibs height is from bottom to top and not center to top...
     ellipse_y.set_facecolor('none')
     ellipse_y.set_edgecolor((0,0,0))
@@ -58,7 +60,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     ellipse_xy.set_edgecolor((0,0,0))
 
     gamma_z = (1+alpha_z**2)/beta_z
-    # end ellipse
+    ## end initial ellipses
 
     xo = [multipartout[i][0][0] for i in xrange(len(multipartout))]
     xpo = [multipartout[i][0][1] for i in xrange(len(multipartout))]
@@ -67,7 +69,43 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     zo = [multipartout[i][0][4] for i in xrange(len(multipartout))]
     zpo = [multipartout[i][0][5] for i in xrange(len(multipartout))]
 
+    # after ellipses
+    envelopeAfter = envelopeFromMultipart(multipartout)
+
+    angle_x_after = angleFrom_i_and_ip(xo, xpo)
+
+    sigma_xTimessigma_xp_after = envelopeAfter[1]
+
+    sigma_xp_after = np.sqrt(envelopeAfter[2]) # sqrt since env has sigma**2. 3*sigma will cover 99.7%. 
+    sigma_x_after = np.sqrt(envelopeAfter[0])
+    three_sigma_x_after = 3*sigma_x_after
+    three_sigma_xp_after = 3*sigma_xp_after
+
+    ellipse_x_after = Ellipse((0,0), 2*three_sigma_x_after, 2*three_sigma_xp_after, angle_x_after*180/constants.pi) # 2* is because matplotlibs height is from bottom to top and not center to top....
+    ellipse_x_after.set_facecolor('none')
+    ellipse_x_after.set_edgecolor((0,0,0))
+
+    # y
+    angle_y_after = angleFrom_i_and_ip(yo, ypo)
+
+    sigma_yTimessigma_yp_after = envelopeAfter[4]
+
+    sigma_yp_after = np.sqrt(envelopeAfter[5]) # sqrt since env has sigma**2. 3*sigma will cover 99.7%. 
+    sigma_y_after = np.sqrt(envelopeAfter[3])
+    three_sigma_y_after = 3*sigma_y_after
+    three_sigma_yp_after = 3*sigma_yp_after
+
+    ellipse_y_after = Ellipse((0,0), 2*three_sigma_y_after, 2*three_sigma_yp_after, angle_y_after*180/constants.pi) # 2* is because matplotlibs height is from bottom to top and not center to top....
+    ellipse_y_after.set_facecolor('none')
+    ellipse_y_after.set_edgecolor((0,0,0))
+
+    ellipse_xy_after = Ellipse((0,0), 2*three_sigma_x_after, 2*three_sigma_y_after, 0)
+    ellipse_xy_after.set_facecolor('none')
+    ellipse_xy_after.set_edgecolor((0,0,0))
+    # end after ellipses
+
     plt.figure(0)
+
     ax1 = plt.subplot2grid((4,3), (0,0))
     ax1.add_artist(ellipse_x)
     ax1.plot(xin,xpin,'ro', zorder=1)
@@ -108,25 +146,46 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     plt.ylabel('Envelope in sigma_y^2')
 
     ax6 = plt.subplot2grid((4,3), (3, 0))
-    ax6.plot(xo,xpo,'ro')
-    plt.title('Values after FODO in x')
+    ax6.add_artist(ellipse_x_after)
+    ax6.plot(xo,xpo,'ro', zorder=1)
+    ax6.set_xlim(-5*sigma_x_after, 5*sigma_x_after)
+    ax6.set_ylim(-5*sigma_xp_after, 5*sigma_xp_after)
+    plt.title('Values after lattice in x')
     plt.xlabel('x [m]')
     plt.ylabel('xp []')
 
     ax7 = plt.subplot2grid((4,3), (3, 1))
-    ax7.plot(yo,ypo,'bo')
-    plt.title('Values after FODO in y')
+    ax7.add_artist(ellipse_y_after)
+    ax7.plot(yo,ypo,'bo', zorder=1)
+    ax7.set_xlim(-5*sigma_y_after, 5*sigma_y_after)
+    ax7.set_ylim(-5*sigma_yp_after, 5*sigma_yp_after)
+    plt.title('Values after lattice in y')
     plt.xlabel('y [m]')
     plt.ylabel('yp []')
 
     ax8 = plt.subplot2grid((4,3), (3, 2))
-    ax8.plot(xo,yo,'go')
-    plt.title('Values after FODO in y and x')
+    ax8.add_artist(ellipse_xy_after)
+    ax8.plot(xo,yo,'go', zorder=1)
+    ax8.set_xlim(-5*sigma_x_after, 5*sigma_x_after)
+    ax8.set_ylim(-5*sigma_y_after, 5*sigma_y_after)
+    plt.title('Values after lattice in y and x')
     plt.xlabel('x [m]')
     plt.ylabel('y [m]')
 
     plt.suptitle("Plots")
     plt.show()
+
+def angleFrom_i_and_ip(i,ip):
+    data = np.array([i, ip])
+    covM = np.cov(data)
+
+    eigenvalues, evectors = np.linalg.eig(covM)
+    largest_eigenvalue_index = np.argmax(eigenvalues)
+
+    eigenvector_with_largest_eigenvalue = evectors[:,largest_eigenvalue_index]
+
+    angleFromCov = np.arctan(eigenvector_with_largest_eigenvalue[1]/eigenvector_with_largest_eigenvalue[0])
+    return angleFromCov
 
 def plotEnvelope(envx,envy):
     plt.figure(0)
