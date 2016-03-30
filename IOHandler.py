@@ -1,10 +1,12 @@
+from __future__ import division # needed for 1/2 = 0.5
 import numpy as np
 import pickle
 import os
 import sys
 import copy
 from scipy import constants
-from relativity import gammaFromBeta
+import struct
+from relativity import gammaFromBeta, betaFromE
 from accelerator import Lattice, Element, LinearElement, Quad, Drift, LieAlgebra, LieAlgElement, leapfrog, Dipole, Cavity # I should clean the code so that this entire import can be removed
 
 def saveAll(filename, multipart, twiss, envelope, lattice):
@@ -44,13 +46,89 @@ def saveMultipart(filename, multipart):
     return 1
 
 def loadMultipart(filename):
-    try:
-        multipart = np.load(filename)
+    if filename.endswith(".dst"):
+        multipart = loadMultipartFormat_dst(filename)
         return multipart
-    except:
-        print 'Bad datafile!'
-        quit()
-        return 0
+    else:
+        try:
+            multipart = np.load(filename)
+            return multipart
+        except:
+            print 'Bad datafile!'
+            quit()
+            return 0
+
+def loadMultipartFormat_dst(filename):
+    with open(filename, "rb") as f: # b is for binary
+        fileContent = f.read()
+        twoChars = struct.unpack("cc", fileContent[:2]) # ???
+        print "twoChars: " + str(twoChars)
+        Np = struct.unpack("i", fileContent[3:7]) # Number of particles
+        Np = Np[0]
+        print "Np: " + str(Np)
+        Ib = struct.unpack("d",fileContent[8:16]) # Beam current
+        Ib = Ib[0]
+        print "Ib: " + str(Ib)
+        freq = struct.unpack("d",fileContent[17:25]) # Frequency in MHz
+        freq = freq[0]
+        print "freq: " + str(freq)
+        thirdChar = struct.unpack("c", fileContent[26:27]) # ???
+        print "thirdChar: " + str(thirdChar)
+
+        # for loop the particles
+        x = np.linspace(0,0,Np)
+        xp = np.linspace(0,0,Np)
+        y = np.linspace(0,0,Np)
+        yp = np.linspace(0,0,Np)
+        phi = np.linspace(0,0,Np)
+        energie = np.linspace(0,0,Np)
+        s = np.linspace(0,0,Np)
+        nextStart = 28
+        nextEnd = 28+8*6
+        for i in range(0,Np):
+            sixDoubles = struct.unpack("dddddd",fileContent[nextStart:nextEnd]) #[28+i*8*6:28+(i+1)*8*6])
+            print "sixDoubles: " + str(sixDoubles)
+
+            x[i] = sixDoubles[0]/100 # cm to m
+            xp[i] = sixDoubles[1] # rad should be the same as unitless
+            y[i] = sixDoubles[2]/100 # cm to m
+            yp[i] = sixDoubles[3] # rad should be the same as unitless
+            phi[i] = sixDoubles[4]
+            energie[i] = sixDoubles[5]
+
+            nextStart = nextEnd+1
+            nextEnd = nextStart+8*6
+            print "bla"
+
+
+        mc2 = struct.unpack("d", fileContent[-8:]) # particle rest mass in MeV/c**2
+        mc2 = mc2[0]
+        print "mc2: " + str(mc2) # Yields the correct value for a proton, wohoo!
+
+        # convert phi and energie to z and zp
+        rf_lambda = constants.c/freq
+        m_0 = mc2*1.672621777e-27/938.272046 # conversion from MeV/c**2 to kg
+        E = float(input('Enter E [J]: '))
+        beta = betaFromE(m_0, E)
+        gamma = gammaFromBeta(beta)
+        z, zp = zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2)
+
+
+        # Make the multipart array
+        bigMatrix = np.array([x, xp, y, yp, z, zp])
+        multipart = [[bigMatrix[:,i], s[i]] for i in xrange(Np)]
+
+        print "multipart: " + str(multipart)
+
+        print "tjena" 
+        # Should the other beam data be returned as well, such as rf_lambda, beam current and m_0?
+        return multipart
+    return 0
+
+def zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2):
+    z = -phi/360*beta*rf_lambda
+    zp = energie/(beta**2*gamma**3*mc2)
+    return z, zp
 
 def saveTwiss(filename, twiss):
     np.save(filename, twiss)

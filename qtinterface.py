@@ -759,8 +759,9 @@ class BeamEditor(QGroupBox):
         try:
             multipart = loadMultipart(fname[0])
             self.facility.setMultipart(multipart)
-        except:
-            print "Bad multipart file!"
+        except Exception,e: print str(e) # prints the entire error
+        #except:
+        #    print "Bad multipart file!" + str(sys.exc_info()[-1].tb_lineno)
     
 
 class LatticeEditor(QGroupBox):
