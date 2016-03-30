@@ -376,6 +376,8 @@ def loadLatticeFormat_dat(filename, lattice):
     gamma = gammaFromBeta(beta)
     q = beamdata[3]
 
+    newLattice = Lattice("Loaded Lattice", beamdata, lattice.getTwiss(), lattice.getMultipart())
+
     try:
         # Parsing
         for line in iter(latticeString.splitlines()):
@@ -391,7 +393,7 @@ def loadLatticeFormat_dat(filename, lattice):
                # Params not stated that I need to construct the element
                name = "d"
                # Create the element
-               lattice.createDrift(name, L)
+               newLattice.createDrift(name, L)
             elif typeOfElem == "QUAD":
                 # Useful params
                 L = float(words[1])/1000
@@ -409,7 +411,7 @@ def loadLatticeFormat_dat(filename, lattice):
                 # Params not stated that I need construct the element
                 name = "q"
                 # Create the element
-                lattice.createQuadrupole(name, K, L)
+                newLattice.createQuadrupole(name, K, L)
             elif typeOfElem == "END":
                 continue
     
@@ -418,7 +420,7 @@ def loadLatticeFormat_dat(filename, lattice):
                 # Useless params
                 # Params not stated that I need construct the element
                 # Create the element         
-        return lattice
+        return newLattice
     except:
         print "Parsing failed" + str(sys.exc_info()[-1].tb_lineno)
         return 0
