@@ -89,9 +89,10 @@ class Facility():
         multipart = gaussianTwiss3D(nbrOfParticles, twiss)
         self.setMultipart(multipart)
 
-    def setMultipart(self,multipart):
+    def setMultipart(self,multipart): # Also updates the envelope
         self.lattice.setMultipart(multipart)
         self.multipart = self.lattice.getMultipart()
+        self.envelope = envelopeFromMultipart(self.multipart)
 
     def setSpaceChargeOnAndSplits(self, spaceChargeOn, nbrOfSplits):
         self.lattice.setSpaceChargeOnAndSplits(spaceChargeOn, nbrOfSplits)
