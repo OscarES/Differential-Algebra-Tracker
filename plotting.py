@@ -173,6 +173,16 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     plt.ylabel('y [m]')
 
     plt.suptitle("Plots")
+
+    left  = 0.125  # the left side of the subplots of the figure
+    right = 0.9    # the right side of the subplots of the figure
+    bottom = 0.1   # the bottom of the subplots of the figure
+    top = 0.9      # the top of the subplots of the figure
+    wspace = 0.2   # the amount of width reserved for blank space between subplots
+    hspace = 0.4   # the amount of height reserved for white space between subplots
+    plt.subplots_adjust(left, bottom, right, top, wspace, hspace) # Increases the space between subplots
+
+
     plt.show()
 
 def angleFrom_i_and_ip(i,ip):
