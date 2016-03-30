@@ -93,8 +93,8 @@ def loadMultipartFormat_dst(filename):
             xp[i] = sixDoubles[1] # rad should be the same as unitless
             y[i] = sixDoubles[2]/100 # cm to m
             yp[i] = sixDoubles[3] # rad should be the same as unitless
-            phi[i] = sixDoubles[4]
-            energie[i] = sixDoubles[5]
+            phi[i] = sixDoubles[4] # rad
+            energie[i] = sixDoubles[5] # MeV
 
             nextStart = nextEnd
             nextEnd = nextStart+8*6
