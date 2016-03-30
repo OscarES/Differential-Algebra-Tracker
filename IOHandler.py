@@ -62,18 +62,18 @@ def loadMultipartFormat_dst(filename):
     with open(filename, "rb") as f: # b is for binary
         fileContent = f.read()
         twoChars = struct.unpack("cc", fileContent[:2]) # ???
-        print "twoChars: " + str(twoChars)
+        #print "twoChars: " + str(twoChars)
         Np = struct.unpack("i", fileContent[2:6]) # Number of particles
         Np = Np[0]
-        print "Np: " + str(Np)
+        #print "Np: " + str(Np)
         Ib = struct.unpack("d",fileContent[6:14]) # Beam current
         Ib = Ib[0]
-        print "Ib: " + str(Ib)
+        #print "Ib: " + str(Ib)
         freq = struct.unpack("d",fileContent[14:22]) # Frequency in MHz
         freq = freq[0]
-        print "freq: " + str(freq)
+        #print "freq: " + str(freq)
         thirdChar = struct.unpack("c", fileContent[22:23]) # ???
-        print "thirdChar: " + str(thirdChar)
+        #print "thirdChar: " + str(thirdChar)
 
         # for loop the particles
         x = np.linspace(0,0,Np)
@@ -87,7 +87,7 @@ def loadMultipartFormat_dst(filename):
         nextEnd = 23+8*6
         for i in range(0,Np):
             sixDoubles = struct.unpack("dddddd",fileContent[nextStart:nextEnd]) #[28+i*8*6:28+(i+1)*8*6])
-            print "sixDoubles: " + str(sixDoubles)
+            #print "sixDoubles: " + str(sixDoubles)
 
             x[i] = sixDoubles[0]/100 # cm to m
             xp[i] = sixDoubles[1] # rad should be the same as unitless
@@ -98,12 +98,12 @@ def loadMultipartFormat_dst(filename):
 
             nextStart = nextEnd
             nextEnd = nextStart+8*6
-            print "bla"
+            #print "bla"
 
 
         mc2 = struct.unpack("d", fileContent[-8:]) # particle rest mass in MeV/c**2
         mc2 = mc2[0]
-        print "mc2: " + str(mc2) # Yields the correct value for a proton, wohoo!
+        #print "mc2: " + str(mc2) # Yields the correct value for a proton, wohoo!
 
         # convert phi and energie to z and zp
         rf_lambda = constants.c/freq
@@ -118,9 +118,9 @@ def loadMultipartFormat_dst(filename):
         bigMatrix = np.array([x, xp, y, yp, z, zp])
         multipart = [[bigMatrix[:,i], s[i]] for i in xrange(Np)]
 
-        print "multipart: " + str(multipart)
+        #print "multipart: " + str(multipart)
 
-        print "tjena" 
+        #print "tjena" 
         # Should the other beam data be returned as well, such as rf_lambda, beam current and m_0?
         return multipart
     return 0
