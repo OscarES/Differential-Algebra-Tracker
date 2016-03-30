@@ -63,16 +63,16 @@ def loadMultipartFormat_dst(filename):
         fileContent = f.read()
         twoChars = struct.unpack("cc", fileContent[:2]) # ???
         print "twoChars: " + str(twoChars)
-        Np = struct.unpack("i", fileContent[3:7]) # Number of particles
+        Np = struct.unpack("i", fileContent[2:6]) # Number of particles
         Np = Np[0]
         print "Np: " + str(Np)
-        Ib = struct.unpack("d",fileContent[8:16]) # Beam current
+        Ib = struct.unpack("d",fileContent[6:14]) # Beam current
         Ib = Ib[0]
         print "Ib: " + str(Ib)
-        freq = struct.unpack("d",fileContent[17:25]) # Frequency in MHz
+        freq = struct.unpack("d",fileContent[14:22]) # Frequency in MHz
         freq = freq[0]
         print "freq: " + str(freq)
-        thirdChar = struct.unpack("c", fileContent[26:27]) # ???
+        thirdChar = struct.unpack("c", fileContent[22:23]) # ???
         print "thirdChar: " + str(thirdChar)
 
         # for loop the particles
@@ -83,8 +83,8 @@ def loadMultipartFormat_dst(filename):
         phi = np.linspace(0,0,Np)
         energie = np.linspace(0,0,Np)
         s = np.linspace(0,0,Np)
-        nextStart = 28
-        nextEnd = 28+8*6
+        nextStart = 23
+        nextEnd = 23+8*6
         for i in range(0,Np):
             sixDoubles = struct.unpack("dddddd",fileContent[nextStart:nextEnd]) #[28+i*8*6:28+(i+1)*8*6])
             print "sixDoubles: " + str(sixDoubles)
@@ -96,7 +96,7 @@ def loadMultipartFormat_dst(filename):
             phi[i] = sixDoubles[4]
             energie[i] = sixDoubles[5]
 
-            nextStart = nextEnd+1
+            nextStart = nextEnd
             nextEnd = nextStart+8*6
             print "bla"
 
