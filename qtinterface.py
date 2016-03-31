@@ -1105,6 +1105,12 @@ class EvalWidget(QWidget):
         grid.addWidget(self.SaveResultButton,0,1)
         self.SaveResultButton.hide()
 
+        EvalButton = QPushButton("Evaluate with profiling!")
+        EvalButton.setMinimumSize(200,50)
+        EvalButton.setStyleSheet("background-color:yellow")
+        EvalButton.clicked.connect(self.evaluateWithProfiling)
+        grid.addWidget(EvalButton,0,2)
+
     def evaluate(self):
         self.facility.evaluate()
         self.facility.plotAfterEval()
@@ -1138,6 +1144,12 @@ class EvalWidget(QWidget):
         except AttributeError:
             print "Could not save envelopelist results!"
 
+        return
+
+    def evaluateWithProfiling(self):
+        self.facility.evaluateWithProfiling()
+        self.facility.plotAfterEval()
+        self.SaveResultButton.show()
         return
 
 # layout manager (aranges the different widgets)

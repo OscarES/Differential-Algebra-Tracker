@@ -4,6 +4,7 @@ from relativity import betaFromE
 from particleFactory import gaussianTwiss3D, envelopeFromMultipart
 import numpy as np
 from plotting import plotEverything
+from profilehooks import profile
 
 
 # code that will be the middle man between accelerator and qtinterface
@@ -106,6 +107,10 @@ class Facility():
 
     def evaluate(self):
         self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist = self.lattice.evaluate(self.multipart,self.envelope,self.twiss)
+
+    @profile(immediate=true)
+    def evaluateWithProfiling(self):
+        self.evaluate()
 
     def getResults(self):
         #if 'self.resultmultipart' in locals():
