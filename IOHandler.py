@@ -106,7 +106,7 @@ def loadMultipartFormat_dst(filename):
         #print "mc2: " + str(mc2) # Yields the correct value for a proton, wohoo!
 
         # convert phi and energie to z and zp
-        rf_lambda = constants.c/(freq*1000000) # *1000000 is freq converted to Hz
+        rf_lambda = constants.c/(freq*1000000) # *1000000 is freq converted to Hz, fixed phi to z problems
         m_0 = mc2*1.672621777e-27/938.272046 # conversion from MeV/c**2 to kg
         E = float(input('Enter E [J]: '))
         beta = betaFromE(m_0, E)
