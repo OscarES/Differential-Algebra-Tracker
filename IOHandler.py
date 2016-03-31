@@ -101,7 +101,7 @@ def loadMultipartFormat_dst(filename):
             #print "bla"
 
 
-        mc2 = struct.unpack("d", fileContent[-8:]) # particle rest mass in MeV/c**2
+        mc2 = struct.unpack("d", fileContent[-8:]) # particle rest mass in MeV ( the usual /c**2 is dropped since c2 is in the name)
         mc2 = mc2[0]
         #print "mc2: " + str(mc2) # Yields the correct value for a proton, wohoo!
 
