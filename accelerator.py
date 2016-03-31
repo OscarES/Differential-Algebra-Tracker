@@ -254,7 +254,8 @@ class Drift(LinearElement):
     def evaluateMT(self,multipart,envelope):
         # should just go through a disunited part
         for j in range(0,len(np.atleast_1d(multipart))):
-            multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
+            multipart[j][0][0:6] = np.dot(self.Msp, multipart[j][0][0:6])
+            multipart[j][1] = multipart[j][1] + self.Lsp
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
@@ -366,7 +367,8 @@ class Dipole(LinearElement):
         # should just go through a disunited part
         # each loop iteration is for a new particle
         for j in range(0,len(np.atleast_1d(multipart))):
-            multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
+            multipart[j][0][0:6] = np.dot(self.Msp, multipart[j][0][0:6])
+            multipart[j][1] = multipart[j][1] + self.Lsp
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
@@ -492,7 +494,8 @@ class Quad(LinearElement):
         # should just go through a disunited part
         # each loop iteration is for a new particle
         for j in range(0,len(np.atleast_1d(multipart))):
-            multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
+            multipart[j][0][0:6] = np.dot(self.Msp, multipart[j][0][0:6])
+            multipart[j][1] = multipart[j][1] + self.Lsp
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
