@@ -45,7 +45,8 @@ class Facility():
         beta = betaFromE(m, E)
         q = float(constants.e)
         nbrOfParticles = 1000
-        beamdata = [beta, rf_lambda, m, q, E, nbrOfParticles]
+        I = 0.0625
+        beamdata = [beta, rf_lambda, m, q, E, nbrOfParticles, I]
         return beamdata
 
     def getDefaultTwiss(self):

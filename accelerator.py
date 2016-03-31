@@ -16,8 +16,8 @@ from particleFactory import envelopeFromMultipart
 from relativity import betaFromE, gammaFromBeta
 import copy
 
-# beamdata comes as [beta, rf_lambda, m, q, E, nbrOfParticles]
-# the units for beamdata: beta is unitless, rf_lambda is in m, m is in kg, q is in C, E is in J (should be in Mev later), nbrOfParticles is unitless
+# beamdata comes as [beta, rf_lambda, m, q, E, nbrOfParticles, I]
+# the units for beamdata: beta is unitless, rf_lambda is in m, m is in kg, q is in C, E is in J (should be in Mev later), nbrOfParticles is unitless, I is Ameperes
 # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
 # the units for twiss: alpha is unitless, beta is in m, epsilon is in m*rad
 # multipart is an array of particles which comes as [[x, xp, y, yp, z, zp], s] with unit m for x, y, z and s. xp, yp and zp are unitless.
@@ -552,6 +552,8 @@ class SpaceCharge(LinearElement):
         rf_lambda = beamdata[1]
         m = beamdata[2]
         q = beamdata[3]
+
+        I = beamdata[6]
         
         # beam data is needed as input to calculate the following variables...
         N = len(multipart) # this info should come from the multipart (len(multipart))
@@ -560,7 +562,7 @@ class SpaceCharge(LinearElement):
         c = constants.c # in metric (metric for everything perhaps?)
         vac_perm = constants.epsilon_0
 
-        I = N*q*c/rf_lambda # from ref. E
+        #I = N*q*c/rf_lambda # from ref. E
 
         ## Courant-Snyder or Twiss params
         # envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
@@ -701,6 +703,8 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         #print "rf_lambda: " + str(rf_lambda)
         m = beamdata[2]
         q = beamdata[3]
+
+        I = beamdata[6]
         
         # beam data is needed as input to calculate the following variables...
         N = len(multipart) # this info should come from the multipart (len(multipart))
@@ -710,7 +714,7 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         c = constants.c # in metric (metric for everything perhaps?)
         vac_perm = constants.epsilon_0
 
-        I = N*q*c/rf_lambda # from ref. E #I = 0.065 # beam data from ref F
+        #I = N*q*c/rf_lambda # from ref. E #I = 0.065 # beam data from ref F
         #print "I: " + str(I)
 
         ## Courant-Snyder or Twiss params

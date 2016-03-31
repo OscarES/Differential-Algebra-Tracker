@@ -426,6 +426,13 @@ class BeamEditor(QGroupBox):
         self.enterNbrOfParticles = QLineEdit()
         grid.addWidget(self.enterNbrOfParticles, 5, 1)
 
+        # Current
+        self.textCurrent = QLabel("Current [A]:")
+        grid.addWidget(self.textCurrent, 6, 0)
+        
+        self.enterCurrent = QLineEdit()
+        grid.addWidget(self.enterCurrent, 6, 1)
+
         # Set the fields to the default parameters
         self.writeInBeamdataFields()
 
@@ -626,6 +633,7 @@ class BeamEditor(QGroupBox):
         self.valueOfCharge = self.enterCharge.text()
         self.valueOfEnergy = self.enterEnergy.text()
         self.valueOfNbrOfParticles = self.enterNbrOfParticles.text()
+        self.valueOfCurrent = self.enterCurrent.text()
 
         try:
             beta = float(self.valueOfBeta)
@@ -657,7 +665,12 @@ class BeamEditor(QGroupBox):
         except:
             print "NbrOfParticles not a number, set to 1 instead"
             nbrOfParticles = 1
-        beamdata = [beta, rf_lambda, m, q, E, nbrOfParticles]
+        try:
+            I = float(self.valueOfCurrent)
+        except:
+            print "Current not a number, set to 0 instead"
+            I = 0
+        beamdata = [beta, rf_lambda, m, q, E, nbrOfParticles, I]
         return beamdata
 
     def useBeamdataInput(self):
@@ -672,6 +685,7 @@ class BeamEditor(QGroupBox):
         self.enterCharge.setText(str(beamdata[3]))
         self.enterEnergy.setText(str(beamdata[4]))
         self.enterNbrOfParticles.setText(str(beamdata[5]))
+        self.enterCurrent.setText(str(beamdata[6]))
 
     def getTwissFromInput(self):
         self.valueOfAlpha_x = self.enterAlpha_x.text()
