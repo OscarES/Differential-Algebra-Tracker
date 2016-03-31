@@ -13,7 +13,7 @@ import random
 import matplotlib.pyplot as plt
 import abc
 from particleFactory import envelopeFromMultipart
-from relativity import betaFromE
+from relativity import betaFromE, gammaFromBeta
 import copy
 
 # beamdata comes as [beta, rf_lambda, m, q, E, nbrOfParticles]
@@ -167,13 +167,14 @@ class Drift(LinearElement):
     def __init__(self, name, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
         LinearElement.__init__(self, "drift " + name)
         self.L = L
-        self.M = self.createMatrixM(L) # M should be a 6x6 matrix
+        gamma = gammaFromBeta(beamdata[0])
+        self.M = self.createMatrixM(L, beamdata[0], gamma) # M should be a 6x6 matrix
         self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
 
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
         
-        self.Msp = self.createMatrixM(self.Lsp)
+        self.Msp = self.createMatrixM(self.Lsp, beamdata[0], gamma)
         self.Tsp = self.createMatrixT(self.Msp)
 
         # space charge class
@@ -190,13 +191,13 @@ class Drift(LinearElement):
         MspAsMatrix = np.asmatrix(self.Msp)
         return str(MspAsMatrix**self.n)
 
-    def createMatrixM(self,L):
+    def createMatrixM(self,L, beta, gamma):
         return np.array([
                 [1,L,0,0,0,0],
                 [0,1,0,0,0,0],
                 [0,0,1,L,0,0],
                 [0,0,0,1,0,0],
-                [0,0,0,0,1,L],
+                [0,0,0,0,1,L/(beta**2*gamma**2)],
                 [0,0,0,0,0,1]
                 ])
     def createMatrixT(self, M):
@@ -377,13 +378,14 @@ class Quad(LinearElement):
         #self.name = name
         self.K = K
         self.L = L
-        self.M = self.createMatrixM(K, L) # M should be a 6x6 matrix
+        gamma = gammaFromBeta(beamdata[0])
+        self.M = self.createMatrixM(K, L, beamdata[0], gamma) # M should be a 6x6 matrix
         self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
         
         # disunite matrices
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
-        self.Msp = self.createMatrixM(self.K, self.Lsp)
+        self.Msp = self.createMatrixM(self.K, self.Lsp, beamdata[0], gamma)
         self.Tsp = self.createMatrixT(self.Msp)
 
         # space charge class
@@ -394,14 +396,14 @@ class Quad(LinearElement):
             self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, multipart, twiss, beamdata)
 
     """ taken from lie code where K = sqrt(k)"""
-    def createMatrixM(self,K,L):
+    def createMatrixM(self,K,L,beta,gamma):
         if K > 0: # defocus in x
             return np.array([
                 [cosh(K*L),sinh(K*L)/K,0,0,0,0],
                 [K*sinh(K*L),cosh(K*L),0,0,0,0],
                 [0,0,cos(K*L),sin(K*L)/K,0,0],
                 [0,0,-K*sin(K*L),cos(K*L),0,0],
-                [0,0,0,0,1,L],
+                [0,0,0,0,1,L/(beta**2*gamma**2)],
                 [0,0,0,0,0,1]
                 ])
         elif K < 0: # focus in x
@@ -410,7 +412,7 @@ class Quad(LinearElement):
                 [-K*sin(K*L),cos(K*L),0,0,0,0],
                 [0,0,cosh(K*L),sinh(K*L)/K,0,0],
                 [0,0,K*sinh(K*L),cosh(K*L),0,0],
-                [0,0,0,0,1,L],
+                [0,0,0,0,1,L/(beta**2*gamma**2)],
                 [0,0,0,0,0,1]
                 ])
         else:
@@ -419,7 +421,7 @@ class Quad(LinearElement):
                 [0,1,0,0,0,0],
                 [0,0,1,L,0,0],
                 [0,0,0,1,0,0],
-                [0,0,0,0,1,L],
+                [0,0,0,0,1,L/(beta**2*gamma**2)],
                 [0,0,0,0,0,1]
                 ])
 
