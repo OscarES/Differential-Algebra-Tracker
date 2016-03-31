@@ -258,7 +258,7 @@ class Drift(LinearElement):
             multipart[j][1] = multipart[j][1] + self.Lsp
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
-        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        env_with_s = np.array([envelope, self.Lsp])
         return multipart, envelope, env_with_s
 
 ### DIPOLE
@@ -371,7 +371,7 @@ class Dipole(LinearElement):
             multipart[j][1] = multipart[j][1] + self.Lsp
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
-        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        env_with_s = np.array([envelope, self.Lsp])
         return multipart, envelope, env_with_s
 
 ### QUAD
@@ -498,7 +498,7 @@ class Quad(LinearElement):
             multipart[j][1] = multipart[j][1] + self.Lsp
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
-        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        env_with_s = np.array([envelope, self.Lsp])
         return multipart, envelope, env_with_s
 
 ### SPACE CHARGE!!!!! C. Allen's approach
@@ -1125,7 +1125,7 @@ class LieAlgElement(Element):
 
             particle[1] += self.Lsp
         envelope = envelopeFromMultipart(multipart)
-        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        env_with_s = np.array([envelope, self.Lsp])
         return multipart, envelope, env_with_s
 
 
@@ -1359,7 +1359,7 @@ class Cavity(Element):
             multipart[j] = np.array([np.dot(self.Msp, multipart[j][0][0:6]), multipart[j][1] + self.Lsp])
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
-        env_with_s = np.array([copy.deepcopy(envelope), self.Lsp])
+        env_with_s = np.array([envelope, self.Lsp])
         return multipart, envelope, env_with_s
 
 # Comes from ref E.
