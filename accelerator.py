@@ -218,7 +218,8 @@ class Drift(LinearElement):
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
         
-        self.Msp = self.createMatrixM(self.Lsp)
+        gamma = gammaFromBeta(beamdata[0])
+        self.Msp = self.createMatrixM(self.Lsp, beamdata[0], gamma)
         self.Tsp = self.createMatrixT(self.Msp)
 
         # space charge class
@@ -450,7 +451,8 @@ class Quad(LinearElement):
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
         
-        self.Msp = self.createMatrixM(self.K, self.Lsp)
+        gamma = gammaFromBeta(beamdata[0])
+        self.Msp = self.createMatrixM(self.K, self.Lsp, beamdata[0], gamma)
         self.Tsp = self.createMatrixT(self.Msp)
 
         # space charge class
