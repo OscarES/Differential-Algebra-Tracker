@@ -182,7 +182,7 @@ class Drift(LinearElement):
         if self.spaceChargeOn == 1:
             self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, beamdata)
 
     def printInfo(self):
         return self.name + "\t L: " + str(self.L)
@@ -227,12 +227,11 @@ class Drift(LinearElement):
         if self.spaceChargeOn == 1:
             self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, beamdata)
 
     def evaluateWithSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
-        for i in range(0,self.n):
-            self.sc.updateMatrix(multipart,twiss)
+        for i in range(0,self.n):  
             multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
@@ -288,7 +287,7 @@ class Dipole(LinearElement):
         if self.spaceChargeOn == 1:
             self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, beamdata)
 
     """ taken from lie code where K = sqrt(k)"""
     def createMatrixM(self, rho, L, K_x, K_y, beta, gamma):
@@ -335,13 +334,12 @@ class Dipole(LinearElement):
         if self.spaceChargeOn == 1:
             self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, beamdata)
 
     def evaluateWithSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
         #print "hej fran quad"
         for i in range(0,self.n):
-            self.sc.updateMatrix(multipart,twiss)
             multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
             multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
@@ -396,7 +394,7 @@ class Quad(LinearElement):
         if self.spaceChargeOn == 1:
             self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, beamdata)
 
     """ taken from lie code where K = sqrt(k)"""
     def createMatrixM(self,K,L,beta,gamma):
@@ -462,13 +460,12 @@ class Quad(LinearElement):
         if self.spaceChargeOn == 1:
             self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
         elif self.spaceChargeOn == 2:
-            self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, multipart, twiss, beamdata)
+            self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, beamdata)
 
     def evaluateWithSC(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
         #print "hej fran quad"
         for i in range(0,self.n):
-            self.sc.updateMatrix(multipart,twiss)
             multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
             multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
@@ -636,6 +633,7 @@ class SpaceCharge(LinearElement):
         return Msc
 
     def evaluateSC(self,multipart,envelope):
+        self.updateMatrix(multipart,twiss)
         for j in range(0,len(np.atleast_1d(multipart))):
             # The should be a check if Msc and Tsc need to be updated if the beam properties have changed a lot!!!!!!!!
             #if beamChanged(envelope):
@@ -656,128 +654,45 @@ class SpaceCharge(LinearElement):
 
 ### SPACE CHARGE!!!!! Elliptical integral approach
 class SpaceChargeEllipticalIntegral(LinearElement):
-    def __init__(self, name, deltas, multipart, twiss, beamdata):
+    def __init__(self, name, deltas, beamdata):
         LinearElement.__init__(self, name)
         self.deltas = deltas
-        self.multipart = multipart
-        self.twiss = twiss
         self.beamdata = beamdata
 
-        self.Msc = self.spaceChargeMatrix(multipart,twiss, self.beamdata)
-
-    #def updateBeam(self, twiss):
-    #    self.twiss = twiss
-    #    return
-
-    def beamChanged(self, newtwiss):
-        threshold = 0.1
-        if diffBtwBeams(self.twiss, newtwiss) > threshold:
-            return 1
-        else:
-            return 0
-
-    def diffBtwBeams(self, twiss1,twiss2):
-        diff = 0
-#        for bla
-#            diff += diff_each_variable
-        return diff
-
-    def updateMatrix(self,multipart,twiss):
-        self.twiss = twiss
-        self.Msc = self.spaceChargeMatrix(multipart,twiss, self.beamdata)
-        return 1
-
-    def R_D(self, x, y, z):
-        # from (110) in ref 1.
-        result = quad(lambda t : 3/2*1/(sqrt(t+x) * sqrt(t+y) * (t+z)**(3/2)), 0, inf)
-        # result[0] is the result and result[1] is the error
-        return result[0]
-
-    def spaceChargeMatrix(self, multipart, twiss, beamdata):        
-        #print "\n\n\nNew element!"
-        #print "deltas: " + str(self.deltas)
         # beamdata: beta (speed), lambda (RF-wavelength), mass, charge
-        beta = beamdata[0]
-        #print "beta: " + str(beta)
-        rf_lambda = beamdata[1]
-        #print "rf_lambda: " + str(rf_lambda)
-        m = beamdata[2]
-        q = beamdata[3]
-
-        I = beamdata[6]
+        self.beta = beamdata[0]
+        self.rf_lambda = beamdata[1]
+        self.m = beamdata[2]
+        self.q = beamdata[3]
+        self.N = beamdata[5]
+        self.I = beamdata[6]
         
         # beam data is needed as input to calculate the following variables...
-        N = len(multipart) # this info should come from the multipart (len(multipart))
-        Q = q*N # from (19) in ref 1.
-        gamma = 1/sqrt(1-beta**2)
-        #print "gamma: " + str(gamma)
-        c = constants.c # in metric (metric for everything perhaps?)
-        vac_perm = constants.epsilon_0
+        self.Q = self.q*self.N # from (19) in ref 1.
+        self.gamma = 1/sqrt(1-self.beta**2)
 
-        #I = N*q*c/rf_lambda # from ref. E #I = 0.065 # beam data from ref F
-        #print "I: " + str(I)
+#    def beamChanged(self, newtwiss):
+#        threshold = 0.1
+#        if diffBtwBeams(self.twiss, newtwiss) > threshold:
+#            return 1
+#        else:
+#            return 0
 
-        ## Courant-Snyder or Twiss params
-        # envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
-        alpha_x = twiss[0]
-        beta_x = twiss[1]
-        #print "beta_x: " + str(beta_x)
-        epsilon_rms_x = twiss[2]
-        #print "epsilon_rms_x: " + str(epsilon_rms_x)
-        alpha_y = twiss[3]
-        beta_y = twiss[4]
-        epsilon_rms_y = twiss[5]
-        alpha_z = twiss[6]
-        beta_z = twiss[7]
-        epsilon_rms_z = twiss[8]
+#    def diffBtwBeams(self, twiss1,twiss2):
+#        diff = 0
+#        for bla
+#            diff += diff_each_variable
+#        return diff
 
-        ## envelope X, Xp, Y, Yp, Z and Zp
-        X = sqrt(5*beta_x*epsilon_rms_x)
-        #print "X: " + str(X)
-        Xp = -alpha_x*sqrt(5*epsilon_rms_x/beta_x)
-        #print "Xp: " + str(Xp)
-
-        Y = sqrt(5*beta_y*epsilon_rms_y)
-        #print "Y: " + str(Y)
-        Yp = -alpha_y*sqrt(5*epsilon_rms_y/beta_y)
-        #print "Yp: " + str(Yp)
-
-        Z = sqrt(5*beta_z*epsilon_rms_z)
-        #print "Z: " + str(Z)
-        Zp = -alpha_z*sqrt(5*epsilon_rms_z/beta_z)
-        #print "Zp: " + str(Zp)
-
-        ## Deviations from multipart (x,y,z). So there should really be one matrix per particle. Now I just use one particle's data
-        #r_x = multipart[0][0][0]
-        r_x = X
-        #print "r_x: " + str(r_x)
-        #r_y = multipart[0][0][2]
-        r_y = Y
-        #print "r_y: " + str(r_y)
-        #r_z = multipart[0][0][4]
-        r_z = Z
-        #print "r_z: " + str(r_z)
-        
-        #r_x = 1 # semi-axes of the ellipsiod. What are they really? putting them to one works
-        #r_y = 1
-        #r_z = 1
-
-        #x = multipart[0][0][0]
-        #print "x: " + str(x)
-        #y = multipart[0][0][2]
-        #print "y: " + str(y)
-        #z = multipart[0][0][4]
-        #print "z: " + str(z)
-
-        ## Eliptical integral?
-        #s = Z/sqrt(X*Y)
-        #epsilon_of_s_integral = s*quad(lambda t : 1/(sqrt(t+1)* (t+s**2)**(3/2)), 0, inf)[0] # eqn 5 in ref B
+    def spaceChargeMatrix(self, envelope):        
+        ## The semi-axes are the to the sigmas
+        r_x = sqrt(envelope[0])
+        r_y = sqrt(envelope[3])
+        r_z = sqrt(envelope[6])
 
         # Eliptical integral
-        g = gamma*r_z/sqrt(r_x*r_y) # eqn 40 from ref E.
-        #print "g: " + str(g)
+        g = self.gamma*r_z/sqrt(r_x*r_y) # eqn 40 from ref E.
         f_of_g_integral = g/2*quad(lambda t : 1/((t+1)*(t+g**2)**(3/2)), 0, inf)[0] # eqn 41 from ref E.
-        #print "f_of_g_integral: " + str(f_of_g_integral)
 
         #G_x = 3*(1-f_of_g_integral)*x/(r_x*(r_x+r_y)*r_z) # eqn 36 from ref E.
         #print "G_x: " + str(G_x)
@@ -797,9 +712,9 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         #U_scz = I*rf_lambda*G_z/(4*math.pi*constants.epsilon_0*c) # eqn 35 from ref E.
         #print "U_scz: " + str(U_scz)
 
-        U_scx_without_x = I*rf_lambda*G_x_without_x/(4*math.pi*constants.epsilon_0*c*gamma**2)
-        U_scy_without_y = I*rf_lambda*G_y_without_y/(4*math.pi*constants.epsilon_0*c*gamma**2)
-        U_scz_without_z = I*rf_lambda*G_z_without_z/(4*math.pi*constants.epsilon_0*c)
+        U_scx_without_x = self.I*self.rf_lambda*G_x_without_x/(4*math.pi*constants.epsilon_0*constants.c*self.gamma**2)
+        U_scy_without_y = self.I*self.rf_lambda*G_y_without_y/(4*math.pi*constants.epsilon_0*constants.c*self.gamma**2)
+        U_scz_without_z = self.I*self.rf_lambda*G_z_without_z/(4*math.pi*constants.epsilon_0*constants.c)
 
         #delta_P_x = q*U_scx*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
         #print "delta_P_x: " + str(delta_P_x)
@@ -808,9 +723,9 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         #delta_P_z = q*U_scz*self.deltas/(m*c**2*beta) # eqn 42 from ref E.
         #print "delta_P_z: " + str(delta_P_z)
 
-        delta_P_x_without_x = q*U_scx_without_x*self.deltas/(m*c**2*beta)
-        delta_P_y_without_y = q*U_scy_without_y*self.deltas/(m*c**2*beta)
-        delta_P_z_without_z = q*U_scz_without_z*self.deltas/(m*c**2*beta)
+        delta_P_x_without_x = self.q*U_scx_without_x*self.deltas/(self.m*constants.c**2*self.beta)
+        delta_P_y_without_y = self.q*U_scy_without_y*self.deltas/(self.m*constants.c**2*self.beta)
+        delta_P_z_without_z = self.q*U_scz_without_z*self.deltas/(self.m*constants.c**2*self.beta)
 
         # Converting from delta_P to delta_xp
         #v = beta*c
@@ -827,17 +742,7 @@ class SpaceChargeEllipticalIntegral(LinearElement):
         delta_yp_without_y = delta_P_y_without_y#/p
         delta_zp_without_z = delta_P_z_without_z#/p
 
-        #Msc = np.array([
-        #        [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
-        #        [0.0,1.0,0.0,0.0,0.0,0.0,delta_xp],
-        #        [0.0,0.0,1.0,0.0,0.0,0.0,0.0],
-        #        [0.0,0.0,0.0,1.0,0.0,0.0,delta_yp],
-        #        [0.0,0.0,0.0,0.0,1.0,0.0,0.0],
-        #        [0.0,0.0,0.0,0.0,0.0,1.0,delta_zp],
-        #        [0.0,0.0,0.0,0.0,0.0,0.0,1.0]
-        #    ])
-
-        Msc_new_from_without = np.array([
+        Msc = np.array([
                 [1.0,0.0,0.0,0.0,0.0,0.0],
                 [delta_xp_without_x,1.0,0.0,0.0,0.0,0.0],
                 [0.0,0.0,1.0,0.0,0.0,0.0],
@@ -846,25 +751,12 @@ class SpaceChargeEllipticalIntegral(LinearElement):
                 [0.0,0.0,0.0,0.0,delta_zp_without_z,1.0]
             ])
 
-        return Msc_new_from_without
-        #return Msc
+        return Msc
 
     def evaluateSC(self,multipart,envelope):
+        self.Msc = self.spaceChargeMatrix(envelope) # Always update Msc
         for j in range(0,len(np.atleast_1d(multipart))):
-            # The should be a check if Msc and Tsc need to be updated if the beam properties have changed a lot!!!!!!!!
-            #if beamChanged(envelope):
-                #self.Msc, self.Tsc = spaceChargeMatrix(envlope)
-
-            #zz
-            #extendedphasespace = np.append(multipart[j][0][0:6], 1) # adds the dispersion 1 term
-            #extendedphasespace = np.dot(self.Msc, extendedphasespace) # here calculations are made
-            #reducedphasespace = extendedphasespace[0:6] # throws away the dispersion 1 term
-            #multipart[j] = np.array([reducedphasespace, multipart[j][1]]) # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
-            #zz
-
-            ### New way of calculating (from the without params)
-            multipart[j][0][0:6] = np.dot(self.Msc, multipart[j][0][0:6]) # self.Msc was set to the new matrix
-
+            multipart[j][0][0:6] = np.dot(self.Msc, multipart[j][0][0:6])
         envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
         return multipart,envelope
 
