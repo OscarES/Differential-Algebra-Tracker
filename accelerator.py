@@ -180,7 +180,8 @@ class Drift(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
-            self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss, beamdata)
+            #self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss, beamdata) # OLD
+            self.sc = SpaceCharge('drift_sc', self.Lsp, beamdata) # NEW
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, beamdata)
 
@@ -225,7 +226,8 @@ class Drift(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
-            self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss, beamdata)
+            #self.sc = SpaceCharge('drift_sc', self.Lsp, multipart, twiss, beamdata) # OLD
+            self.sc = SpaceCharge('drift_sc', self.Lsp, beamdata) # NEW
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('drift_sc', self.Lsp, beamdata)
 
@@ -285,7 +287,8 @@ class Dipole(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
-            self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata)
+            #self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata) # OLD
+            self.sc = SpaceCharge('dipole_sc', self.Lsp, beamdata) # NEW
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, beamdata)
 
@@ -332,7 +335,8 @@ class Dipole(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
-            self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata)
+            #self.sc = SpaceCharge('dipole_sc', self.Lsp, multipart, twiss, beamdata) # OLD
+            self.sc = SpaceCharge('dipole_sc', self.Lsp, beamdata) # NEW
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('dipole_sc', self.Lsp, beamdata)
 
@@ -392,7 +396,8 @@ class Quad(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
-            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
+            #self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata) # OLD
+            self.sc = SpaceCharge('quad_sc', self.Lsp, beamdata) # NEW
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, beamdata)
 
@@ -458,7 +463,8 @@ class Quad(LinearElement):
         # space charge class
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
-            self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata)
+            #self.sc = SpaceCharge('quad_sc', self.Lsp, multipart, twiss, beamdata) # OLD
+            self.sc = SpaceCharge('quad_sc', self.Lsp, beamdata) # NEW
         elif self.spaceChargeOn == 2:
             self.sc = SpaceChargeEllipticalIntegral('quad_sc', self.Lsp, beamdata)
 
@@ -500,140 +506,177 @@ class Quad(LinearElement):
 
 ### SPACE CHARGE!!!!! C. Allen's approach
 class SpaceCharge(LinearElement):
-    def __init__(self, name, deltas, multipart, twiss, beamdata):
+    #def __init__(self, name, deltas, multipart, twiss, beamdata): # old style
+    def __init__(self, name, deltas, beamdata): # new style
         LinearElement.__init__(self, name)
         self.deltas = deltas
-        self.multipart = multipart
-        self.twiss = twiss
         self.beamdata = beamdata
 
-        self.Msc = self.spaceChargeMatrix(multipart,twiss, self.beamdata)
+        ## NEW STUFF
+        self.beta = beamdata[0]
+        self.m = beamdata[2]
+        self.q = beamdata[3]
+        self.N = beamdata[5]
+        self.I = beamdata[6]
+        self.gamma = gammaFromBeta(self.beta)
+        self.bc2 = self.gamma*self.gamma-1 # wierd gamma**2 that CKA uses
+
+        ## END NEW STUFF
+
+        #########self.Msc = self.spaceChargeMatrix(multipart,twiss, self.beamdata)
 
     #def updateBeam(self, twiss):
     #    self.twiss = twiss
     #    return
 
-    def beamChanged(self, newtwiss):
-        threshold = 0.1
-        if diffBtwBeams(self.twiss, newtwiss) > threshold:
-            return 1
-        else:
-            return 0
-
-    def diffBtwBeams(self, twiss1,twiss2):
-        diff = 0
-#        for bla
-#            diff += diff_each_variable
-        return diff
-
-    def updateMatrix(self,multipart,twiss):
-        self.twiss = twiss
-        self.Msc = self.spaceChargeMatrix(multipart,twiss, self.beamdata)
-        return 1
+    #########def beamChanged(self, newtwiss):
+    #########    threshold = 0.1
+    #########    if diffBtwBeams(self.twiss, newtwiss) > threshold:
+    #########        return 1
+    #########    else:
+    #########        return 0
+#########
+    #########def diffBtwBeams(self, twiss1,twiss2):
+    #########    diff = 0
+#   #########     for bla
+#   #########         diff += diff_each_variable
+    #########    return diff
+#########
+    #########def updateMatrix(self,multipart,twiss):
+    #########    self.twiss = twiss
+    #########    self.Msc = self.spaceChargeMatrix(multipart,twiss, self.beamdata)
+    #########    return 1
 
     def R_D(self, x, y, z):
         # from (110) in ref 1.
-        #print "hello1"
-        #print "x: " + str(x)
-        #print "y: " + str(y)
-        #print "z: " + str(z)
         result = quad(lambda t : 3/2*1/(sqrt(t+x) * sqrt(t+y) * (t+z)**(3/2)), 0, inf)
-        #print "result: " + str(result)
-        #print "hello2"
         # result[0] is the result and result[1] is the error
         return result[0]
 
-    def spaceChargeMatrix(self, multipart, twiss, beamdata):
-        # beamdata: beta (speed), mass, charge, lambda (RF-wavelength)
-        beta = beamdata[0]
-        rf_lambda = beamdata[1]
-        m = beamdata[2]
-        q = beamdata[3]
+    #def spaceChargeMatrix(self, multipart, twiss, beamdata, envelope): # OLD
+    def spaceChargeMatrix(self, multipart, envelope): # NEW
+        ########## beamdata: beta (speed), mass, charge, lambda (RF-wavelength)
+        #########beta = beamdata[0]
+        #########rf_lambda = beamdata[1]
+        #########m = beamdata[2]
+        #########q = beamdata[3]
+#########
+        #########I = beamdata[6]
+        #########
+        ########## beam data is needed as input to calculate the following variables...
+        #########N = len(multipart) # this info should come from the multipart (len(multipart))
+        #########Q = q*N # from (19) in ref 1.
+        #########gamma = 1/sqrt(1-beta**2)
+        #########c = constants.c # in metric (metric for everything perhaps?)
+        #########vac_perm = constants.epsilon_0
+#########
+        ##########I = N*q*c/rf_lambda # from ref. E
+#########
+        ########### Courant-Snyder or Twiss params
+        ########## envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
+        #########alpha_x = twiss[0]
+        #########beta_x = twiss[1]
+        #########epsilon_rms_x = twiss[2]
+        #########alpha_y = twiss[3]
+        #########beta_y = twiss[4]
+        #########epsilon_rms_y = twiss[5]
+        #########alpha_z = twiss[6]
+        #########beta_z = twiss[7]
+        #########epsilon_rms_z = twiss[8]
+#########
+        ########### envelope X, Xp, Y, Yp, Z and Zp
+        #########X = sqrt(5*beta_x*epsilon_rms_x)
+        #########Xp = -alpha_x*sqrt(5*epsilon_rms_x/beta_x)
+#########
+        #########Y = sqrt(5*beta_y*epsilon_rms_y)
+        #########Yp = -alpha_y*sqrt(5*epsilon_rms_y/beta_y)
+#########
+        #########Z = sqrt(5*beta_z*epsilon_rms_z)
+        ##########print "beta_z: " + str(beta_z)
+        #########Zp = -alpha_z*sqrt(5*epsilon_rms_z/beta_z)
+#########
+        ########## <.> is called "norm_of_."
+        ########## <x^2> (norm_of_xx), <xx'> (norm_of_xx') and <x'^2> (norm_of_xpxp) come from (119) in ref 1.
+        #########norm_of_xx = 1/5*X**2
+        ########## <x> (norm_of_x) come from (81) in ref 1.
+        #########norm_of_x = 0.0
+        ########## <xx'> (norm_of_xxp) come from (119) in ref 1. NOT used here but here as a reminder
+        #########norm_of_xxp = 1/5*X*Xp
+        ########## <x'x'> (norm_of_xpxp) come from (119) in ref 1. NOT used here but here as a reminder
+        #########norm_of_xpxp = 1/5*Xp**2+5*epsilon_rms_x**2/X**2
+#########
+        #########norm_of_yy = 1/5*Y**2
+        #########norm_of_y = 0.0
+        #########norm_of_yp = 1/5*Y*Yp
+        #########norm_of_ypyp = 1/5*Yp**2+5*epsilon_rms_y**2/Y**2
+#########
+        #########norm_of_zz = 1/5*Z**2
+        #########norm_of_z = 0.0
+        #########norm_of_zp = 1/5*Z*Zp
+        #########norm_of_zpzp = 1/5*Zp**2+5*epsilon_rms_z**2/Z**2
+#########
+        ########## <xE_x> (norm_of_xE_x) come from (115) in ref 1.
+        #########norm_of_xE_x = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_xx*self.R_D(norm_of_yy, norm_of_zz, norm_of_xx)
+        #########norm_of_yE_y = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_yy*self.R_D(norm_of_xx, norm_of_zz, norm_of_yy)
+        #########norm_of_zE_z = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_zz*self.R_D(norm_of_xx, norm_of_yy, norm_of_zz)
+        ########## R_D_bracket() = R_D_() from (111) and (112) in ref 1.
+#########
+        ########## eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
+        #########f_scx = gamma**3*beta**2*m*c**2/q*(norm_of_xx - norm_of_x**2)/norm_of_xE_x # eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
+        #########f_scy = gamma**3*beta**2*m*c**2/q*(norm_of_yy - norm_of_y**2)/norm_of_yE_y # (152) (with x->y) in ref 1.
+        #########f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.        
+#########
+        ########## Mean of x,y and z from all the particles
+        #########xbar = sum([multipart[i][0][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
+        #########ybar = sum([multipart[i][0][2] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting y out of each particle and then taking the mean
+        #########zbar = sum([multipart[i][0][4] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting z out of each particle and then taking the mean
+#########
+        ########## Matrix eqn (154) in ref 1.
+        #########Msc = np.array([
+        #########        [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
+        #########        [self.deltas/f_scx,1.0,0.0,0.0,0.0,0.0,-xbar*self.deltas/f_scx],
+        #########        [0.0,0.0,1.0,0.0,0.0,0.0,0.0],
+        #########        [0.0,0.0,self.deltas/f_scy,1.0,0.0,0.0,-ybar*self.deltas/f_scy],
+        #########        [0.0,0.0,0.0,0.0,1.0,0.0,0.0],
+        #########        [0.0,0.0,0.0,0.0,self.deltas/f_scz,1.0,-zbar*self.deltas/f_scz],
+        #########        [0.0,0.0,0.0,0.0,0.0,0.0,1.0]
+        #########    ])
 
-        I = beamdata[6]
-        
-        # beam data is needed as input to calculate the following variables...
-        N = len(multipart) # this info should come from the multipart (len(multipart))
-        Q = q*N # from (19) in ref 1.
-        gamma = 1/sqrt(1-beta**2)
-        c = constants.c # in metric (metric for everything perhaps?)
-        vac_perm = constants.epsilon_0
+        ## NEW STUFF
+        K = self.q**2*self.N/2/constants.pi/constants.epsilon_0/self.gamma/self.bc2/self.beta**2/self.m/constants.c**2 # (18) (bunched beam) with mods q*q -> q**2 and uses CKA's bc2 instead of a gamma**2
+        #K = self.I*self.q/2/constants.pi/constants.epsilon_0/gamma**3/beta**3/self.m/constants.c**3 # (20) (continous beam)
 
-        #I = N*q*c/rf_lambda # from ref. E
+        sigma_x = sqrt(envelope[0])
+        sigma_y = sqrt(envelope[3])
+        sigma_z = sqrt(envelope[6])
 
-        ## Courant-Snyder or Twiss params
-        # envelope comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
-        alpha_x = twiss[0]
-        beta_x = twiss[1]
-        epsilon_rms_x = twiss[2]
-        alpha_y = twiss[3]
-        beta_y = twiss[4]
-        epsilon_rms_y = twiss[5]
-        alpha_z = twiss[6]
-        beta_z = twiss[7]
-        epsilon_rms_z = twiss[8]
-
-        ## envelope X, Xp, Y, Yp, Z and Zp
-        X = sqrt(5*beta_x*epsilon_rms_x)
-        Xp = -alpha_x*sqrt(5*epsilon_rms_x/beta_x)
-
-        Y = sqrt(5*beta_y*epsilon_rms_y)
-        Yp = -alpha_y*sqrt(5*epsilon_rms_y/beta_y)
-
-        Z = sqrt(5*beta_z*epsilon_rms_z)
-        #print "beta_z: " + str(beta_z)
-        Zp = -alpha_z*sqrt(5*epsilon_rms_z/beta_z)
-
-        # <.> is called "norm_of_."
-        # <x^2> (norm_of_xx), <xx'> (norm_of_xx') and <x'^2> (norm_of_xpxp) come from (119) in ref 1.
-        norm_of_xx = 1/5*X**2
-        # <x> (norm_of_x) come from (81) in ref 1.
-        norm_of_x = 0.0
-        # <xx'> (norm_of_xxp) come from (119) in ref 1. NOT used here but here as a reminder
-        norm_of_xxp = 1/5*X*Xp
-        # <x'x'> (norm_of_xpxp) come from (119) in ref 1. NOT used here but here as a reminder
-        norm_of_xpxp = 1/5*Xp**2+5*epsilon_rms_x**2/X**2
-
-        norm_of_yy = 1/5*Y**2
-        norm_of_y = 0.0
-        norm_of_yp = 1/5*Y*Yp
-        norm_of_ypyp = 1/5*Yp**2+5*epsilon_rms_y**2/Y**2
-
-        norm_of_zz = 1/5*Z**2
-        norm_of_z = 0.0
-        norm_of_zp = 1/5*Z*Zp
-        norm_of_zpzp = 1/5*Zp**2+5*epsilon_rms_z**2/Z**2
-
-        # <xE_x> (norm_of_xE_x) come from (115) in ref 1.
-        norm_of_xE_x = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_xx*self.R_D(norm_of_yy, norm_of_zz, norm_of_xx)
-        norm_of_yE_y = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_yy*self.R_D(norm_of_xx, norm_of_zz, norm_of_yy)
-        norm_of_zE_z = 1/5**(3/2)*Q/(4*math.pi*vac_perm)*norm_of_zz*self.R_D(norm_of_xx, norm_of_yy, norm_of_zz)
-        # R_D_bracket() = R_D_() from (111) and (112) in ref 1.
-
-        # eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
-        f_scx = gamma**3*beta**2*m*c**2/q*(norm_of_xx - norm_of_x**2)/norm_of_xE_x # eqn (152) in ref 1. But maybe it should be (157) in ref 1. instead??????????
-        f_scy = gamma**3*beta**2*m*c**2/q*(norm_of_yy - norm_of_y**2)/norm_of_yE_y # (152) (with x->y) in ref 1.
-        f_scz = gamma**3*beta**2*m*c**2/q*(norm_of_zz - norm_of_z**2)/norm_of_zE_z # (152) (with x->z) in ref 1.        
+        one_over_f_scx = K/2*(5*sigma_x)**(-3.0/2)*sigma_x**3*self.R_D(sigma_y**2/sigma_x**2,sigma_z**2/sigma_x**2,1) # negative in exponent instead of 1/... . *sigma_x**3 since (112)
+        one_over_f_scy = K/2*(5*sigma_y)**(-3.0/2)*sigma_y**3*self.R_D(sigma_z**2/sigma_y**2,sigma_x**2/sigma_y**2,1)
+        one_over_f_scz = K/2*(5*sigma_z)**(-3.0/2)*sigma_z**3*self.R_D(sigma_x**2/sigma_z**2,sigma_y**2/sigma_z**2,1)
 
         # Mean of x,y and z from all the particles
         xbar = sum([multipart[i][0][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
         ybar = sum([multipart[i][0][2] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting y out of each particle and then taking the mean
         zbar = sum([multipart[i][0][4] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting z out of each particle and then taking the mean
 
-        # Matrix eqn (154) in ref 1.
         Msc = np.array([
                 [1.0,0.0,0.0,0.0,0.0,0.0,0.0],
-                [self.deltas/f_scx,1.0,0.0,0.0,0.0,0.0,-xbar*self.deltas/f_scx],
+                [self.deltas*one_over_f_scx,1.0,0.0,0.0,0.0,0.0,-xbar*self.deltas*one_over_f_scx],
                 [0.0,0.0,1.0,0.0,0.0,0.0,0.0],
-                [0.0,0.0,self.deltas/f_scy,1.0,0.0,0.0,-ybar*self.deltas/f_scy],
+                [0.0,0.0,self.deltas*one_over_f_scy,1.0,0.0,0.0,-ybar*self.deltas*one_over_f_scy],
                 [0.0,0.0,0.0,0.0,1.0,0.0,0.0],
-                [0.0,0.0,0.0,0.0,self.deltas/f_scz,1.0,-zbar*self.deltas/f_scz],
+                [0.0,0.0,0.0,0.0,self.deltas*one_over_f_scz,1.0,-zbar*self.deltas*one_over_f_scz],
                 [0.0,0.0,0.0,0.0,0.0,0.0,1.0]
             ])
+
+        #R = ... # eqn (161)
+        #Msc = np.dot(R.transpose(),np.dot(Msc, R))
+
         return Msc
 
     def evaluateSC(self,multipart,envelope):
-        self.updateMatrix(multipart,twiss)
+        #self.updateMatrix(multipart,twiss)
+        self.Msc = self.spaceChargeMatrix(multipart, envelope)
         for j in range(0,len(np.atleast_1d(multipart))):
             # The should be a check if Msc and Tsc need to be updated if the beam properties have changed a lot!!!!!!!!
             #if beamChanged(envelope):
