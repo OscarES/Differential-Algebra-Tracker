@@ -643,8 +643,10 @@ class SpaceCharge(LinearElement):
         #########    ])
 
         ## NEW STUFF
-        K = self.q**2*self.N/2/constants.pi/constants.epsilon_0/self.gamma/self.bc2/self.beta**2/self.m/constants.c**2 # (18) (bunched beam) with mods q*q -> q**2 and uses CKA's bc2 instead of a gamma**2
+        #K = self.q**2*self.N/2/constants.pi/constants.epsilon_0/self.gamma/self.bc2/self.beta**2/self.m/constants.c**2 # (18) (bunched beam) with mods q*q -> q**2 and uses CKA's bc2 instead of a gamma**2
         #K = self.I*self.q/2/constants.pi/constants.epsilon_0/gamma**3/beta**3/self.m/constants.c**3 # (20) (continous beam)
+        ## NEWNEW STUFF
+        K = self.I*self.q/2/constants.pi/constants.epsilon_0/self.gamma/self.bc2/self.beta**2/self.m/constants.c**2 # I = q*N
 
         sigma_x = sqrt(envelope[0])
         sigma_y = sqrt(envelope[3])
@@ -678,7 +680,6 @@ class SpaceCharge(LinearElement):
     def evaluateSC(self,multipart,envelope):
         #self.updateMatrix(multipart,twiss)
         self.Msc = self.spaceChargeMatrix(multipart, envelope)
-        print "Msc: \n" + str(self.Msc)
         for j in range(0,len(np.atleast_1d(multipart))):
             # The should be a check if Msc and Tsc need to be updated if the beam properties have changed a lot!!!!!!!!
             #if beamChanged(envelope):
