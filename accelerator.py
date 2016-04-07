@@ -684,8 +684,7 @@ class SpaceCharge(LinearElement):
 
             extendedphasespace = np.append(multipart[j][0][0:6], 1) # adds the dispersion 1 term
             extendedphasespace = np.dot(self.Msc, extendedphasespace) # here calculations are made
-            reducedphasespace = extendedphasespace[0:6] # throws away the dispersion 1 term
-            multipart[j][0][0:6] = reducedphasespace # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
+            multipart[j][0][0:6] = extendedphasespace[0:6] # throws away the dispersion 1 term # s remains the same because the particles don't go anywhere. They "go" in evaluateM()
         envelope = envelopeFromMultipart(multipart) # the envelope is just calculated from the particles (NOT ON ITS OWN)
         #env_with_s = np.array([copy.deepcopy(envelope), self.Lsp]) # there is only an angle kick so the deviation envelope wont change
         return multipart, envelope
