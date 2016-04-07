@@ -650,9 +650,10 @@ class SpaceCharge(LinearElement):
         sigma_y = sqrt(envelope[3])
         sigma_z = sqrt(envelope[6])
 
-        one_over_f_scx = K/2*(5*sigma_x)**(-3.0/2)*sigma_x**3*self.R_D(sigma_y**2/sigma_x**2,sigma_z**2/sigma_x**2,1) # negative in exponent instead of 1/... . *sigma_x**3 since (112)
-        one_over_f_scy = K/2*(5*sigma_y)**(-3.0/2)*sigma_y**3*self.R_D(sigma_z**2/sigma_y**2,sigma_x**2/sigma_y**2,1)
-        one_over_f_scz = K/2*(5*sigma_z)**(-3.0/2)*sigma_z**3*self.R_D(sigma_x**2/sigma_z**2,sigma_y**2/sigma_z**2,1)
+        # R_D[X**2/Z**2,Y**2/Z**2,1] = Z**3*R_D(X**2,Y**2,Z**2)
+        one_over_f_scx = K/2*(5*sigma_x)**(-3.0/2)*sigma_x**3*self.R_D(sigma_y**2,sigma_z**2,sigma_x**2) # negative in exponent instead of 1/... . *sigma_x**3 since (112)
+        one_over_f_scy = K/2*(5*sigma_y)**(-3.0/2)*sigma_y**3*self.R_D(sigma_z**2,sigma_x**2,sigma_y**2)
+        one_over_f_scz = K/2*(5*sigma_z)**(-3.0/2)*sigma_z**3*self.R_D(sigma_x**2,sigma_y**2,sigma_z**2)
 
         # Mean of x,y and z from all the particles
         xbar = sum([multipart[i][0][0] for i in xrange(len(multipart))])/(len(multipart)) # Tedious way of getting x out of each particle and then taking the mean
@@ -677,6 +678,7 @@ class SpaceCharge(LinearElement):
     def evaluateSC(self,multipart,envelope):
         #self.updateMatrix(multipart,twiss)
         self.Msc = self.spaceChargeMatrix(multipart, envelope)
+        print "Msc: \n" + str(self.Msc)
         for j in range(0,len(np.atleast_1d(multipart))):
             # The should be a check if Msc and Tsc need to be updated if the beam properties have changed a lot!!!!!!!!
             #if beamChanged(envelope):
