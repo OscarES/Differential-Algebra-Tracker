@@ -15,7 +15,6 @@ from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
 from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart, saveEnvelope # loadLattice, saveLattice
 import numpy as np
 from scipy import *
-from scipy import constants
 from facility import *
 from relativity import *
 import re
@@ -1083,16 +1082,16 @@ class LatticeEditor(QGroupBox):
             try:
                 nu_x = float(valueOfnu_x)
             except:
-                print "Not a number! nu_x set to 0.246*2*pi"
-                nu_x = 0.246*2*constants.pi
+                print "Not a number! nu_x set to 0.246"
+                nu_x = 0.246
 
         if not self.enternu_y.isHidden():
             valueOfnu_y = self.enternu_y.text()
             try:
                 nu_y = float(valueOfnu_y)
             except:
-                print "Not a number! nu_y set to 0.246*2*pi"
-                nu_y = 0.246*2*constants.pi
+                print "Not a number! nu_y set to 0.246"
+                nu_y = 0.246
 
         ## Make new elements
         if self.selectedElement == "Drift":
