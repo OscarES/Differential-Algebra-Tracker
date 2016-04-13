@@ -989,6 +989,10 @@ class LatticeEditor(QGroupBox):
         self.entern.hide()
         self.textOrder.hide()
         self.enterOrder.hide()
+        self.textnu_x.hide()
+        self.enternu_x.hide()
+        self.textnu_y.hide()
+        self.enternu_y.hide()
 
         if text == "Drift":
             self.textL.show()
