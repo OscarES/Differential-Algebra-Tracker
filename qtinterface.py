@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
 from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart, saveEnvelope # loadLattice, saveLattice
 import numpy as np
 from scipy import *
+from scipy import constants
 from facility import *
 from relativity import *
 import re
@@ -55,12 +56,13 @@ class LatticeOverviewWidget(QGLWidget):
         lattticeString = self.facility.printLattice()
         self.elements = []
         nextWillBeL = 0
+        print lattticeString
         for line in lattticeString.split():
             if nextWillBeL:
                 self.elements.append([tempword, float(line)])
                 self.cameraSpeed_s = float(line)
                 nextWillBeL = 0
-            if line == "drift" or line == "dipole" or line == "quad" or line == "liealgelem" or line == "cavity":  
+            if line == "drift" or line == "dipole" or line == "quad" or line == "liealgelem" or line == "rotation" or line == "cavity":  
                 tempword = line
             if line == "L:":
                 nextWillBeL = 1
@@ -80,6 +82,8 @@ class LatticeOverviewWidget(QGLWidget):
                 color = [1, 0, 0]
             elif elem[0] == "liealgelem":
                 color = [0, 0, 1]
+            elif elem[0] == "rotation":
+                color = [0, 0, 0]
             elif elem[0] == "cavity":
                 color = [1, 1, 0]
 
@@ -845,6 +849,7 @@ class LatticeEditor(QGroupBox):
         self.elementSelector.addItem("Dipole")
         self.elementSelector.addItem("Quadrupole")
         self.elementSelector.addItem("Sextupole")
+        self.elementSelector.addItem("Rotation")
         self.elementSelector.addItem("RF-Cavity")
         self.elementSelector.addItem("Higher order element")
         grid.addWidget(self.elementSelector, 2, 0)
@@ -908,6 +913,23 @@ class LatticeEditor(QGroupBox):
         self.enterOrder = QLineEdit()
         grid.addWidget(self.enterOrder, 6, 1)
         self.enterOrder.hide()
+
+        ## Rotation
+        self.textnu_x = QLabel("nu_x:")
+        grid.addWidget(self.textnu_x, 4, 0)
+        self.textnu_x.hide()
+
+        self.enternu_x = QLineEdit()
+        grid.addWidget(self.enternu_x, 4, 1)
+        self.enternu_x.hide()
+
+        self.textnu_y = QLabel("nu_y:")
+        grid.addWidget(self.textnu_y, 5, 0)
+        self.textnu_y.hide()
+
+        self.enternu_y = QLineEdit()
+        grid.addWidget(self.enternu_y, 5, 1)
+        self.enternu_y.hide()
 
         ## Create Element
         createElementButton = QPushButton("Create Element")
@@ -990,6 +1012,11 @@ class LatticeEditor(QGroupBox):
             self.enterL.show()
             self.textOrder.show()
             self.enterOrder.show()
+        elif text == "Rotation":
+            self.textnu_x.show()
+            self.enternu_x.show()
+            self.textnu_y.show()
+            self.enternu_y.show()
         elif text == "RF-Cavity":
             self.textL.show()
             self.enterL.show()
@@ -1047,6 +1074,22 @@ class LatticeEditor(QGroupBox):
                 print "Not a number! Order set to 5"
                 Order = 5
 
+        if not self.enternu_x.isHidden():
+            valueOfnu_x = self.enternu_x.text()
+            try:
+                nu_x = float(valueOfnu_x)
+            except:
+                print "Not a number! nu_x set to 0.246*2*pi"
+                nu_x = 0.246*2*constants.pi
+
+        if not self.enternu_y.isHidden():
+            valueOfnu_y = self.enternu_y.text()
+            try:
+                nu_y = float(valueOfnu_y)
+            except:
+                print "Not a number! nu_y set to 0.246*2*pi"
+                nu_y = 0.246*2*constants.pi
+
         ## Make new elements
         if self.selectedElement == "Drift":
             self.facility.createDrift(name, L)
@@ -1056,6 +1099,8 @@ class LatticeEditor(QGroupBox):
             self.facility.createQuadrupole(name, K, L)
         elif self.selectedElement == "Sextupole":
             self.facility.createSextupole(name, K, L, Order)
+        elif self.selectedElement == "Rotation":
+            self.facility.createRotation(name, nu_x, nu_y)
         elif self.selectedElement == "RF-Cavity":
             Oscillations = 2
             AmplitudeA = 0

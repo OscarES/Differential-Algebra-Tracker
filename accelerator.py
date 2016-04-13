@@ -52,6 +52,10 @@ class Lattice:
         sextu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(sextu)
 
+    def createRotation(self, name, nu_x, nu_y):
+        rot = Rotation(name, nu_x, nu_y)
+        self.appendElement(rot)
+
     def createCavity(self, name, L, Ezofs):
         cavity = Cavity(name, L, Ezofs, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(cavity)
@@ -1065,6 +1069,70 @@ class LieAlgElement(Element):
             particle[0][5] = self.numFuns[5](x, xp, y, yp, z, zp)
 
             particle[1] += self.Lsp
+        envelope = envelopeFromMultipart(multipart)
+        env_with_s = np.array([envelope, self.Lsp])
+        return multipart, envelope, env_with_s
+
+
+### DRIFT !!!!
+class Rotation(LinearElement):
+    def __init__(self, name, nu_x, nu_y):
+        LinearElement.__init__(self, "rotation " + name)        
+        self.L = 0.0
+        self.M = self.createMatrixM(nu_x, nu_y) # M should be a 6x6 matrix
+        self.T = self.createMatrixT(self.M) # M should be a 9x9 matrix
+        
+        self.Lsp = 0.0
+        self.Msp = self.M
+        self.Tsp = self.T
+
+    def printInfo(self):
+        return self.name + "\t L: " + str(self.L)
+
+    def printMatrix(self):
+        MspAsMatrix = np.asmatrix(self.Msp)
+        return str(MspAsMatrix**self.n)
+
+    def createMatrixM(self,nu_x, nu_y):
+        return np.array([
+                [cos(2*constants.pi*nu_x),sin(2*constants.pi*nu_x),0,0,0,0],
+                [-sin(2*constants.pi*nu_x),cos(2*constants.pi*nu_x),0,0,0,0],
+                [0,0,cos(2*constants.pi*nu_y),sin(2*constants.pi*nu_y),0,0],
+                [0,0,-sin(2*constants.pi*nu_y),cos(2*constants.pi*nu_y),0,0],
+                [0,0,0,0,1,0],
+                [0,0,0,0,0,1]
+                ])
+    def createMatrixT(self, M):
+        # T is size 9x9 and defined from eqn (1.56) in ref C
+        return np.array([
+                [M[0,0]**2, 2*M[0,0]*M[0,1], M[0,1]**2, 0, 0, 0, 0, 0, 0],
+                [M[0,0]*M[1,0], M[0,0]*M[1,1]+M[0,1]*M[1,0], M[0,1]*M[1,1], 0, 0, 0, 0, 0, 0],
+                [M[1,0]**2, 2*M[1,0]*M[1,1], M[1,1]**2, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, M[2,2]**2, 2*M[2,2]*M[2,3], M[2,3]**2, 0, 0, 0],
+                [0, 0, 0, M[2,2]*M[3,2], M[2,2]*M[3,3]+M[2,3]*M[3,2], M[2,3]*M[3,3], 0, 0, 0],
+                [0, 0, 0, M[3,2]**2, 2*M[3,2]*M[3,3], M[3,3]**2, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, M[4,4]**2, 2*M[4,4]*M[4,5], M[4,5]**2],
+                [0, 0, 0, 0, 0, 0, M[4,4]*M[5,4], M[4,4]*M[5,5]+M[4,5]*M[5,4], M[4,5]*M[5,5]],
+                [0, 0, 0, 0, 0, 0, M[5,4]**2, 2*M[5,4]*M[5,5], M[5,5]**2]
+                ])
+
+    def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
+        return
+
+    def evaluateWithoutSC(self,multipart,envelope,twiss):
+        #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+        #twiss[4] = envelope[3] / twiss[5]
+        #twiss[7] = envelope[6] / twiss[8]
+        multipart, envelope, env_with_s = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
+            
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluateMT(self,multipart,envelope):
+        # should just go through a disunited part
+        for j in range(0,len(np.atleast_1d(multipart))):
+            multipart[j][0][0:6] = np.dot(self.Msp, multipart[j][0][0:6])
+            multipart[j][1] = multipart[j][1] + self.Lsp
+        #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([envelope, self.Lsp])
         return multipart, envelope, env_with_s
