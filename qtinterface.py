@@ -848,6 +848,7 @@ class LatticeEditor(QGroupBox):
         self.elementSelector.addItem("Dipole")
         self.elementSelector.addItem("Quadrupole")
         self.elementSelector.addItem("Sextupole")
+        self.elementSelector.addItem("Sextupolerel")
         self.elementSelector.addItem("Rotation")
         self.elementSelector.addItem("RF-Cavity")
         self.elementSelector.addItem("Higher order element")
@@ -905,6 +906,14 @@ class LatticeEditor(QGroupBox):
         self.entern.hide()
 
         ## Sextupole
+        self.textsK = QLabel("K [m^-3]:") # see calculations 2016-03-18 and TraceWin man s 102
+        grid.addWidget(self.textsK, 5, 0)
+        self.textsK.hide()
+
+        self.entersK = QLineEdit()
+        grid.addWidget(self.entersK, 5, 1)
+        self.entersK.hide()
+
         self.textOrder = QLabel("Order []:")
         grid.addWidget(self.textOrder, 6, 0)
         self.textOrder.hide()
@@ -986,6 +995,8 @@ class LatticeEditor(QGroupBox):
         self.enterAlpha.hide()
         self.textn.hide()
         self.entern.hide()
+        self.textsK.hide()
+        self.entersK.hide()
         self.textOrder.hide()
         self.enterOrder.hide()
         self.textnu_x.hide()
@@ -1011,6 +1022,13 @@ class LatticeEditor(QGroupBox):
         elif text == "Sextupole":
             self.textK.show()
             self.enterK.show()
+            self.textL.show()
+            self.enterL.show()
+            self.textOrder.show()
+            self.enterOrder.show()
+        elif text == "Sextupolerel":
+            self.textsK.show()
+            self.entersK.show()
             self.textL.show()
             self.enterL.show()
             self.textOrder.show()
@@ -1069,6 +1087,15 @@ class LatticeEditor(QGroupBox):
                 print "Not a number! n set to 0.0"
                 n = 0.0
 
+        if not self.entersK.isHidden():
+            valueOfsK = self.entersK.text()
+            try:
+                K = float(valueOfsK)
+            except:
+                print "Not a number! K set to 0.0"
+                K = 0.0
+
+
         if not self.enterOrder.isHidden():
             valueOfOrder = self.enterOrder.text()
             try:
@@ -1102,6 +1129,8 @@ class LatticeEditor(QGroupBox):
             self.facility.createQuadrupole(name, K, L)
         elif self.selectedElement == "Sextupole":
             self.facility.createSextupole(name, K, L, Order)
+        elif self.selectedElement == "Sextupolerel":
+            self.facility.createSextupolerel(name, K, L, Order)
         elif self.selectedElement == "Rotation":
             self.facility.createRotation(name, nu_x, nu_y)
         elif self.selectedElement == "RF-Cavity":

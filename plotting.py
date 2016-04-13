@@ -150,6 +150,8 @@ def plotEverything(multipartin,twiss,multipartout, envlist):#,envx,envy):
     ax6.plot(xo,xpo,'ro', zorder=1)
     ax6.set_xlim(-5*sigma_x_after, 5*sigma_x_after)
     ax6.set_ylim(-5*sigma_xp_after, 5*sigma_xp_after)
+    #ax6.set_xlim(-0.004, 0.004)
+    #ax6.set_ylim(-0.004, 0.004)
     plt.title('Values after lattice in x')
     plt.xlabel('x [m]')
     plt.ylabel('xp []')

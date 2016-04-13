@@ -32,6 +32,9 @@ class Facility():
     def createSextupole(self,name, K, L, compOrder):
         self.lattice.createSextupole(name, K, L, compOrder)
 
+    def createSextupolerel(self,name, K, L, compOrder):
+        self.lattice.createSextupolerel(name, K, L, compOrder)
+
     def createRotation(self, name, nu_x, nu_y):
         self.lattice.createRotation(name, nu_x, nu_y)
 

@@ -52,6 +52,11 @@ class Lattice:
         sextu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(sextu)
 
+    def createSextupolerel(self,name, K, L, compOrder):
+        hamToUse = "sextupolehamrel"
+        sextu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(sextu)
+
     def createRotation(self, name, nu_x, nu_y):
         rot = Rotation(name, nu_x, nu_y)
         self.appendElement(rot)
@@ -982,6 +987,14 @@ class LieAlgElement(Element):
         self.sextupoleham = -self.l/2*(2/3*self.k**2*(self.qx**3-3*self.qx*self.qy**2)+(self.px**2+self.py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
         self.octupoleham = -self.l/2*(2/4*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+(self.px**2+self.py**2)) # same decision as above
 
+        ## Relativistic Hamiltonian from Wolski
+        beta = beamdata[0]
+        gamma = gammaFromBeta(beta)
+        beta = 1 # ultra relativistic
+        gamma = 1e20 # ultra relativistic
+        # delta =approx= gamma**2*z' from tracewins conversion section
+        self.sextupolehamrel = gamma**2*self.pz/beta - sqrt((1/beta + gamma**2*self.pz)**2 - self.px**2 - self.py**2 - 1/(beta**2*gamma**2)) + self.k/6*(self.qx**3 - 3*self.qx*self.qy**2) # (9.47)
+
         if self.hamToUse == "drift":
             self.numFuns = self.LA.hamToNumFuns(self.driftham, self.K, self.Lsp, self.order)
         elif self.hamToUse == "quad":
@@ -992,6 +1005,8 @@ class LieAlgElement(Element):
             self.numFuns = self.LA.hamToNumFuns(self.sextupoleham, self.K, self.Lsp, self.order)
         elif self.hamToUse == "octupoleham":
             self.numFuns = self.LA.hamToNumFuns(self.octupoleham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "sextupolehamrel":
+            self.numFuns = self.LA.hamToNumFuns(self.sextupolehamrel, self.K, self.Lsp, self.order)
 
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
@@ -1074,7 +1089,7 @@ class LieAlgElement(Element):
         return multipart, envelope, env_with_s
 
 
-### DRIFT !!!!
+### Rotation !!!!
 class Rotation(LinearElement):
     def __init__(self, name, nu_x, nu_y):
         LinearElement.__init__(self, "rotation " + name)        
