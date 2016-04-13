@@ -106,12 +106,17 @@ def gaussianTwiss1D(nbrOfParticles, alpha, beta, epsilon):
     xi = np.random.normal(0,1,nbrOfParticles)
     xip = np.random.normal(0,1,nbrOfParticles)
 
-    M = np.array([
-        [1/np.sqrt(beta*epsilon), 0],
-        [alpha/np.sqrt(beta*epsilon), np.sqrt(beta/epsilon)]
-        ])
+    #M = np.array([
+    #    [1/np.sqrt(beta*epsilon), 0],
+    #    [alpha/np.sqrt(beta*epsilon), np.sqrt(beta/epsilon)]
+    #    ])
+#
+    #Minv = np.linalg.inv(M)
 
-    Minv = np.linalg.inv(M)
+    Minv = np.array([
+        [np.sqrt(beta*epsilon), 0],
+        [-alpha*np.sqrt(epsilon/beta), np.sqrt(epsilon/beta)]
+        ])
 
     x = np.zeros(nbrOfParticles)
     xp = np.zeros(nbrOfParticles)
