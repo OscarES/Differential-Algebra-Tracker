@@ -29,6 +29,9 @@ class Facility():
     def createQuadrupole(self, name, K, L):
         self.lattice.createQuadrupole(name, K, L)
 
+    def createLieDrift(self, name, L, compOrder):
+        self.lattice.createLieDrift(name, L, compOrder)
+
     def createSextupole(self, name, K, L, compOrder):
         self.lattice.createSextupole(name, K, L, compOrder)
 

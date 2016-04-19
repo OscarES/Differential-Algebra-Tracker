@@ -856,6 +856,7 @@ class LatticeEditor(QGroupBox):
         self.elementSelector.addItem("Drift")
         self.elementSelector.addItem("Dipole")
         self.elementSelector.addItem("Quadrupole")
+        self.elementSelector.addItem("LieDrift")
         self.elementSelector.addItem("Sextupole")
         self.elementSelector.addItem("Octupole")
         self.elementSelector.addItem("Sextupolerel")
@@ -1043,6 +1044,11 @@ class LatticeEditor(QGroupBox):
             self.enterAlpha.show()
             self.textn.show()
             self.entern.show()
+        if text == "LieDrift":
+            self.textL.show()
+            self.enterL.show()
+            self.textOrder.show()
+            self.enterOrder.show()
         elif text == "Sextupole":
             self.textK.show()
             self.enterK.show()
@@ -1176,6 +1182,8 @@ class LatticeEditor(QGroupBox):
             self.facility.createDipole(name, Rho, Alpha, n)
         elif self.selectedElement == "Quadrupole":
             self.facility.createQuadrupole(name, K, L)
+        elif self.selectedElement == "LieDrift":
+            self.facility.createLieDrift(name, L, Order)
         elif self.selectedElement == "Sextupole":
             self.facility.createSextupole(name, K, L, Order)
         elif self.selectedElement == "Octupole":

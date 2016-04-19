@@ -48,6 +48,11 @@ class Lattice:
         quad = Quad(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(quad)
 
+    def createLieDrift(self, name, L, compOrder):
+        hamToUse = "driftham"
+        liedrift = LieAlgElement(name, hamToUse, 0, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(liedrift)
+
     def createSextupole(self, name, K, L, compOrder):
         hamToUse = "sextupoleham"
         sextu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
@@ -1006,13 +1011,14 @@ class LieAlgElement(Element):
         self.LA = LieAlgebra() # Lie algebra object
 
         ## Hamiltonians, works with Lie transform which says "Ems formalism"
-        self.driftham = -self.l/2*(self.px**2 + self.py**2 + self.pz**2)
+        #self.driftham = -self.l/2*(self.px**2 + self.py**2 + self.pz**2)
         self.quadham = -self.l/2*(self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
         self.quaddefocusham = -self.l/2*(-self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
         #self.sextupoleham = -self.l/2*(2/3*self.k**2*(self.qx**3-3*self.qx*self.qy**2)+(self.px**2+self.py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
         #self.octupoleham = -self.l/2*(2/4*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+(self.px**2+self.py**2)) # same decision as above
 
         ## redefined Hamiltonians (works!!!!! for sextu, ) works with the "relativistic" transform
+        self.driftham = 1/2*(self.px**2 + self.py**2 + self.pz**2)
         self.sextupoleham = 1/6*self.k*(self.qx**3-3*self.qx*self.qy**2)+1/2*(self.px**2+self.py**2) # works with lie trans for the rel (which is the better trans)
         self.octupoleham = 1/8*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+1/2*(self.px**2+self.py**2)
 
@@ -1029,7 +1035,7 @@ class LieAlgElement(Element):
         self.sextupolehamrel = -sqrt(1 - self.px**2) + self.k/6*(self.qx**3) # (9.47) # only in x dimension!!!!
         #self.octupolehamrel = -sqrt(1 - self.px**2) + 2/8*self.k*(self.qx**4)
 
-        if self.hamToUse == "drift":
+        if self.hamToUse == "driftham":
             self.numFuns = self.LA.hamToNumFuns(self.driftham, self.K, self.Lsp, self.order)
         elif self.hamToUse == "quad":
             self.numFuns = self.LA.hamToNumFuns(self.quadham, self.K, self.Lsp, self.order)
@@ -1055,7 +1061,7 @@ class LieAlgElement(Element):
         self.n = nbrOfSplits
         self.Lsp = self.L/self.n
         
-        if self.hamToUse == "drift":
+        if self.hamToUse == "driftham":
             self.numFuns = self.LA.hamToNumFuns(self.driftham, self.K, self.Lsp, self.order)
         elif self.hamToUse == "quad":
             self.numFuns = self.LA.hamToNumFuns(self.quadham, self.K, self.Lsp, self.order)
