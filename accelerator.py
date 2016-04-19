@@ -159,8 +159,8 @@ class Lattice:
                     multipart,envelope, twiss, env_with_s = elem.evaluateWithoutSC(multipart,envelope,twiss)
                     env_with_s[1] = env_with_s[1] + envlist[-1][1]
                     envlist.append(env_with_s)
-                    for i in range(len(multipart)):
-                        multipartafterall.append(copy.deepcopy(multipart[i]))
+                    #for i in range(len(multipart)): # for saving the particles after each element
+                    #    multipartafterall.append(copy.deepcopy(multipart[i]))
         t1 = time.clock()
         tdiff = t1-t0
         print "Evaluation finished, time = " + str(tdiff)
