@@ -520,6 +520,10 @@ class BeamEditor(QGroupBox):
         useTwissButton.clicked.connect(self.useTwissInput)
         grid.addWidget(useTwissButton,9,4)
 
+        generateGridpartButton = QPushButton("Generate particle grid\n(# of particles squared)")
+        generateGridpartButton.clicked.connect(self.generateGridpart)
+        grid.addWidget(generateGridpartButton,8,5)
+
         generateMultipartButton = QPushButton("Generate Multiparticles")
         generateMultipartButton.clicked.connect(self.generateMultipart)
         grid.addWidget(generateMultipartButton,9,5)
@@ -617,6 +621,11 @@ class BeamEditor(QGroupBox):
         nbrOfParticles = self.getNbrOfParticles()
         twiss = self.getTwissFromInput()
         self.facility.generateMultipart(nbrOfParticles, twiss)
+        return
+
+    def generateGridpart(self):
+        nbrOfParticles = self.getNbrOfParticles()
+        self.facility.generateGridpart(nbrOfParticles)
         return
 
     def getNbrOfParticles(self):
@@ -848,7 +857,10 @@ class LatticeEditor(QGroupBox):
         self.elementSelector.addItem("Dipole")
         self.elementSelector.addItem("Quadrupole")
         self.elementSelector.addItem("Sextupole")
+        self.elementSelector.addItem("Octupole")
         self.elementSelector.addItem("Sextupolerel")
+        self.elementSelector.addItem("Sextupolemat")
+        self.elementSelector.addItem("Sextupolematema")
         self.elementSelector.addItem("Rotation")
         self.elementSelector.addItem("RF-Cavity")
         self.elementSelector.addItem("Higher order element")
@@ -914,6 +926,16 @@ class LatticeEditor(QGroupBox):
         grid.addWidget(self.entersK, 5, 1)
         self.entersK.hide()
 
+        ## Octupole
+        self.textoK = QLabel("K [m^-3]:") # see calculations 2016-03-18 and TraceWin man s 102
+        grid.addWidget(self.textoK, 5, 0)
+        self.textoK.hide()
+
+        self.enteroK = QLineEdit()
+        grid.addWidget(self.enteroK, 5, 1)
+        self.enteroK.hide()
+
+        ## Order for Liealgelements
         self.textOrder = QLabel("Order []:")
         grid.addWidget(self.textOrder, 6, 0)
         self.textOrder.hide()
@@ -997,6 +1019,8 @@ class LatticeEditor(QGroupBox):
         self.entern.hide()
         self.textsK.hide()
         self.entersK.hide()
+        self.textoK.hide()
+        self.enteroK.hide()
         self.textOrder.hide()
         self.enterOrder.hide()
         self.textnu_x.hide()
@@ -1026,6 +1050,13 @@ class LatticeEditor(QGroupBox):
             self.enterL.show()
             self.textOrder.show()
             self.enterOrder.show()
+        elif text == "Octupole":
+            self.textoK.show()
+            self.enteroK.show()
+            self.textL.show()
+            self.enterL.show()
+            self.textOrder.show()
+            self.enterOrder.show()
         elif text == "Sextupolerel":
             self.textsK.show()
             self.entersK.show()
@@ -1033,6 +1064,16 @@ class LatticeEditor(QGroupBox):
             self.enterL.show()
             self.textOrder.show()
             self.enterOrder.show()
+        elif text == "Sextupolemat":
+            self.textsK.show()
+            self.entersK.show()
+            self.textL.show()
+            self.enterL.show()
+        elif text == "Sextupolematema":
+            self.textsK.show()
+            self.entersK.show()
+            self.textL.show()
+            self.enterL.show()
         elif text == "Rotation":
             self.textnu_x.show()
             self.enternu_x.show()
@@ -1095,6 +1136,14 @@ class LatticeEditor(QGroupBox):
                 print "Not a number! K set to 0.0"
                 K = 0.0
 
+        if not self.enteroK.isHidden():
+            valueOfoK = self.enteroK.text()
+            try:
+                K = float(valueOfoK)
+            except:
+                print "Not a number! K set to 0.0"
+                K = 0.0
+
 
         if not self.enterOrder.isHidden():
             valueOfOrder = self.enterOrder.text()
@@ -1129,8 +1178,14 @@ class LatticeEditor(QGroupBox):
             self.facility.createQuadrupole(name, K, L)
         elif self.selectedElement == "Sextupole":
             self.facility.createSextupole(name, K, L, Order)
+        elif self.selectedElement == "Octupole":
+            self.facility.createOctupole(name, K, L, Order)
         elif self.selectedElement == "Sextupolerel":
             self.facility.createSextupolerel(name, K, L, Order)
+        elif self.selectedElement == "Sextupolemat":
+            self.facility.createSextupolemat(name, K, L)
+        elif self.selectedElement == "Sextupolematema":
+            self.facility.createSextupolematema(name, K, L)
         elif self.selectedElement == "Rotation":
             self.facility.createRotation(name, nu_x, nu_y)
         elif self.selectedElement == "RF-Cavity":

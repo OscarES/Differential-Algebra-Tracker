@@ -15,6 +15,7 @@ import abc
 from particleFactory import envelopeFromMultipart
 from relativity import betaFromE, gammaFromBeta
 import copy
+import time
 
 # beamdata comes as [beta, rf_lambda, m, q, E, nbrOfParticles, I]
 # the units for beamdata: beta is unitless, rf_lambda is in m, m is in kg, q is in C, E is in J (should be in Mev later), nbrOfParticles is unitless, I is Ameperes
@@ -47,14 +48,27 @@ class Lattice:
         quad = Quad(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(quad)
 
-    def createSextupole(self,name, K, L, compOrder):
+    def createSextupole(self, name, K, L, compOrder):
         hamToUse = "sextupoleham"
         sextu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(sextu)
 
-    def createSextupolerel(self,name, K, L, compOrder):
+    def createOctupole(self, name, K, L, compOrder):
+        hamToUse = "octupoleham"
+        octu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(octu)
+
+    def createSextupolerel(self, name, K, L, compOrder):
         hamToUse = "sextupolehamrel"
         sextu = LieAlgElement(name, hamToUse, K, L, compOrder, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(sextu)
+
+    def createSextupolemat(self, name, K, L):
+        sextu = SextupoleMat(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
+        self.appendElement(sextu)
+
+    def createSextupolematema(self, name, K, L):
+        sextu = SextupoleMatEma(name, K, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(sextu)
 
     def createRotation(self, name, nu_x, nu_y):
@@ -123,11 +137,14 @@ class Lattice:
         return text
 
     def evaluate(self, multipartin,envelopein,twissin):
+        print "Evaluation started..."
+        t0 = time.clock()
         multipart = copy.deepcopy(multipartin)
         envelope = copy.deepcopy(envelopein)
         twiss = copy.deepcopy(twissin)
         envlist = list()
         envlist.append(np.array([envelope, 0]))
+        multipartafterall = copy.deepcopy(multipartin)
         if self.spaceChargeOn:
             for elem in self.lattice:
                 print elem.printInfo()
@@ -135,12 +152,19 @@ class Lattice:
                 env_with_s[1] = env_with_s[1] + envlist[-1][1]
                 envlist.append(env_with_s)
         else:
-            for elem in self.lattice:
-                print elem.printInfo()
-                multipart,envelope, twiss, env_with_s = elem.evaluateWithoutSC(multipart,envelope,twiss)
-                env_with_s[1] = env_with_s[1] + envlist[-1][1]
-                envlist.append(env_with_s)
-        return multipart,envelope, twiss, envlist
+            laps = 1000
+            for i in range(0,laps):
+                for elem in self.lattice:
+                    #print elem.printInfo()
+                    multipart,envelope, twiss, env_with_s = elem.evaluateWithoutSC(multipart,envelope,twiss)
+                    env_with_s[1] = env_with_s[1] + envlist[-1][1]
+                    envlist.append(env_with_s)
+                    for i in range(len(multipart)):
+                        multipartafterall.append(copy.deepcopy(multipart[i]))
+        t1 = time.clock()
+        tdiff = t1-t0
+        print "Evaluation finished, time = " + str(tdiff)
+        return multipart,envelope, twiss, envlist, multipartafterall
 
     def relativityAtTheEnd(self, multipart,envelope):
         return multipart,envelope
@@ -880,7 +904,8 @@ class LieAlgebra():
                 lieterm = simplify(self.lieop(ham,lieterm))
 
             #voft = voft + t**i / factorial(i) * lieterm # for my formalism, #zzz
-            voft = voft + lieterm / factorial(i) # for Ems formalism, shouldn't each term also 
+            #voft = voft + lieterm / factorial(i) # for Ems formalism, (For all the old hamiltonians)
+            voft = voft + (-self.l)**i * lieterm / factorial(i) # adds L**i (used for relativistic hamiltonians (those with sqrt:s))
 
         return voft
 
@@ -951,7 +976,7 @@ class LieAlgebra():
         ## symplecticity check with 1.81 in ref C (checks if J^T*S*J = S)
         #if sum(sum(np.isclose(LHSminusS.astype(np.float64), np.zeros((2*size,2*size)).astype(np.float64)))) == LHSminusS.size: # if all elements are close the sum will be a sum of ones
         #    return 1
-
+        print "distance from symplecticity: " + str(abs(detOfJ-1))
         return 0
 
 # General class for elements from Hamiltonians, can be linear but since all is based on differential algebra "linear" is set to 0
@@ -980,20 +1005,29 @@ class LieAlgElement(Element):
 
         self.LA = LieAlgebra() # Lie algebra object
 
-        ## Hamiltonians
+        ## Hamiltonians, works with Lie transform which says "Ems formalism"
         self.driftham = -self.l/2*(self.px**2 + self.py**2 + self.pz**2)
         self.quadham = -self.l/2*(self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
         self.quaddefocusham = -self.l/2*(-self.k**2*(self.qx**2-self.qy**2)+self.px**2+self.py**2+self.pz**2) # replace k with -k for defocus. Without quad term in z dir
-        self.sextupoleham = -self.l/2*(2/3*self.k**2*(self.qx**3-3*self.qx*self.qy**2)+(self.px**2+self.py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
-        self.octupoleham = -self.l/2*(2/4*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+(self.px**2+self.py**2)) # same decision as above
+        #self.sextupoleham = -self.l/2*(2/3*self.k**2*(self.qx**3-3*self.qx*self.qy**2)+(self.px**2+self.py**2)) # should the ps' perhaps be divided by 2 as in nonlinear2013_3.pdf? That division is assumed to be the l/2 in the beginning, . k is actually k**2
+        #self.octupoleham = -self.l/2*(2/4*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+(self.px**2+self.py**2)) # same decision as above
+
+        ## redefined Hamiltonians (works!!!!! for sextu, ) works with the "relativistic" transform
+        self.sextupoleham = 1/6*self.k*(self.qx**3-3*self.qx*self.qy**2)+1/2*(self.px**2+self.py**2) # works with lie trans for the rel (which is the better trans)
+        self.octupoleham = 2/8*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+1/2*(self.px**2+self.py**2)
 
         ## Relativistic Hamiltonian from Wolski
-        beta = beamdata[0]
-        gamma = gammaFromBeta(beta)
-        beta = 1 # ultra relativistic
-        gamma = 1e20 # ultra relativistic
+        #beta = beamdata[0]
+        #gamma = gammaFromBeta(beta)
+        #beta = 1 # ultra relativistic
+        #gamma = 1e20 # ultra relativistic
         # delta =approx= gamma**2*z' from tracewins conversion section
-        self.sextupolehamrel = gamma**2*self.pz/beta - sqrt((1/beta + gamma**2*self.pz)**2 - self.px**2 - self.py**2 - 1/(beta**2*gamma**2)) + self.k/6*(self.qx**3 - 3*self.qx*self.qy**2) # (9.47)
+        #self.sextupolehamrel = gamma**2*self.pz/beta - sqrt((1/beta + gamma**2*self.pz)**2 - self.px**2 - self.py**2 - 1/(beta**2*gamma**2)) + self.k/6*(self.qx**3 - 3*self.qx*self.qy**2) # (9.47)
+        # delta =approx= z'
+        #self.sextupolehamrel = self.pz/beta - sqrt((1/beta + self.pz)**2 - self.px**2 - self.py**2 - 1/(beta**2*gamma**2)) + self.k/6*(self.qx**3 - 3*self.qx*self.qy**2) # (9.47)
+        # only x and xp (y, yp, z and delta = 0), with beta = 1 and gamma = inf
+        self.sextupolehamrel = -sqrt(1 - self.px**2) + self.k/6*(self.qx**3) # (9.47) # only in x dimension!!!!
+        #self.octupolehamrel = -sqrt(1 - self.px**2) + 2/8*self.k*(self.qx**4)
 
         if self.hamToUse == "drift":
             self.numFuns = self.LA.hamToNumFuns(self.driftham, self.K, self.Lsp, self.order)
@@ -1088,6 +1122,158 @@ class LieAlgElement(Element):
         env_with_s = np.array([envelope, self.Lsp])
         return multipart, envelope, env_with_s
 
+class SextupoleMat(Element): # Based on wolski ch 10, mainly eqn (10.6)
+    def __init__(self, name, K, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
+        Element.__init__(self, "liealgelem mat " + name, 0)
+
+        self.L = L
+        self.K = K
+        self.n = nbrOfSplits # matches matrix approach well
+        self.Lsp = L/self.n
+
+        self.qx = Symbol('qx')
+        self.px = Symbol('px')
+
+        xf = self.qx + self.L*self.px/sqrt(1-self.px**2)
+        xpf = self.px - self.K*self.L*self.qx**2/2 - self.K*self.L**2*self.qx*self.px/sqrt(1-self.px**2) - self.K*self.L**3*self.px**2/(2*(1-self.px**2))
+        #xfun = -self.k*self.l**2*self.qx**2/(4*(-self.px**2 + 1)**(3/2)) + self.l*self.px/sqrt(-self.px**2 + 1) + self.qx # moved here from a temp place in LieAlg
+        #xprimefun = -self.k*self.l**2*self.px*self.qx/(2*sqrt(-self.px**2 + 1)) + self.k*self.l*self.qx**2/2 + self.px # moved here from a temp place in LieAlg
+
+        self.xNumFun = lambdify((self.qx,self.px),xf, "numpy")
+        self.xpNumFun = lambdify((self.qx,self.px),xpf, "numpy")
+
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+
+    def printInfo(self):
+        return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K)
+
+    def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+
+    def evaluateWithSC(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        for i in range(0,self.n):
+            self.sc.updateMatrix(multipart,twiss)
+            multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
+            multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #twiss[7] = envelope[6] / twiss[8]
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluateWithoutSC(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        for i in range(0,self.n):
+            multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #twiss[7] = envelope[6] / twiss[8]
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluate(self,multipart,envelope,twiss):
+        # some for loop that goes through all of the disunited parts
+        for i in range(0,self.n):
+            multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+            #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+            #twiss[4] = envelope[3] / twiss[5]
+            #twiss[7] = envelope[6] / twiss[8]
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluateNumFun(self,multipart,envelope):
+        for particle in multipart:
+
+            x = particle[0][0]
+            xp = particle[0][1]
+
+            particle[0][0] = self.xNumFun(x, xp)
+            particle[0][1] = self.xpNumFun(x, xp)
+
+            particle[1] += self.Lsp
+        envelope = envelopeFromMultipart(multipart)
+        env_with_s = np.array([envelope, self.Lsp])
+        return multipart, envelope, env_with_s
+
+class SextupoleMatEma(Element): # from ema's lecture 4
+    def __init__(self, name, K, L, spaceChargeOn, multipart, twiss, beamdata, nbrOfSplits):
+        Element.__init__(self, "liealgelem matema " + name, 0)
+
+        self.L = L
+        self.K = K
+        self.n = nbrOfSplits # matches matrix approach well
+        self.Lsp = L
+
+        self.qx = Symbol('qx')
+        self.px = Symbol('px')
+
+        xf = self.K**6*self.L**4*self.qx**3/12 - self.K**3*self.L**4*self.px**2/12 - self.K**3*self.L**3*self.qx*self.px/3 - self.L**2*self.K**3*self.qx**2/2 + self.L*self.px + self.qx
+        xpf = self.K**6*self.L**4*self.qx**2*self.px/6 + self.K**6*self.L**3*self.qx**3/3 - self.K**3*self.L**3*self.px**2/3 - self.K**3*self.L**2*self.qx*self.px + self.K**6*self.L**4*self.qx**2*self.px/6 + self.K**6*self.L**4*self.qx**2*self.px/12 - self.K**3*self.L*self.qx**2 + self.px
+
+        self.xNumFun = lambdify((self.qx,self.px),xf, "numpy")
+        self.xpNumFun = lambdify((self.qx,self.px),xpf, "numpy")
+
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+
+    def printInfo(self):
+        return self.name + "\t L: " +  str(self.L) + "\t K: " +  str(self.K)
+
+    def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
+        self.n = nbrOfSplits
+        self.Lsp = self.L/self.n
+
+        self.spaceChargeOn = spaceChargeOn
+        if self.spaceChargeOn == 1:
+            self.sc = SpaceCharge('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+        elif self.spaceChargeOn == 2:
+            self.sc = SpaceChargeEllipticalIntegral('liealg_sc', self.Lsp, multipart, twiss, beamdata)
+
+    def evaluateWithSC(self,multipart,envelope,twiss):
+        self.sc.updateMatrix(multipart,twiss)
+        multipart, envelope = self.sc.evaluateSC(multipart,envelope) # evaluate the SC # not needed since it is linear
+        multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+        #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+        #twiss[4] = envelope[3] / twiss[5]
+        #twiss[7] = envelope[6] / twiss[8]
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluateWithoutSC(self,multipart,envelope,twiss):
+        multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+        #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+        #twiss[4] = envelope[3] / twiss[5]
+        #twiss[7] = envelope[6] / twiss[8]
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluate(self,multipart,envelope,twiss):
+        multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
+        #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
+        #twiss[4] = envelope[3] / twiss[5]
+        #twiss[7] = envelope[6] / twiss[8]
+        return multipart, envelope, twiss, env_with_s
+
+    def evaluateNumFun(self,multipart,envelope):
+        for particle in multipart:
+
+            particle[0][0] = self.xNumFun(particle[0][0], particle[0][1])
+            particle[0][1] = self.xpNumFun(particle[0][0], particle[0][1])
+
+            particle[1] += self.Lsp
+        envelope = envelopeFromMultipart(multipart)
+        env_with_s = np.array([envelope, self.Lsp])
+        return multipart, envelope, env_with_s
 
 ### Rotation !!!!
 class Rotation(LinearElement):
@@ -1147,6 +1333,17 @@ class Rotation(LinearElement):
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j][0][0:6] = np.dot(self.Msp, multipart[j][0][0:6])
             multipart[j][1] = multipart[j][1] + self.Lsp
+            # remove particles far away
+            ####if sqrt(multipart[j][0][0]**2 + multipart[j][0][1]**2 + multipart[j][0][2]**2 + multipart[j][0][3]**2 + multipart[j][0][4]**2 + multipart[j][0][5]**2) > 1:
+            ####    print "Particle far away:"
+            ####    print "x: " + str(multipart[j][0][0])
+            ####    print "xp: " + str(multipart[j][0][1])
+            ####    print "y: " + str(multipart[j][0][2])
+            ####    print "yp: " + str(multipart[j][0][3])
+            ####    print "z: " + str(multipart[j][0][4])
+            ####    print "zp: " + str(multipart[j][0][5])
+            ####    print "radius: " + str(sqrt(multipart[j][0][0]**2 + multipart[j][0][1]**2 + multipart[j][0][2]**2 + multipart[j][0][3]**2 + multipart[j][0][4]**2 + multipart[j][0][5]**2))
+            ####    multipart[j][0][0:6] = np.array([0,0,0,0,0,0])
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([envelope, self.Lsp])

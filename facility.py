@@ -1,7 +1,7 @@
 from accelerator import *
 from scipy import constants
 from relativity import betaFromE
-from particleFactory import gaussianTwiss3D, envelopeFromMultipart
+from particleFactory import gaussianTwiss3D, envelopeFromMultipart, straightxxp, singleparticle
 import numpy as np
 from plotting import plotEverything
 from profilehooks import profile
@@ -29,11 +29,20 @@ class Facility():
     def createQuadrupole(self, name, K, L):
         self.lattice.createQuadrupole(name, K, L)
 
-    def createSextupole(self,name, K, L, compOrder):
+    def createSextupole(self, name, K, L, compOrder):
         self.lattice.createSextupole(name, K, L, compOrder)
 
-    def createSextupolerel(self,name, K, L, compOrder):
+    def createOctupole(self, name, K, L, compOrder):
+        self.lattice.createOctupole(name, K, L, compOrder)
+
+    def createSextupolerel(self, name, K, L, compOrder):
         self.lattice.createSextupolerel(name, K, L, compOrder)
+
+    def createSextupolemat(self, name, K, L):
+        self.lattice.createSextupolemat(name, K, L)
+
+    def createSextupolematema(self, name, K, L):
+        self.lattice.createSextupolematema(name, K, L)
 
     def createRotation(self, name, nu_x, nu_y):
         self.lattice.createRotation(name, nu_x, nu_y)
@@ -97,6 +106,10 @@ class Facility():
         multipart = gaussianTwiss3D(nbrOfParticles, twiss)
         self.setMultipart(multipart)
 
+    def generateGridpart(self, nbrOfParticles):
+        multipart = straightxxp(nbrOfParticles) #### !!!!! wolski
+        self.setMultipart(multipart)
+
     def setMultipart(self,multipart): # Also updates the envelope
         self.lattice.setMultipart(multipart)
         self.multipart = self.lattice.getMultipart()
@@ -113,7 +126,7 @@ class Facility():
         return self.lattice.printMatrices()
 
     def evaluate(self):
-        self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist = self.lattice.evaluate(self.multipart,self.envelope,self.twiss)
+        self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist, self.multipartafterall = self.lattice.evaluate(self.multipart,self.envelope,self.twiss)
 
     @profile(immediate=true)
     def evaluateWithProfiling(self):
@@ -127,4 +140,4 @@ class Facility():
             return
 
     def plotAfterEval(self):
-        plotEverything(self.multipart, self.twiss, self.resultmultipart, self.resultenvlist)
+        plotEverything(self.multipart, self.twiss, self.resultmultipart, self.resultenvlist, self.multipartafterall)

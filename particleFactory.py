@@ -20,7 +20,49 @@ def straight(nbrOfParticles):
 
     return multipart
 
+def straightxxp(nbrOfParticles): # needed for wolski test
+    x = np.linspace(-4e-3,4e-3,nbrOfParticles) #x and xp for when xp is 0
+    xp = np.linspace(-4e-3,4e-3,nbrOfParticles)
+    temp = x
+    for i in range(0,nbrOfParticles-1):
+        temp = np.append(temp,x)
+    x = temp
+    xp = np.repeat(xp,nbrOfParticles)
+    y = np.linspace(0,0,nbrOfParticles**2) #y and yp for when yp is 0
+    yp = np.linspace(0,0,nbrOfParticles**2)
+
+    z = np.linspace(0,0,nbrOfParticles**2)
+    zp = np.linspace(0,0,nbrOfParticles**2)
+
+    s = np.linspace(0,0,nbrOfParticles**2)
+
+    bigMatrix = np.array([x, xp, y, yp, z, zp])
+
+
+    multipart = [[bigMatrix[:,i], s[i]] for i in xrange(nbrOfParticles**2)]
+
+    return multipart
+
     #return x,xp,y,yp,z,zp
+
+def singleparticle(): # needed for wolski test
+    x = np.array([0.004])
+    xp = np.array([0.004])
+    y = np.array([0])
+    yp = np.array([0])
+
+    z = np.array([0])
+    zp = np.array([0])
+
+    s = np.array([0])
+
+    bigMatrix = np.array([x, xp, y, yp, z, zp])
+
+
+    multipart = [[bigMatrix[:,i], s[i]] for i in xrange(1)]
+    print "multipart: \n" + str(multipart)
+
+    return multipart
 
 def scanned(nbrOfParticles):
     x = np.linspace(-0.05,0.05,nbrOfParticles)     # x and xp for when xp is scanned

@@ -412,6 +412,18 @@ def loadLatticeFormat_dat(filename, lattice):
                 name = "q"
                 # Create the element
                 newLattice.createQuadrupole(name, K, L)
+            elif typeOfElem == "MULTIPOLE":
+                if int(words[1]) == 3: # sextupole
+                    L = float(words[2])/1000
+                    k = float(words[4])
+                    order = 2 # for the lie transform
+                    name = "s"
+                    newLattice.createSextupolerel(name, k, L, order)
+            elif typeOfElem == "ROTATION":
+                nu_x = float(words[1])
+                nu_y = float(words[2])
+                name = "r"
+                newLattice.createRotation(name, nu_x, nu_y)
             elif typeOfElem == "END":
                 continue
     
