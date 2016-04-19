@@ -1014,7 +1014,7 @@ class LieAlgElement(Element):
 
         ## redefined Hamiltonians (works!!!!! for sextu, ) works with the "relativistic" transform
         self.sextupoleham = 1/6*self.k*(self.qx**3-3*self.qx*self.qy**2)+1/2*(self.px**2+self.py**2) # works with lie trans for the rel (which is the better trans)
-        self.octupoleham = 2/8*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+1/2*(self.px**2+self.py**2)
+        self.octupoleham = 1/8*self.k*(self.qx**4-6*self.qx**2*self.qy**2+self.qy**4)+1/2*(self.px**2+self.py**2)
 
         ## Relativistic Hamiltonian from Wolski
         #beta = beamdata[0]
