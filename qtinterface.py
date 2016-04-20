@@ -860,6 +860,8 @@ class LatticeEditor(QGroupBox):
         self.elementSelector.addItem("Sextupole")
         self.elementSelector.addItem("Octupole")
         self.elementSelector.addItem("Sextupolerel")
+        self.elementSelector.addItem("Sextupolekin")
+        self.elementSelector.addItem("Octupolekin")
         self.elementSelector.addItem("Sextupolemat")
         self.elementSelector.addItem("Sextupolematema")
         self.elementSelector.addItem("Rotation")
@@ -1070,6 +1072,20 @@ class LatticeEditor(QGroupBox):
             self.enterL.show()
             self.textOrder.show()
             self.enterOrder.show()
+        elif text == "Sextupolekin":
+            self.textsK.show()
+            self.entersK.show()
+            self.textL.show()
+            self.enterL.show()
+            self.textOrder.show()
+            self.enterOrder.show()
+        elif text == "Octupolekin":
+            self.textoK.show()
+            self.enteroK.show()
+            self.textL.show()
+            self.enterL.show()
+            self.textOrder.show()
+            self.enterOrder.show()
         elif text == "Sextupolemat":
             self.textsK.show()
             self.entersK.show()
@@ -1190,6 +1206,10 @@ class LatticeEditor(QGroupBox):
             self.facility.createOctupole(name, K, L, Order)
         elif self.selectedElement == "Sextupolerel":
             self.facility.createSextupolerel(name, K, L, Order)
+        elif self.selectedElement == "Sextupolekin":
+            self.facility.createSextupolekin(name, K, L, Order)
+        elif self.selectedElement == "Octupolekin":
+            self.facility.createOctupolekin(name, K, L, Order)
         elif self.selectedElement == "Sextupolemat":
             self.facility.createSextupolemat(name, K, L)
         elif self.selectedElement == "Sextupolematema":

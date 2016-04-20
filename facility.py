@@ -41,6 +41,12 @@ class Facility():
     def createSextupolerel(self, name, K, L, compOrder):
         self.lattice.createSextupolerel(name, K, L, compOrder)
 
+    def createSextupolekin(self, name, K, L, compOrder):
+        self.lattice.createSextupolekin(name, K, L, compOrder)
+
+    def createOctupolekin(self, name, K, L, compOrder):
+        self.lattice.createOctupolekin(name, K, L, compOrder)
+
     def createSextupolemat(self, name, K, L):
         self.lattice.createSextupolemat(name, K, L)
 
