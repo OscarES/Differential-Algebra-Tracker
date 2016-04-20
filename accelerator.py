@@ -1071,6 +1071,8 @@ class LieAlgElement(Element):
             self.numFuns = self.LA.hamToNumFuns(self.sextupoleham, self.K, self.Lsp, self.order)
         elif self.hamToUse == "octupoleham":
             self.numFuns = self.LA.hamToNumFuns(self.octupoleham, self.K, self.Lsp, self.order)
+        elif self.hamToUse == "sextupolehamrel":
+            self.numFuns = self.LA.hamToNumFuns(self.sextupolehamrel, self.K, self.Lsp, self.order)
 
         self.spaceChargeOn = spaceChargeOn
         if self.spaceChargeOn == 1:
