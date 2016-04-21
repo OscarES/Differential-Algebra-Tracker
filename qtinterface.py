@@ -1269,6 +1269,7 @@ class LatticeEditor(QGroupBox):
             self.parent.parent.widget.latticeoverview.s_pressed = 1 # zoom out
             self.parent.parent.widget.latticeoverview.a_pressed = 1 # move with lattice
             self.parent.latticeoverview.mousePressEvent("bla") # repaint by setting focus
+            self.parent.evalwidget.updateLaps()
         
     def printMatrices(self):
         print self.facility.printMatrices()
@@ -1300,7 +1301,15 @@ class EvalWidget(QWidget):
         EvalButton.clicked.connect(self.evaluateWithProfiling)
         grid.addWidget(EvalButton,0,2)
 
+        self.textLaps = QLabel("# of laps:") # see calculations 2016-03-18 and TraceWin man s 102
+        grid.addWidget(self.textLaps, 0, 3)
+
+        self.enterLaps = QLineEdit()
+        grid.addWidget(self.enterLaps, 0, 4)
+        self.enterLaps.setText(str(self.facility.getLaps()))
+
     def evaluate(self):
+        self.setLaps()
         self.facility.evaluate()
         self.facility.plotAfterEval()
         self.SaveResultButton.show()
@@ -1336,10 +1345,23 @@ class EvalWidget(QWidget):
         return
 
     def evaluateWithProfiling(self):
+        self.setLaps()
         self.facility.evaluateWithProfiling()
         self.facility.plotAfterEval()
         self.SaveResultButton.show()
         return
+
+    def setLaps(self):
+        valueOfLaps = self.enterLaps.text()
+        try:
+            laps = int(valueOfLaps)
+        except:
+            print "Laps not an integer, set to 1 instead."
+            laps = 1
+        self.facility.setLaps(laps)
+
+    def updateLaps(self):
+        self.enterLaps.setText(str(self.facility.getLaps()))
 
 # layout manager (aranges the different widgets)
 class FormWidget(QWidget):

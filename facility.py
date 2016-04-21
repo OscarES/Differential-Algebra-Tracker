@@ -130,6 +130,12 @@ class Facility():
 
     def setSpaceChargeOnAndSplits(self, spaceChargeOn, nbrOfSplits):
         self.lattice.setSpaceChargeOnAndSplits(spaceChargeOn, nbrOfSplits)
+
+    def getLaps(self):
+        return self.lattice.getLaps()
+
+    def setLaps(self, laps):
+        self.lattice.setLaps(laps)
     ## End Passing
 
     def printLattice(self):

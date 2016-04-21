@@ -36,6 +36,9 @@ class Lattice:
         self.spaceChargeOn = 0
         self.nbrOfSplits = 1
 
+        ## laps to be made
+        self.laps = 1
+
     def createDrift(self, name, L):
         drift = Drift(name, L, self.spaceChargeOn, self.multipart, self.twiss, self.beamdata, self.nbrOfSplits)
         self.appendElement(drift)
@@ -133,6 +136,12 @@ class Lattice:
         # Now the lattice shall remake each element with the new spaceChargeOn and nbrOfSplits
         for elem in self.lattice:
             elem.updateSC(self.spaceChargeOn, self.nbrOfSplits, self.multipart, self.twiss, self.beamdata)
+
+    def getLaps(self):
+        return self.laps
+
+    def setLaps(self, laps):
+        self.laps = laps
     ## End Passing
 
     def printLattice(self):
@@ -167,8 +176,7 @@ class Lattice:
                 env_with_s[1] = env_with_s[1] + envlist[-1][1]
                 envlist.append(env_with_s)
         else:
-            laps = 1000
-            for i in range(0,laps):
+            for i in range(0,self.laps):
                 for elem in self.lattice:
                     #print elem.printInfo()
                     multipart,envelope, twiss, env_with_s = elem.evaluateWithoutSC(multipart,envelope,twiss)
