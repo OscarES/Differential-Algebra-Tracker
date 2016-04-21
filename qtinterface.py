@@ -806,49 +806,51 @@ class LatticeEditor(QGroupBox):
         grid = QGridLayout()
         self.setLayout(grid)
 
+        # load and save
+        loadButton = QPushButton("Load Lattice")
+        loadButton.clicked.connect(self.loadLattice)
+        grid.addWidget(loadButton,0,0)
+
+        saveButton = QPushButton("Save Lattice")
+        saveButton.clicked.connect(self.saveLattice)
+        grid.addWidget(saveButton,0,1)
+
         # SC and splits
         self.textNbrOfSplits = QLabel("# of Splits:")
-        grid.addWidget(self.textNbrOfSplits, 0, 4)
+        grid.addWidget(self.textNbrOfSplits, 1, 4)
         self.textNbrOfSplits.hide()
         
         self.enterNbrOfSplits = QLineEdit()
-        grid.addWidget(self.enterNbrOfSplits, 0, 5)
+        grid.addWidget(self.enterNbrOfSplits, 1, 5)
         self.enterNbrOfSplits.hide()
 
         # SC radio buttons (they come after since they change the split buttons)
         self.textSC = QLabel("Space Charge:")
-        grid.addWidget(self.textSC, 0, 0)
+        grid.addWidget(self.textSC, 1, 0)
         
         self.radioGroup = QButtonGroup(self)
 
         self.radioNoSC = QRadioButton("None")
         self.radioGroup.addButton(self.radioNoSC)
         self.radioNoSC.toggled.connect(self.radioNoSC_clicked)
-        grid.addWidget(self.radioNoSC, 0, 1)
+        grid.addWidget(self.radioNoSC, 1, 1)
         self.radioNoSC.toggle()
 
         self.radioSC1 = QRadioButton("Allen's SC")
         self.radioGroup.addButton(self.radioSC1)
         self.radioSC1.toggled.connect(self.radioSC1_clicked)
-        grid.addWidget(self.radioSC1, 0, 2)
+        grid.addWidget(self.radioSC1, 1, 2)
 
         self.radioSC2 = QRadioButton("Elliptic integral")
         self.radioGroup.addButton(self.radioSC2)
         self.radioSC2.toggled.connect(self.radioSC2_clicked)
-        grid.addWidget(self.radioSC2, 0, 3)
+        grid.addWidget(self.radioSC2, 1, 3)
 
         redoLatticeButton = QPushButton("Redo Lattice")
         redoLatticeButton.clicked.connect(self.redoLattice)
-        grid.addWidget(redoLatticeButton,0,6)
+        grid.addWidget(redoLatticeButton,1,6)
 
-        # load and save
-        loadButton = QPushButton("Load Lattice")
-        loadButton.clicked.connect(self.loadLattice)
-        grid.addWidget(loadButton,1,0)
-
-        saveButton = QPushButton("Save Lattice")
-        saveButton.clicked.connect(self.saveLattice)
-        grid.addWidget(saveButton,1,1)
+        
 
         self.selectedElement = "Drift"
 
