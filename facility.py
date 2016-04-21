@@ -103,6 +103,10 @@ class Facility():
     def setLattice(self,lattice): # changes the entire lattice object!
         self.lattice = lattice
 
+    def deleteLattice(self):
+        # empty lattice
+        self.lattice = Lattice("Facility", self.beamdata, self.twiss, self.multipart)
+
     def setBeamdata(self,beamdata):
         self.lattice.setBeamdata(beamdata)
         self.beamdata = self.lattice.getBeamdata()

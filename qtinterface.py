@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5 import QtCore
 from PyQt5 import QtOpenGL
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
+from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QInputDialog
 from IOHandler import saveLattice, loadLattice, loadSummer2015Formatzasx, saveBeamdata, loadBeamdata, saveTwiss, loadTwiss, saveMultipart, loadMultipart, saveEnvelope # loadLattice, saveLattice
 import numpy as np
 from scipy import *
@@ -815,6 +815,10 @@ class LatticeEditor(QGroupBox):
         saveButton.clicked.connect(self.saveLattice)
         grid.addWidget(saveButton,0,1)
 
+        deleteButton = QPushButton("Delete Lattice")
+        deleteButton.clicked.connect(self.deleteLattice)
+        grid.addWidget(deleteButton,0,2)
+
         # SC and splits
         self.textNbrOfSplits = QLabel("# of Splits:")
         grid.addWidget(self.textNbrOfSplits, 1, 4)
@@ -1257,6 +1261,15 @@ class LatticeEditor(QGroupBox):
         self.parent.latticeoverview.initializeGL()
         self.parent.latticeoverview.paintGL()
 
+    def deleteLattice(self):
+        item, ok = QInputDialog.getItem(self, "Are you sure you really want to delete the lattice?", "options", ("Yes", "No"), 1, False)
+        if item == "Yes":
+            self.facility.deleteLattice()
+            self.parent.latticeoverview.initializeGL()
+            self.parent.parent.widget.latticeoverview.s_pressed = 1 # zoom out
+            self.parent.parent.widget.latticeoverview.a_pressed = 1 # move with lattice
+            self.parent.latticeoverview.mousePressEvent("bla") # repaint by setting focus
+        
     def printMatrices(self):
         print self.facility.printMatrices()
     
