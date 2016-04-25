@@ -59,6 +59,9 @@ class Facility():
     def createCavity(self, name, L, Ezofs):
         self.lattice.createCavity(name, L, Ezofs)
 
+    def createCavityMatrix(self, name, L, a, Efield_0, phi_0):
+        self.lattice.createCavityMatrix(name, L, a, Efield_0, phi_0)
+
     ## Setup
     def getDefaultBeamdata(self):
         E = 2e9*constants.e # 2GeV to joule from ref F. # Why show this in Joules?

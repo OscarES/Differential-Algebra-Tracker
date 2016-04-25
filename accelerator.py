@@ -13,7 +13,7 @@ import random
 import matplotlib.pyplot as plt
 import abc
 from particleFactory import envelopeFromMultipart
-from relativity import betaFromE, gammaFromBeta
+from relativity import betaFromE, gammaFromBeta, EFromBeta
 import copy
 import time
 
@@ -98,6 +98,10 @@ class Lattice:
         self.appendElement(cavity)
         self.beamdata[4] = cavity.getNewE() # Update energy
 
+    def createCavityMatrix(self, name, L, a, Efield_0, phi_0):
+        cavity = CavityMatrix(name, L, a, Efield_0, phi_0, self.beamdata)
+        self.appendElement(cavity)
+
     def appendElement(self, element):
         self.lattice.append(element)
         return 1
@@ -179,7 +183,10 @@ class Lattice:
             for i in range(0,self.laps):
                 for elem in self.lattice:
                     #print elem.printInfo()
-                    multipart,envelope, twiss, env_with_s = elem.evaluateWithoutSC(multipart,envelope,twiss)
+                    if elem.printInfo().startswith("cavmat"):
+                        multipart,envelope, twiss, env_with_s, self.beamdata = elem.evaluateWithoutSC(multipart,envelope,twiss, self.beamdata)
+                    else:
+                        multipart,envelope, twiss, env_with_s = elem.evaluateWithoutSC(multipart,envelope,twiss)
                     env_with_s[1] = env_with_s[1] + envlist[-1][1]
                     envlist.append(env_with_s)
                     #for i in range(len(multipart)): # for saving the particles after each element
@@ -1658,6 +1665,130 @@ class FieldMapCavity(Element):
             [0,0,0,0,1,0],
             [0,0,0,0,self.Lsp*self.prefactor*1/self.gamma_s**2*self.dE_zoverdz,1-self.Lsp*self.prefactor*self.E_z]
             ])
+
+# Cavity a la Wolski ch 3.6
+class CavityMatrix(Element):
+    def __init__(self, name, L, a, Efield_0, phi_0, beamdata):
+        Element.__init__(self, "cavmat " + name, 1)
+
+        #beta_0 = beamdata[0]
+        #gamma_0 = gammaFromBeta(beta_0)
+        self.m_0 = beamdata[2]
+        self.q = beamdata[3]
+        #E_0 = beamdata[4]
+    
+        #P_0 = self.momFromE(E_0,m_0)
+        
+        self.p_01 = 2.405
+        self.a = a # radius of cavity
+        self.Efield_0 = Efield_0 # Electric field amplitude
+
+        self.L = L # Length of cavity
+        self.k = self.p_01/self.a # wavenumber for the TM_010 mode
+
+        self.phi_0 = phi_0
+        # What can be set has been set the rest depends on the incoming beam
+
+    def printInfo(self):
+        return self.name + "\t L: " + str(self.L)
+
+    def EFromMom(self, P, m_0): # Takes momentum and converts it into energy
+        return sqrt((P*constants.c)**2+(m_0*constants.c**2)**2)
+
+    def momFromE(self, E, m_0): # Takes energy and converts it into momentum
+        return 1/constants.c*sqrt(E**2-(m_0*constants.c**2)**2)
+
+    def elementFromBeamE(self, beta_0, E_0):
+        #beta_0 = beamdata[0]
+        gamma_0 = gammaFromBeta(beta_0)
+        P_0 = self.momFromE(E_0,self.m_0)
+        T = 2*constants.pi*beta_0/self.k**2/self.L**2*sin(self.k*self.L/2/beta_0) # Transit-time factor
+        #update everything
+
+        V_0 = self.L*self.Efield_0*T # Cavity voltage
+        alpha = self.q*V_0/P_0/constants.c # just a definition
+        print "alpha: " + str(alpha)
+        
+    
+        wt = self.k*sqrt(alpha*cos(self.phi_0)/2/constants.pi)# omega transversal
+        wp = self.k/(beta_0*gamma_0)*sqrt(alpha*cos(self.phi_0)/constants.pi)# omega parallel
+    
+        ct = cos(wt*self.L) # cos transversal
+        cp = cos(wp*self.L) # cos parallel
+        st = sin(wt*self.L)/wt # sin transversal
+        sp = sin(wp*self.L)/wp # sin parallel
+        # the transfer matrices
+        self.Rrf = np.array([
+            [ct, st, 0, 0, 0, 0],
+            [-wt**2*st, ct, 0, 0, 0, 0],
+            [0, 0, ct, st, 0, 0],
+            [0, 0, -wt**2*st, ct, 0, 0],
+            [0, 0, 0, 0, cp, 1/(beta_0**2*gamma_0**2)*sp],
+            [0, 0, 0, 0, -beta_0**2*gamma_0**2*wp**2*sp, cp] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski)
+            ])
+        # same
+        self.mrf = np.array([
+            [0],
+            [0],
+            [0],
+            [0],
+            [(1-cos(wp*self.L))*tan(self.phi_0)/self.k],
+            [beta_0**2*gamma_0**2*wp*sin(wp*self.L)*tan(self.phi_0)/self.k] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski)
+            ])
+        print "beta_0**2*gamma_0**2: " + str(beta_0**2*gamma_0**2)
+        print "wp: " + str(wp)
+        print "sin(wp*self.L): " + str(sin(wp*self.L))
+        print "tan(self.phi_0): " + str(tan(self.phi_0))
+        print "self.k: " + str(self.k)
+    
+        # change in reference momentum
+        Deltadelta = self.q*V_0/P_0/constants.c*self.k*self.L/constants.pi*sin(self.phi_0) # eqn (3.152)
+        E_1 = E_0 + Deltadelta
+        # if k*L=pi: Deltadelta = q*V_0/P_0/constants.c*sin(phi_0)
+        #z#P_1 = self.momFromE(self.EFromMom(P_0, self.m_0) + Deltadelta, self.m_0)
+        #P_1 = self.momFromE(E_0 + Deltadelta, self.m_0)
+        P_1 = self.momFromE(E_1, self.m_0)
+        print "P_0:" + str(P_0)
+        print "P_1:" + str(P_1)
+        beta_1 = betaFromE(self.m_0,E_1)
+        gamma_1 = gammaFromBeta(beta_1)
+        print "gamma_0:" + str(gamma_0)
+        print "gamma_1:" + str(gamma_1)
+        self.R_deltaP = np.array([
+            [1, 0, 0, 0, 0, 0],
+            [0, P_0/P_1, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0],
+            [0, 0, 0, P_0/P_1, 0, 0],
+            [0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, P_0/P_1] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski)
+            ])
+        # same
+        self.m_deltaP = np.array([
+            [0],
+            [0],
+            [0],
+            [0],
+            [0],
+            [1/(beta_1*constants.c)*(gamma_0/gamma_1-1)] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski) # The divide by c isn't in wolski and doesn't give right dimensions but it makes my results work...
+            ])
+        self.newbeta = beta_1
+
+    def evaluateWithoutSC(self,multipart,envelope,twiss, beamdata): # beamdata can be made seperately since energy change is stored in z'
+        self.elementFromBeamE(beamdata[0],beamdata[4]) # Update the T and all else that follows...
+        print "self.Rrf: \n" + str(self.Rrf)
+        print "self.mrf: \n" + str(self.mrf)
+        print "self.R_deltaP: \n" + str(self.R_deltaP)
+        print "self.m_deltaP: \n" + str(self.m_deltaP)
+        print "Total matrix: \n" + str(np.dot(self.R_deltaP, self.Rrf))
+        print "Total +m: \n" + str(np.dot(self.R_deltaP, self.mrf) + self.m_deltaP)
+        for j in range(0,len(np.atleast_1d(multipart))):
+            multipart[j] = np.array([np.dot(self.Rrf, multipart[j][0][0:6]) + self.mrf, multipart[j][1] + self.L])
+            multipart[j] = np.array([np.dot(self.R_deltaP, multipart[j][0][0:6]) + self.m_deltaP, multipart[j][1]])
+        beamdata[0] = self.newbeta # new beta 
+        beamdata[4] = EFromBeta(beamdata[2],beamdata[0]) # new E: E(m_0,beta)
+        envelope = envelopeFromMultipart(multipart)
+        env_with_s = np.array([envelope, self.L])
+        return multipart, envelope, twiss, env_with_s, beamdata
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition

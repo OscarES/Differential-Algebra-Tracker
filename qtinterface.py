@@ -61,7 +61,7 @@ class LatticeOverviewWidget(QGLWidget):
                 self.elements.append([tempword, float(line)])
                 self.cameraSpeed_s = float(line)
                 nextWillBeL = 0
-            if line == "drift" or line == "dipole" or line == "quad" or line == "liealgelem" or line == "rotation" or line == "cavity":  
+            if line == "drift" or line == "dipole" or line == "quad" or line == "liealgelem" or line == "rotation" or line == "cavity" or line == "cavmat":  
                 tempword = line
             if line == "L:":
                 nextWillBeL = 1
@@ -83,14 +83,14 @@ class LatticeOverviewWidget(QGLWidget):
                 color = [0, 0, 1]
             elif elem[0] == "rotation":
                 color = [0, 0, 0]
-            elif elem[0] == "cavity":
+            elif elem[0] == "cavity" or elem[0] == "cavmat":
                 color = [1, 1, 0]
 
             length = elem[1]
 
             if elem[0] == "liealgelem":
                 VtxArray, IdxArray, ClrArray = self.createHexaBlock(length, color)
-            elif elem[0] == "cavity":
+            elif elem[0] == "cavity" or elem[0] == "cavmat":
                 VtxArray, IdxArray, ClrArray = self.createCylinder(length, color)
             else:
                 VtxArray, IdxArray, ClrArray = self.createGeomBlock(length, color)
@@ -168,7 +168,7 @@ class LatticeOverviewWidget(QGLWidget):
         elemtype = elem[4]
         if elemtype == "quad":
             glRotate(45, 0.0, 0.0, 1.0)
-        elif elemtype == "liealgelem" or elemtype == "cavity":
+        elif elemtype == "liealgelem" or elemtype == "cavity" or elemtype == "cavmat":
             glTranslate(0.5, 0.5, 0.0)
         glTranslate(-0.5, -0.5, -0.5)
 
@@ -176,7 +176,7 @@ class LatticeOverviewWidget(QGLWidget):
         glEnableClientState(GL_COLOR_ARRAY)
         glVertexPointerf(elem[0])
         glColorPointerf(elem[2])
-        if elemtype == "liealgelem" or elemtype == "cavity":
+        if elemtype == "liealgelem" or elemtype == "cavity" or elemtype == "cavmat":
             glDrawElementsui(GL_TRIANGLES, elem[1])
         else:
             glDrawElementsui(GL_QUADS, elem[1])
@@ -871,8 +871,9 @@ class LatticeEditor(QGroupBox):
         self.elementSelector.addItem("Sextupolemat")
         self.elementSelector.addItem("Sextupolematema")
         self.elementSelector.addItem("Rotation")
-        self.elementSelector.addItem("RF-Cavity")
-        self.elementSelector.addItem("Higher order element")
+        self.elementSelector.addItem("RF-Cavity") #  (Not implemented/working)
+        self.elementSelector.addItem("Cavity Matrix") #  (need more work), bug now is that z' always goes to around -1 when it should be cetered around 0)
+        self.elementSelector.addItem("Higher order element") #  (Not implemented/working)
         grid.addWidget(self.elementSelector, 2, 0)
 
         self.elementSelector.activated[str].connect(self.activatedElementSelector)
@@ -970,15 +971,40 @@ class LatticeEditor(QGroupBox):
         grid.addWidget(self.enternu_y, 5, 1)
         self.enternu_y.hide()
 
+        ## Cavity Matrix
+        self.texta = QLabel("a [m]:")
+        grid.addWidget(self.texta, 5, 0)
+        self.texta.hide()
+
+        self.entera = QLineEdit()
+        grid.addWidget(self.entera, 5, 1)
+        self.entera.hide()
+
+        self.textEfield_0 = QLabel("Efield_0 [V/m]:")
+        grid.addWidget(self.textEfield_0, 6, 0)
+        self.textEfield_0.hide()
+
+        self.enterEfield_0 = QLineEdit()
+        grid.addWidget(self.enterEfield_0, 6, 1)
+        self.enterEfield_0.hide()
+
+        self.textphi_0 = QLabel("phi_0 [rad]:")
+        grid.addWidget(self.textphi_0, 7, 0)
+        self.textphi_0.hide()
+
+        self.enterphi_0 = QLineEdit()
+        grid.addWidget(self.enterphi_0, 7, 1)
+        self.enterphi_0.hide()
+
         ## Create Element
         createElementButton = QPushButton("Create Element")
         createElementButton.clicked.connect(self.createElement) # here arguments should be passed
-        grid.addWidget(createElementButton, 7,1)
+        grid.addWidget(createElementButton, 8,1)
 
         ## Print Matrices
         printMatricesButton = QPushButton("Print Matrices")
         printMatricesButton.clicked.connect(self.printMatrices)
-        grid.addWidget(printMatricesButton, 7,2)
+        grid.addWidget(printMatricesButton, 8,2)
 
     def radioNoSC_clicked(self, enabled):
         if enabled:
@@ -1036,6 +1062,12 @@ class LatticeEditor(QGroupBox):
         self.enternu_x.hide()
         self.textnu_y.hide()
         self.enternu_y.hide()
+        self.texta.hide()
+        self.entera.hide()
+        self.textEfield_0.hide()
+        self.enterEfield_0.hide()
+        self.textphi_0.hide()
+        self.enterphi_0.hide()
 
         if text == "Drift":
             self.textL.show()
@@ -1110,6 +1142,15 @@ class LatticeEditor(QGroupBox):
         elif text == "RF-Cavity":
             self.textL.show()
             self.enterL.show()
+        elif text == "Cavity Matrix":
+            self.textL.show()
+            self.enterL.show()
+            self.texta.show()
+            self.entera.show()
+            self.textEfield_0.show()
+            self.enterEfield_0.show()
+            self.textphi_0.show()
+            self.enterphi_0.show()
 
     def createElement(self):
         ## Take the inputs in fields
@@ -1181,6 +1222,7 @@ class LatticeEditor(QGroupBox):
                 print "Not a number! Order set to 5"
                 Order = 5
 
+        ## Rotation
         if not self.enternu_x.isHidden():
             valueOfnu_x = self.enternu_x.text()
             try:
@@ -1196,6 +1238,31 @@ class LatticeEditor(QGroupBox):
             except:
                 print "Not a number! nu_y set to 0.246"
                 nu_y = 0.246
+
+        ## Cavity Matrix
+        if not self.entera.isHidden():
+            valueOfa = self.entera.text()
+            try:
+                a = float(valueOfa)
+            except:
+                print "Not a number! a set to 0.76553527627 (gives k = pi, which is nice to combine with L = 1)"
+                a = 0.76553527627
+
+        if not self.enterEfield_0.isHidden():
+            valueOfEfield_0 = self.enterEfield_0.text()
+            try:
+                Efield_0 = float(valueOfEfield_0)
+            except:
+                print "Not a number! Efield_0 set to 100"
+                Efield_0 = 100
+
+        if not self.enterphi_0.isHidden():
+            valueOfphi_0 = self.enterphi_0.text()
+            try:
+                phi_0 = float(valueOfphi_0)
+            except:
+                print "Not a number! phi_0 set to 0"
+                phi_0 = 0
 
         ## Make new elements
         if self.selectedElement == "Drift":
@@ -1231,6 +1298,8 @@ class LatticeEditor(QGroupBox):
             P = 3
             Ezofs = [Oscillations, AmplitudeA, AmplitudeB, E_0, Sigma, P]
             self.facility.createCavity(name, L, Ezofs)
+        elif self.selectedElement == "Cavity Matrix":
+            self.facility.createCavityMatrix(name, L, a, Efield_0, phi_0)
         else:
             return
         # Higher order (specify order)
@@ -1416,6 +1485,10 @@ class DATWidgetInterface(QMainWindow):
 
         self.widget = FormWidget(self, self.facility)
         self.setCentralWidget(self.widget)
+
+        # Move to top left
+        qr = self.frameGeometry()
+        self.move(qr.topLeft())
 
     def keyPressEvent(self, e):
         
