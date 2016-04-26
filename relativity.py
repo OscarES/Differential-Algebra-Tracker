@@ -15,3 +15,6 @@ def EFromBeta(m_0,beta):
 
 def gammaFromBeta(beta):
     return 1/sqrt(1-beta**2)
+
+def betaFromGamma(gamma):
+    return sqrt(1-1/gamma**2)
