@@ -1702,10 +1702,13 @@ class CavityMatrix(Element):
         #beta_0 = beamdata[0]
         gamma_0 = gammaFromBeta(beta_0)
         P_0 = self.momFromE(E_0,self.m_0)
+        #P_0 = 5.3442858e-21 # wolski's ?electron? example
         T = 2*constants.pi*beta_0/self.k**2/self.L**2*sin(self.k*self.L/2/beta_0) # Transit-time factor
+        print "T: " + str(T)
         #update everything
 
         V_0 = self.L*self.Efield_0*T # Cavity voltage
+        print "V_0: " + str(V_0)
         alpha = self.q*V_0/P_0/constants.c # just a definition
         print "alpha: " + str(alpha)
         
@@ -1742,8 +1745,12 @@ class CavityMatrix(Element):
         print "self.k: " + str(self.k)
     
         # change in reference momentum
-        Deltadelta = self.q*V_0/P_0/constants.c*self.k*self.L/constants.pi*sin(self.phi_0) # eqn (3.152)
-        E_1 = E_0 + Deltadelta
+        #Deltadelta = self.q*V_0/P_0/constants.c*self.k*self.L/constants.pi*sin(self.phi_0) # eqn (3.152)
+        Deltadelta = beta_0**2*gamma_0**2*wp*sin(wp*self.L)*tan(self.phi_0)/self.k # Exact Deltadelta from mrf
+        print "Deltadelta: " + str(Deltadelta)
+        E_1 = E_0*(1 + Deltadelta)
+        print "E_0:" + str(E_0)
+        print "E_1:" + str(E_1)
         # if k*L=pi: Deltadelta = q*V_0/P_0/constants.c*sin(phi_0)
         #z#P_1 = self.momFromE(self.EFromMom(P_0, self.m_0) + Deltadelta, self.m_0)
         #P_1 = self.momFromE(E_0 + Deltadelta, self.m_0)
@@ -1769,9 +1776,10 @@ class CavityMatrix(Element):
             [0],
             [0],
             [0],
-            [1/(beta_1*constants.c)*(gamma_0/gamma_1-1)] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski) # The divide by c isn't in wolski and doesn't give right dimensions but it makes my results work...
+            [1/(beta_1)*(gamma_0/gamma_1-1)] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski) # The divide by c isn't in wolski and doesn't give right dimensions but it makes my results work... *constants.c
             ])
         self.newbeta = beta_1
+        self.newE = E_1
 
     def evaluateWithoutSC(self,multipart,envelope,twiss, beamdata): # beamdata can be made seperately since energy change is stored in z'
         self.elementFromBeamE(beamdata[0],beamdata[4]) # Update the T and all else that follows...
@@ -1785,7 +1793,8 @@ class CavityMatrix(Element):
             multipart[j] = np.array([np.dot(self.Rrf, multipart[j][0][0:6]) + self.mrf, multipart[j][1] + self.L])
             multipart[j] = np.array([np.dot(self.R_deltaP, multipart[j][0][0:6]) + self.m_deltaP, multipart[j][1]])
         beamdata[0] = self.newbeta # new beta 
-        beamdata[4] = EFromBeta(beamdata[2],beamdata[0]) # new E: E(m_0,beta)
+        beamdata[4] = self.newE
+        print "new beamdata: \n" + str(beamdata)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([envelope, self.L])
         return multipart, envelope, twiss, env_with_s, beamdata
