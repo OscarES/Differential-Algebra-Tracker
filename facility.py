@@ -83,7 +83,7 @@ class Facility():
 
     ## Passing of varibles to and fro
     def getLattice(self):
-        return self.lattice.getLattice()
+        return self.lattice
 
     def getLatticeObj(self):
         return self.lattice
