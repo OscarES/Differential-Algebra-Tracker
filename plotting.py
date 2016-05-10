@@ -25,6 +25,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
 
     envx = [envlist[i][0][0] for i in xrange(len(envlist))]
     envy = [envlist[i][0][3] for i in xrange(len(envlist))]
+    envz = [envlist[i][0][6] for i in xrange(len(envlist))]
     s = [envlist[i][1] for i in xrange(len(envlist))]
 
     ## begin ellipse, see appendix C in Wille
@@ -60,6 +61,8 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
     ellipse_xy.set_edgecolor((0,0,0))
 
     gamma_z = (1+alpha_z**2)/beta_z
+    sigma_zp = np.sqrt(envlist[0][0][8]) # sqrt since env has sigma**2. 3*sigma will cover 99.7%. 
+    sigma_z = np.sqrt(envz[0])
     ## end initial ellipses
 
     xo = [multipartout[i][0][0] for i in xrange(len(multipartout))]
@@ -160,12 +163,12 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
     ax3 = plt.subplot2grid((4,4), (0, 2))
     #ax8.add_artist(ellipse_y_after)
     ax3.plot(zin,zpin,'yo', zorder=1)
-    #if not sigma_z == 0:
-        #ax3.set_xlim(-5*sigma_z, 5*sigma_z)
-    #if not sigma_zp == 0:
-        #ax3.set_ylim(-5*sigma_zp, 5*sigma_zp)
-    ax3.set_xlim(-4e-3, 4e-3)
-    ax3.set_ylim(-4e-3, 4e-3)
+    if not sigma_z == 0:
+        ax3.set_xlim(-5*sigma_z, 5*sigma_z)
+    if not sigma_zp == 0:
+        ax3.set_ylim(-5*sigma_zp, 5*sigma_zp)
+    #ax3.set_xlim(-4e-3, 4e-3)
+    #ax3.set_ylim(-4e-3, 4e-3)
     plt.title('Values before lattice in z')
     plt.xlabel('z [m]')
     plt.ylabel('zp []')
@@ -196,12 +199,12 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
     ax7 = plt.subplot2grid((4,4), (2, 3))
     #ax7.add_artist(ellipse_x_after)
     ax7.plot(xallo,xpallo,'r.', zorder=1)
-    #if not sigma_x_after == 0:
-        #ax7.set_xlim(-5*sigma_x_after, 5*sigma_x_after)
-    #if not sigma_xp_after == 0:
-        #ax7.set_ylim(-5*sigma_xp_after, 5*sigma_xp_after)
-    ax7.set_xlim(-0.004, 0.004)
-    ax7.set_ylim(-0.004, 0.004)
+    if not sigma_x_after == 0:
+        ax7.set_xlim(-5*sigma_x_after, 5*sigma_x_after)
+    if not sigma_xp_after == 0:
+        ax7.set_ylim(-5*sigma_xp_after, 5*sigma_xp_after)
+    #ax7.set_xlim(-0.004, 0.004)
+    #ax7.set_ylim(-0.004, 0.004)
     plt.title('Values after all elems in lattice in x')
     plt.xlabel('x [m]')
     plt.ylabel('xp []')
@@ -209,12 +212,12 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
     ax8 = plt.subplot2grid((4,4), (3, 0))
     #ax8.add_artist(ellipse_x_after)
     ax8.plot(xo,xpo,'ro', zorder=1)
-    #if not sigma_x_after == 0:
-        #ax8.set_xlim(-5*sigma_x_after, 5*sigma_x_after)
-    #if not sigma_xp_after == 0:
-        #ax8.set_ylim(-5*sigma_xp_after, 5*sigma_xp_after)
-    ax8.set_xlim(-0.004, 0.004)
-    ax8.set_ylim(-0.004, 0.004)
+    if not sigma_x_after == 0:
+        ax8.set_xlim(-5*sigma_x_after, 5*sigma_x_after)
+    if not sigma_xp_after == 0:
+        ax8.set_ylim(-5*sigma_xp_after, 5*sigma_xp_after)
+    #ax8.set_xlim(-0.004, 0.004)
+    #ax8.set_ylim(-0.004, 0.004)
     plt.title('Values after lattice in x')
     plt.xlabel('x [m]')
     plt.ylabel('xp []')
