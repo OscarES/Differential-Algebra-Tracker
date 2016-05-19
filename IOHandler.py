@@ -111,7 +111,8 @@ def loadMultipartFormat_dst(filename):
         E = float(input('Enter E [J]: '))
         beta = betaFromE(m_0, E)
         gamma = gammaFromBeta(beta)
-        z, zp = zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2)
+        #z, zp = zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2)
+        z, zp = zdeltaFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2)
 
 
         # Make the multipart array
@@ -129,6 +130,11 @@ def zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2):
     z = -phi/360*beta*rf_lambda
     zp = energie/(beta**2*gamma**3*mc2)
     return z, zp
+
+def zdeltaFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2):
+    z = -phi/360*beta*rf_lambda
+    delta = energie/(beta**2*gamma*mc2)
+    return z, delta
 
 def saveTwiss(filename, twiss):
     np.save(filename, twiss)
