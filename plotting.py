@@ -148,7 +148,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
         ax1.set_ylim(-5*sigma_xp, 5*sigma_xp)
     plt.title('Initial values in x')
     plt.xlabel('x [m]')
-    plt.ylabel('xp []')
+    plt.ylabel('x\' []')
 
     ax2 = plt.subplot2grid((4,4), (0,1))
     #ax2.add_artist(ellipse_y)
@@ -159,7 +159,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
         ax2.set_ylim(-5*sigma_yp, 5*sigma_yp)
     plt.title('Initial values in y')
     plt.xlabel('y [m]')
-    plt.ylabel('yp []')
+    plt.ylabel('y\' []')
 
     ax3 = plt.subplot2grid((4,4), (0, 2))
     #ax8.add_artist(ellipse_y_after)
@@ -172,7 +172,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
     #ax3.set_ylim(-4e-3, 4e-3)
     plt.title('Values before lattice in z')
     plt.xlabel('z [m]')
-    plt.ylabel('zp []')
+    plt.ylabel('$\delta$ []')
 
     ax4 = plt.subplot2grid((4,4), (0,3))
     ax4.add_artist(ellipse_xy)
@@ -208,7 +208,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
     #ax7.set_ylim(-0.004, 0.004)
     plt.title('Values after all elems in lattice in x')
     plt.xlabel('x [m]')
-    plt.ylabel('xp []')
+    plt.ylabel('x\' []')
 
     ax8 = plt.subplot2grid((4,4), (3, 0))
     #ax8.add_artist(ellipse_x_after)
@@ -221,7 +221,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
     #ax8.set_ylim(-0.004, 0.004)
     plt.title('Values after lattice in x')
     plt.xlabel('x [m]')
-    plt.ylabel('xp []')
+    plt.ylabel('x\' []')
 
     ax9 = plt.subplot2grid((4,4), (3, 1))
     #ax9.add_artist(ellipse_y_after)
@@ -232,7 +232,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
         ax9.set_ylim(-5*sigma_yp_after, 5*sigma_yp_after)
     plt.title('Values after lattice in y')
     plt.xlabel('y [m]')
-    plt.ylabel('yp []')
+    plt.ylabel('y\' []')
 
     ax10 = plt.subplot2grid((4,4), (3, 2))
     #ax10.add_artist(ellipse_y_after)
@@ -243,7 +243,7 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
         ax10.set_ylim(-5*sigma_zp_after, 5*sigma_zp_after)
     plt.title('Values after lattice in z')
     plt.xlabel('z [m]')
-    plt.ylabel('zp []')
+    plt.ylabel('$\delta$ []')
 
     ax11 = plt.subplot2grid((4,4), (3, 3))
     ax11.add_artist(ellipse_xy_after)
@@ -309,13 +309,13 @@ def plot_z_before_and_after(multipartin, multipartout):
     ax1.plot(zin,zpin,'ro', zorder=1)
     plt.title('Initial values in z')
     plt.xlabel('z [m]')
-    plt.ylabel('z\' []')
+    plt.ylabel('$\delta$ []')
 
     ax2 = plt.subplot2grid((1,2), (0,1))
     ax2.plot(zo,zpo,'ro', zorder=1)
     plt.title('Values after lattice in z')
     plt.xlabel('z [m]')
-    plt.ylabel('z\' []')
+    plt.ylabel('$\delta$ []')
 
     plt.show()
 
