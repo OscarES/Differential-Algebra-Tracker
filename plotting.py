@@ -1,4 +1,5 @@
 from __future__ import division # needed for 1/2 = 0.5
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
 import numpy as np
@@ -265,6 +266,31 @@ def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#
     hspace = 0.4   # the amount of height reserved for white space between subplots
     plt.subplots_adjust(left, bottom, right, top, wspace, hspace) # Increases the space between subplots
 
+
+    plt.show()
+
+def plot_x_before_and_after(multipartin, multipartout):
+
+    xin = [multipartin[i][0][0] for i in xrange(len(multipartin))]
+    xpin = [multipartin[i][0][1] for i in xrange(len(multipartin))]
+
+    xo = [multipartout[i][0][0] for i in xrange(len(multipartout))]
+    xpo = [multipartout[i][0][1] for i in xrange(len(multipartout))]
+
+    matplotlib.rcParams.update({'font.size': 31})
+    plt.figure(0)
+
+    ax1 = plt.subplot2grid((1,2), (0,0))
+    ax1.plot(xin,xpin,'ro', zorder=1)
+    plt.title('Initial values in x')
+    plt.xlabel('x [m]')
+    plt.ylabel('x\' []')
+
+    ax2 = plt.subplot2grid((1,2), (0,1))
+    ax2.plot(xo,xpo,'ro', zorder=1)
+    plt.title('Values after lattice in x')
+    plt.xlabel('x [m]')
+    plt.ylabel('x\' []')
 
     plt.show()
 

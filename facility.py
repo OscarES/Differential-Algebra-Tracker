@@ -3,7 +3,7 @@ from scipy import constants
 from relativity import betaFromE
 from particleFactory import gaussianTwiss3D, envelopeFromMultipart, straightxxp, singleparticle
 import numpy as np
-from plotting import plotEverything
+from plotting import plotEverything, plot_x_before_and_after
 from profilehooks import profile
 
 
@@ -163,3 +163,4 @@ class Facility():
 
     def plotAfterEval(self):
         plotEverything(self.multipart, self.twiss, self.resultmultipart, self.resultenvlist, self.multipartafterall)
+        plot_x_before_and_after(self.multipart, self.resultmultipart)
