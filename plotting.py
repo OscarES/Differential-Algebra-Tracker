@@ -294,6 +294,31 @@ def plot_x_before_and_after(multipartin, multipartout):
 
     plt.show()
 
+def plot_z_before_and_after(multipartin, multipartout):
+
+    zin = [multipartin[i][0][4] for i in xrange(len(multipartin))]
+    zpin = [multipartin[i][0][5] for i in xrange(len(multipartin))]
+
+    zo = [multipartout[i][0][4] for i in xrange(len(multipartout))]
+    zpo = [multipartout[i][0][5] for i in xrange(len(multipartout))]
+
+    matplotlib.rcParams.update({'font.size': 31})
+    plt.figure(0)
+
+    ax1 = plt.subplot2grid((1,2), (0,0))
+    ax1.plot(zin,zpin,'ro', zorder=1)
+    plt.title('Initial values in z')
+    plt.xlabel('z [m]')
+    plt.ylabel('z\' []')
+
+    ax2 = plt.subplot2grid((1,2), (0,1))
+    ax2.plot(zo,zpo,'ro', zorder=1)
+    plt.title('Values after lattice in z')
+    plt.xlabel('z [m]')
+    plt.ylabel('z\' []')
+
+    plt.show()
+
 def angleFrom_i_and_ip(i,ip):
     if len(i) == 1:
         return 0
