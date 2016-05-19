@@ -397,7 +397,7 @@ def loadLatticeFormat_dat(filename, lattice):
             elif typeOfElem == "QUAD":
                 # Useful params
                 L = float(words[1])/1000
-                G = float(words[2]) # They say G I say K, what is the difference? Ans: See TraceWin manual page 102 my K is their -k
+                G = float(words[2]) # They say G I say K, what is the difference? Ans: See TraceWin documentation page 102 my K is their -k
     
                 # Indirect params
                 Brho = m_0*constants.c*beta*gamma/q
