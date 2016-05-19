@@ -894,7 +894,7 @@ class LatticeEditor(QGroupBox):
         valueOfL = self.enterL.text()
 
         ## Quad and sextupole
-        self.textK = QLabel("K [sqrt(T*C*s/kg) (quad at least)]:") # see calculations 2016-03-18 and TraceWin man s 102
+        self.textK = QLabel("K [sqrt(T*C*s/kg)]:") # see calculations 2016-03-18 and TraceWin man s 102
         grid.addWidget(self.textK, 5, 0)
         self.textK.hide()
 
@@ -937,7 +937,7 @@ class LatticeEditor(QGroupBox):
         self.entersK.hide()
 
         ## Octupole
-        self.textoK = QLabel("K [m^-3]:") # see calculations 2016-03-18 and TraceWin man s 102
+        self.textoK = QLabel("K [m^-4]:") # see calculations 2016-03-18 and TraceWin man s 102
         grid.addWidget(self.textoK, 5, 0)
         self.textoK.hide()
 
