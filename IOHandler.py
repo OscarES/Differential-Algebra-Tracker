@@ -94,7 +94,7 @@ def loadMultipartFormat_dst(filename):
             y[i] = sixDoubles[2]/100 # cm to m
             yp[i] = sixDoubles[3] # rad should be the same as unitless
             phi[i] = sixDoubles[4] # rad
-            energie[i] = sixDoubles[5] # MeV
+            energie[i] = sixDoubles[5] # MeV and its the actual energy not a diff
 
             nextStart = nextEnd
             nextEnd = nextStart+8*6
@@ -111,8 +111,8 @@ def loadMultipartFormat_dst(filename):
         E = float(input('Enter E [J]: '))
         beta = betaFromE(m_0, E)
         gamma = gammaFromBeta(beta)
-        #z, zp = zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2)
-        z, zp = zdeltaFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2)
+        #z, zp = zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2, E)
+        z, zp = zdeltaFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2, E)
 
 
         # Make the multipart array
@@ -126,14 +126,16 @@ def loadMultipartFormat_dst(filename):
         return multipart
     return 0
 
-def zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2):
+def zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2, E):
+    energydiff = energie*constants.e-E
     z = -phi/360*beta*rf_lambda
-    zp = energie/(beta**2*gamma**3*mc2)
+    zp = energydiff/(beta**2*gamma**3*mc2)
     return z, zp
 
-def zdeltaFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2):
+def zdeltaFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2, E):
+    energydiff = energie*constants.e-E
     z = -phi/360*beta*rf_lambda
-    delta = energie/(beta**2*gamma*mc2)
+    delta = energydiff/(beta**2*gamma*mc2)
     return z, delta
 
 def saveTwiss(filename, twiss):
