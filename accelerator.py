@@ -1751,6 +1751,10 @@ class CavityMatrix(Element):
         E_1 = E_0*(1 + Deltadelta)
         print "E_0:" + str(E_0)
         print "E_1:" + str(E_1)
+
+        approxDeltadelta = self.q*V_0/P_0/constants.c*sin(self.phi_0)
+        print "approxDeltadelta: " + str(approxDeltadelta)
+
         # if k*L=pi: Deltadelta = q*V_0/P_0/constants.c*sin(phi_0)
         #z#P_1 = self.momFromE(self.EFromMom(P_0, self.m_0) + Deltadelta, self.m_0)
         #P_1 = self.momFromE(E_0 + Deltadelta, self.m_0)
