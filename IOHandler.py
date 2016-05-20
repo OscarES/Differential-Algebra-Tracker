@@ -1,5 +1,6 @@
 from __future__ import division # needed for 1/2 = 0.5
 import numpy as np
+import math
 import pickle
 import os
 import sys
@@ -128,13 +129,16 @@ def loadMultipartFormat_dst(filename):
 
 def zzpFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2, E):
     energydiff = energie*constants.e-E
-    z = -phi/360*beta*rf_lambda
+    z = -phi/2/math.pi*beta*rf_lambda
+    #z = -phi/360*beta*rf_lambda
     zp = energydiff/(beta**2*gamma**3*mc2)
     return z, zp
 
 def zdeltaFromPhiEnergie(phi, energie, beta, rf_lambda, gamma, mc2, E):
     energydiff = energie*constants.e-E
-    z = -phi/360*beta*rf_lambda
+    #print "phi: \n" + str(phi) # shows that phi goes from -pi to pi so for z it should actually be phi/(2pi)
+    z = -phi/2/math.pi*beta*rf_lambda
+    #z = -phi/360*beta*rf_lambda # wrong FIX THIS!!!
     delta = energydiff/(beta**2*gamma*mc2)
     return z, delta
 
