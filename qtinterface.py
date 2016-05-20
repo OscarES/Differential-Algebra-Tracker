@@ -1090,8 +1090,8 @@ class LatticeEditor(QGroupBox):
             self.textOrder.show()
             self.enterOrder.show()
         elif text == "Sextupole":
-            self.textK.show()
-            self.enterK.show()
+            self.textsK.show()
+            self.entersK.show()
             self.textL.show()
             self.enterL.show()
             self.textOrder.show()
@@ -1197,6 +1197,7 @@ class LatticeEditor(QGroupBox):
                 print "Not a number! n set to 0.0"
                 n = 0.0
 
+        ## Sextupole
         if not self.entersK.isHidden():
             valueOfsK = self.entersK.text()
             try:
@@ -1205,6 +1206,7 @@ class LatticeEditor(QGroupBox):
                 print "Not a number! K set to 0.0"
                 K = 0.0
 
+        ## Octupole
         if not self.enteroK.isHidden():
             valueOfoK = self.enteroK.text()
             try:
@@ -1213,7 +1215,7 @@ class LatticeEditor(QGroupBox):
                 print "Not a number! K set to 0.0"
                 K = 0.0
 
-
+        ## Order for LieAlg elements
         if not self.enterOrder.isHidden():
             valueOfOrder = self.enterOrder.text()
             try:
