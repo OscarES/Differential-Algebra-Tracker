@@ -294,6 +294,23 @@ def plot_x_before_and_after(multipartin, multipartout):
 
     plt.show()
 
+def plot_x_after(multipartout):
+    xo = [multipartout[i][0][0] for i in xrange(len(multipartout))]
+    xpo = [multipartout[i][0][1] for i in xrange(len(multipartout))]
+
+    matplotlib.rcParams.update({'font.size': 31})
+    plt.figure(0)
+
+    ax1 = plt.subplot2grid((1,1), (0,0))
+    ax1.plot(xo,xpo,'ro', zorder=1)
+    ax1.set_xlim(-0.004, 0.004)
+    ax1.set_ylim(-0.004, 0.004)
+    plt.title('Values after lattice in x')
+    plt.xlabel('x [m]')
+    plt.ylabel('x\' []')
+
+    plt.show()
+
 def plot_z_before_and_after(multipartin, multipartout):
 
     zin = [multipartin[i][0][4] for i in xrange(len(multipartin))]
