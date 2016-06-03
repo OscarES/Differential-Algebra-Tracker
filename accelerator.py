@@ -1730,14 +1730,7 @@ class CavityMatrix(Element):
             [0, 0, 0, 0, -beta_0**2*gamma_0**2*wp**2*sp, cp] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski)
             ])
         # same
-        self.mrf = np.array([
-            [0],
-            [0],
-            [0],
-            [0],
-            [(1-cos(wp*self.L))*tan(self.phi_0)/self.k],
-            [beta_0**2*gamma_0**2*wp*sin(wp*self.L)*tan(self.phi_0)/self.k] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski)
-            ])
+        self.mrf = np.array([0, 0, 0, 0, (1-cos(wp*self.L))*tan(self.phi_0)/self.k, beta_0**2*gamma_0**2*wp*sin(wp*self.L)*tan(self.phi_0)/self.k])# Deltadelta!!! (see eqn 2.54 and 2.55 in wolski)
         print "beta_0**2*gamma_0**2: " + str(beta_0**2*gamma_0**2)
         print "wp: " + str(wp)
         print "sin(wp*self.L): " + str(sin(wp*self.L))
@@ -1774,14 +1767,15 @@ class CavityMatrix(Element):
             [0, 0, 0, 0, 0, P_0/P_1] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski)
             ])
         # same
-        self.m_deltaP = np.array([
-            [0],
-            [0],
-            [0],
-            [0],
-            [0],
-            [1/(beta_1)*(gamma_0/gamma_1-1)] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski) # The divide by c isn't in wolski and doesn't give right dimensions but it makes my results work... *constants.c
-            ])
+        #self.m_deltaP = np.array([
+        #    [0],
+        #    [0],
+        #    [0],
+        #    [0],
+        #    [0],
+        #    [1/(beta_1)*(gamma_0/gamma_1-1)] # Deltadelta!!! (see eqn 2.54 and 2.55 in wolski) # The divide by c isn't in wolski and doesn't give right dimensions but it makes my results work... *constants.c
+        #    ])
+        self.m_deltaP = np.array([0, 0, 0, 0, 0, 1/(beta_1)*(gamma_0/gamma_1-1)])# Deltadelta!!! (see eqn 2.54 and 2.55 in wolski) # The divide by c isn't in wolski and doesn't give right dimensions but it makes my results work... *constants.c
         self.newbeta = beta_1
         self.newE = E_1
 
@@ -1794,8 +1788,26 @@ class CavityMatrix(Element):
         print "Total matrix: \n" + str(np.dot(self.R_deltaP, self.Rrf))
         print "Total +m: \n" + str(np.dot(self.R_deltaP, self.mrf) + self.m_deltaP)
         for j in range(0,len(np.atleast_1d(multipart))):
-            multipart[j] = np.array([np.dot(self.Rrf, multipart[j][0][0:6]) + self.mrf, multipart[j][1] + self.L])
-            multipart[j] = np.array([np.dot(self.R_deltaP, multipart[j][0][0:6]) + self.m_deltaP, multipart[j][1]])
+            #multipart[j] = np.array([np.dot(self.Rrf, multipart[j][0][0:6]) + self.mrf, multipart[j][1] + self.L])
+            #multipart[j] = np.array([np.dot(self.R_deltaP, multipart[j][0][0:6]) + self.m_deltaP, multipart[j][1]])
+
+            #print "multipart[j] before first calc: " + str(multipart[j])
+            #multipart[j] = np.array([np.dot(self.Rrf, multipart[j][0]) + self.mrf, multipart[j][1] + self.L])
+            #print "Next particle"
+            #print "multipart[j] after first calc: " + str(multipart[j])
+            #multipart[j] = np.array([np.dot(self.R_deltaP, multipart[j][0]) + self.m_deltaP, multipart[j][1]])
+            #print "multipart[j] after second calc: " + str(multipart[j])
+
+            #print "multipart[j] before first calc: " + str(multipart[j])
+            #print "multipart[j][0] before first calc: " + str(multipart[j][0])
+            #print "np.dot(self.Rrf, multipart[j][0][0:6]): \n" + str(np.dot(self.Rrf, multipart[j][0][0:6]))
+            #print "np.dot(self.Rrf, multipart[j][0][0:6]) + self.mrf: \n" + str(np.dot(self.Rrf, multipart[j][0][0:6]) + self.mrf)
+            multipart[j][0][0:6] = np.dot(self.Rrf, multipart[j][0][0:6]) + self.mrf
+            multipart[j][1] = multipart[j][1] + self.L
+            #print "Next particle"
+            #print "multipart[j] after first calc: " + str(multipart[j])
+            multipart[j][0][0:6] = np.dot(self.R_deltaP, multipart[j][0][0:6]) + self.m_deltaP
+            #print "multipart[j] after second calc: " + str(multipart[j])
         beamdata[0] = self.newbeta # new beta 
         beamdata[4] = self.newE
         print "new beamdata: \n" + str(beamdata)
