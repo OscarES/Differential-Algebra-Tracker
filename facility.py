@@ -77,7 +77,7 @@ class Facility():
         return beamdata
 
     def getDefaultTwiss(self):
-        twiss = np.array([0.0, 10.3338028723, 1e-06, -3.331460652e-16, 8.85901414121, 1e-06, 0.0, 10.3338028723, 1e-06])
+        twiss = np.array([0.0, 10.3338028723, 3.14159e-06, -3.331460652e-16, 8.85901414121, 3.14159e-06, 0.0, 10.3338028723, 1e-06])
         return twiss
     ## End Setup
 
