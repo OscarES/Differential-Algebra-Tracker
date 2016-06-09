@@ -20,6 +20,7 @@ import time
 # beamdata comes as [beta, rf_lambda, m, q, E, nbrOfParticles, I]
 # the units for beamdata: beta is unitless, rf_lambda is in m, m is in kg, q is in C, E is in J (should be in Mev later), nbrOfParticles is unitless, I is Ameperes
 # twiss comes as [alpha_x, beta_x, epsilon_rms_x, alpha_y, beta_y, epsilon_rms_y, alpha_z, beta_z, epsilon_rms_z]
+# realtwiss comes as [beta_x, alpha_x, gamma_x, beta_y, alpha_y, gamma_y, beta_z, alpha_z, gamma_z]
 # the units for twiss: alpha is unitless, beta is in m, epsilon is in m*rad
 # multipart is an array of particles which comes as [[x, xp, y, yp, z, zp], s] with unit m for x, y, z and s. xp, yp and zp are unitless.
 class Lattice:
@@ -170,6 +171,7 @@ class Lattice:
         multipart = copy.deepcopy(multipartin)
         envelope = copy.deepcopy(envelopein)
         twiss = copy.deepcopy(twissin)
+        realtwiss = np.array([twiss[1], twiss[0], (1+twiss[0]**2)/twiss[1], twiss[4], twiss[3], (1+twiss[3]**2)/twiss[4], twiss[7], twiss[6], (1+twiss[6]**2)/twiss[7]])
         envlist = list()
         envlist.append(np.array([envelope, 0]))
         multipartafterall = copy.deepcopy(multipartin)
@@ -184,9 +186,9 @@ class Lattice:
                 for elem in self.lattice:
                     #print elem.printInfo()
                     if elem.printInfo().startswith("cavmat"):
-                        multipart,envelope, twiss, env_with_s, self.beamdata = elem.evaluateWithoutSC(multipart,envelope,twiss, self.beamdata)
+                        multipart,envelope, twiss, env_with_s, self.beamdata, realtwiss = elem.evaluateWithoutSC(multipart,envelope,twiss, self.beamdata, realtwiss)
                     else:
-                        multipart,envelope, twiss, env_with_s = elem.evaluateWithoutSC(multipart,envelope,twiss)
+                        multipart,envelope, twiss, env_with_s, realtwiss = elem.evaluateWithoutSC(multipart,envelope,twiss, realtwiss)
                     env_with_s[1] = env_with_s[1] + envlist[-1][1]
                     envlist.append(env_with_s)
                     #for i in range(len(multipart)): # for saving the particles after each element
@@ -194,7 +196,7 @@ class Lattice:
         t1 = time.clock()
         tdiff = t1-t0
         print "Evaluation finished, time = " + str(tdiff)
-        return multipart,envelope, twiss, envlist, multipartafterall
+        return multipart,envelope, twiss, envlist, multipartafterall, realtwiss
 
     def relativityAtTheEnd(self, multipart,envelope):
         return multipart,envelope
@@ -305,25 +307,26 @@ class Drift(LinearElement):
             
         return multipart, envelope, twiss, env_with_s
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss,realtwiss):
         # some for loop that goes through all of the disunited parts
         for i in range(0,self.n):
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #twiss[7] = envelope[6] / twiss[8]
-            multipart, envelope, env_with_s = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope, env_with_s, realtwiss = self.evaluateMT(multipart,envelope,realtwiss) # use the new data for "normal" evaluation
             
-        return multipart, envelope, twiss, env_with_s
+        return multipart, envelope, twiss, env_with_s, realtwiss
 
-    def evaluateMT(self,multipart,envelope):
+    def evaluateMT(self,multipart,envelope,realtwiss):
         # should just go through a disunited part
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j][0][0:6] = np.dot(self.Msp, multipart[j][0][0:6])
             multipart[j][1] = multipart[j][1] + self.Lsp
+        realtwiss = np.dot(self.Tsp, realtwiss)
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([envelope, self.Lsp])
-        return multipart, envelope, env_with_s
+        return multipart, envelope, env_with_s, realtwiss
 
 ### DIPOLE
 class Dipole(LinearElement):
@@ -416,28 +419,29 @@ class Dipole(LinearElement):
             #print "twiss[7] after: " + str(twiss[7])
         return multipart, envelope, twiss, env_with_s
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss,realtwiss):
         # some for loop that goes through all of the disunited parts
         #print "hej fran quad"
         for i in range(0,self.n):
-            multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope, env_with_s, realtwiss = self.evaluateM(multipart,envelope,realtwiss) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
             #twiss[7] = envelope[6] / twiss[8]
             #print "twiss[7] after: " + str(twiss[7])
-        return multipart, envelope, twiss, env_with_s
+        return multipart, envelope, twiss, env_with_s, realtwiss
 
-    def evaluateM(self,multipart,envelope):
+    def evaluateM(self,multipart,envelope,realtwiss):
         # should just go through a disunited part
         # each loop iteration is for a new particle
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j][0][0:6] = np.dot(self.Msp, multipart[j][0][0:6])
             multipart[j][1] = multipart[j][1] + self.Lsp
+        realtwiss = np.dot(self.Tsp, realtwiss)
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([envelope, self.Lsp])
-        return multipart, envelope, env_with_s
+        return multipart, envelope, env_with_s, realtwiss
 
 ### QUAD
 class Quad(LinearElement):
@@ -544,28 +548,29 @@ class Quad(LinearElement):
             #print "twiss[7] after: " + str(twiss[7])
         return multipart, envelope, twiss, env_with_s
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss,realtwiss):
         # some for loop that goes through all of the disunited parts
         #print "hej fran quad"
         for i in range(0,self.n):
-            multipart, envelope, env_with_s = self.evaluateM(multipart,envelope) # use the new data for "normal" evaluation
+            multipart, envelope, env_with_s, realtwiss = self.evaluateM(multipart,envelope,realtwiss) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
             #twiss[7] = envelope[6] / twiss[8]
             #print "twiss[7] after: " + str(twiss[7])
-        return multipart, envelope, twiss, env_with_s
+        return multipart, envelope, twiss, env_with_s, realtwiss
 
-    def evaluateM(self,multipart,envelope):
+    def evaluateM(self,multipart,envelope,realtwiss):
         # should just go through a disunited part
         # each loop iteration is for a new particle
         for j in range(0,len(np.atleast_1d(multipart))):
             multipart[j][0][0:6] = np.dot(self.Msp, multipart[j][0][0:6])
             multipart[j][1] = multipart[j][1] + self.Lsp
+        realtwiss = np.dot(self.Tsp, realtwiss)
         #envelope = np.dot(self.Tsp, envelope)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([envelope, self.Lsp])
-        return multipart, envelope, env_with_s
+        return multipart, envelope, env_with_s, realtwiss
 
 ### SPACE CHARGE!!!!! C. Allen's approach
 class SpaceCharge(LinearElement):
@@ -1128,14 +1133,14 @@ class LieAlgElement(Element):
             #twiss[7] = envelope[6] / twiss[8]
         return multipart, envelope, twiss, env_with_s
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss,realtwiss):
         # some for loop that goes through all of the disunited parts
         for i in range(0,self.n):
             multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #twiss[7] = envelope[6] / twiss[8]
-        return multipart, envelope, twiss, env_with_s
+        return multipart, envelope, twiss, env_with_s, realtwiss
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
@@ -1217,14 +1222,14 @@ class SextupoleMat(Element): # Based on wolski ch 10, mainly eqn (10.6)
             #twiss[7] = envelope[6] / twiss[8]
         return multipart, envelope, twiss, env_with_s
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss,realtwiss):
         # some for loop that goes through all of the disunited parts
         for i in range(0,self.n):
             multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
             #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
             #twiss[4] = envelope[3] / twiss[5]
             #twiss[7] = envelope[6] / twiss[8]
-        return multipart, envelope, twiss, env_with_s
+        return multipart, envelope, twiss, env_with_s, realtwiss
 
     def evaluate(self,multipart,envelope,twiss):
         # some for loop that goes through all of the disunited parts
@@ -1295,12 +1300,12 @@ class SextupoleMatEma(Element): # from ema's lecture 4
         #twiss[7] = envelope[6] / twiss[8]
         return multipart, envelope, twiss, env_with_s
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss,realtwiss):
         multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
         #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
         #twiss[4] = envelope[3] / twiss[5]
         #twiss[7] = envelope[6] / twiss[8]
-        return multipart, envelope, twiss, env_with_s
+        return multipart, envelope, twiss, env_with_s, realtwiss
 
     def evaluate(self,multipart,envelope,twiss):
         multipart, envelope, env_with_s = self.evaluateNumFun(multipart,envelope) # use the new data for "normal" evaluation
@@ -1365,13 +1370,13 @@ class Rotation(LinearElement):
     def updateSC(self, spaceChargeOn, nbrOfSplits, multipart, twiss, beamdata):
         return
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss,realtwiss):
         #twiss[1] = envelope[0] / twiss[2] # updating beta: beta = sigma**2/epsilon (envelope[0] is sigma_x**2)
         #twiss[4] = envelope[3] / twiss[5]
         #twiss[7] = envelope[6] / twiss[8]
         multipart, envelope, env_with_s = self.evaluateMT(multipart,envelope) # use the new data for "normal" evaluation
             
-        return multipart, envelope, twiss, env_with_s
+        return multipart, envelope, twiss, env_with_s, realtwiss
 
     def evaluateMT(self,multipart,envelope):
         # should just go through a disunited part
@@ -1606,7 +1611,7 @@ class Cavity(Element):
             #print "twiss[7] after: " + str(twiss[7])
         return multipart, envelope, twiss, env_with_s
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss):
+    def evaluateWithoutSC(self,multipart,envelope,twiss,realtwiss):
         # some for loop that goes through all of the disunited parts
         # WARNING THE ELEMENT IS NEVER SPLIT SO THAT IT WILL BE n NORMAL SIZED ELEMENT IN THE PLACE OF THE WHOLE ELEMENT
         for i in range(0,self.n):
@@ -1616,7 +1621,7 @@ class Cavity(Element):
             #print "twiss[7] before: " + str(twiss[7]) + " \t name: " + self.name
             #twiss[7] = envelope[6] / twiss[8]
             #print "twiss[7] after: " + str(twiss[7])
-        return multipart, envelope, twiss, env_with_s
+        return multipart, envelope, twiss, env_with_s, realtwiss
 
     def evaluateM(self,multipart,envelope):
         # should just go through a disunited part
@@ -1779,7 +1784,7 @@ class CavityMatrix(Element):
         self.newbeta = beta_1
         self.newE = E_1
 
-    def evaluateWithoutSC(self,multipart,envelope,twiss, beamdata): # beamdata can be made seperately since energy change is stored in z'
+    def evaluateWithoutSC(self,multipart,envelope,twiss, beamdata, realtwiss): # beamdata can be made seperately since energy change is stored in z'
         self.elementFromBeamE(beamdata[0],beamdata[4]) # Update the T and all else that follows...
         print "self.Rrf: \n" + str(self.Rrf)
         print "self.mrf: \n" + str(self.mrf)
@@ -1813,7 +1818,7 @@ class CavityMatrix(Element):
         print "new beamdata: \n" + str(beamdata)
         envelope = envelopeFromMultipart(multipart)
         env_with_s = np.array([envelope, self.L])
-        return multipart, envelope, twiss, env_with_s, beamdata
+        return multipart, envelope, twiss, env_with_s, beamdata, realtwiss
 
 # references
 # 1. simulatingbeamswithellipsoidalsymmetry-secondedition

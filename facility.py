@@ -3,7 +3,7 @@ from scipy import constants
 from relativity import betaFromE
 from particleFactory import gaussianTwiss3D, envelopeFromMultipart, straightxxp, singleparticle
 import numpy as np
-from plotting import plotEverything, plot_x_before_and_after, plot_x_after, plot_z_before_and_after
+from plotting import plotEverything, plot_x_before_and_after, plot_x_after, plot_z_before_and_after, plot_x_with_mulpart_and_twiss
 from profilehooks import profile
 
 
@@ -148,7 +148,7 @@ class Facility():
         return self.lattice.printMatrices()
 
     def evaluate(self):
-        self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist, self.multipartafterall = self.lattice.evaluate(self.multipart,self.envelope,self.twiss)
+        self.resultmultipart, self.resultenvelope, self.resulttwiss, self.resultenvlist, self.multipartafterall, self.resultrealtwiss = self.lattice.evaluate(self.multipart,self.envelope,self.twiss)
 
     @profile(immediate=true)
     def evaluateWithProfiling(self):
@@ -166,3 +166,8 @@ class Facility():
         plot_x_before_and_after(self.multipart, self.resultmultipart)
         plot_x_after(self.resultmultipart)
         plot_z_before_and_after(self.multipart, self.resultmultipart)
+
+        # plot mulpart and twiss
+        realtwissin = np.array([self.twiss[1], self.twiss[0], (1+self.twiss[0]**2)/self.twiss[1], self.twiss[4], self.twiss[3], (1+self.twiss[3]**2)/self.twiss[4], self.twiss[7], self.twiss[6], (1+self.twiss[6]**2)/self.twiss[7]])
+        emittance_x = self.twiss[2]
+        plot_x_with_mulpart_and_twiss(self.multipart, realtwissin, self.resultmultipart, self.resultrealtwiss, emittance_x)

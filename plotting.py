@@ -5,6 +5,7 @@ from matplotlib.patches import Ellipse
 import numpy as np
 from scipy import constants
 from particleFactory import envelopeFromMultipart
+import math
 
 def plotEverything(multipartin,twiss,multipartout, envlist, multipartafterall):#,envx,envy):
     xin = [multipartin[i][0][0] for i in xrange(len(multipartin))]
@@ -376,5 +377,56 @@ def plotPhaseSpace(x,xp,y,yp):
     plt.plot(y,yp,'ro')
     plt.xlabel('y [m]')
     plt.ylabel('yp [rad]')
+
+    plt.show()
+
+def plot_x_with_mulpart_and_twiss(multipartin, twissin, multipartout, twissout, emittance_x):
+    xin = [multipartin[i][0][0] for i in xrange(len(multipartin))]
+    xpin = [multipartin[i][0][1] for i in xrange(len(multipartin))]
+
+    beta_x_in = twissin[0]
+    alpha_x_in = twissin[1]
+    gamma_x_in = twissin[2]
+
+    a = math.sqrt(emittance_x*beta_x_in)
+    b = math.sqrt(emittance_x*gamma_x_in)
+    phi = 1/2*math.atan(2*alpha_x_in/(gamma_x_in-beta_x_in))
+
+    xo = [multipartout[i][0][0] for i in xrange(len(multipartout))]
+    xpo = [multipartout[i][0][1] for i in xrange(len(multipartout))]
+
+    beta_x_out = twissout[0]
+    alpha_x_out = twissout[1]
+    gamma_x_out = twissout[2]
+
+    a_after = math.sqrt(emittance_x*beta_x_out)
+    b_after = math.sqrt(emittance_x*gamma_x_out)
+    phi_after = 1/2*math.atan(2*alpha_x_out/(gamma_x_out-beta_x_out))
+
+    ellipse_x = Ellipse((0,0), 2*a, 2*b, -phi*180/constants.pi, linewidth=5)
+    ellipse_x.set_facecolor('none')
+    ellipse_x.set_edgecolor((0,0,1))
+
+    ellipse_x_after = Ellipse((0,0), 2*a_after, 2*b_after, -phi_after*180/constants.pi, linewidth=5)
+    ellipse_x_after.set_facecolor('none')
+    ellipse_x_after.set_edgecolor((0,0,1))
+
+    plt.figure(0)
+
+    ax1 = plt.subplot2grid((1,2), (0,0))
+    ax1.add_artist(ellipse_x)
+    ax1.plot(xin,xpin,'ro', zorder=1)
+    plt.title('Initial values in x')
+    plt.xlabel('x [m]')
+    plt.ylabel('x\' []')
+
+    ax2 = plt.subplot2grid((1,2), (0, 1))
+    ax2.add_artist(ellipse_x_after)
+    ax2.plot(xo,xpo,'ro', zorder=1)
+    #ax2.set_xlim(-0.004, 0.004)
+    #ax2.set_ylim(-0.004, 0.004)
+    plt.title('Values after all elems in lattice in x')
+    plt.xlabel('x [m]')
+    plt.ylabel('x\' []')
 
     plt.show()
